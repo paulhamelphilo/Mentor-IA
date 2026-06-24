@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -207,6 +207,11 @@
             margin-top: 15px;
         }
 
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
         .footer-credit {
             position: fixed;
             right: 10px;
@@ -235,22 +240,71 @@
             </div>
 
             <div id="selector-dissertation">
-                <label><strong>1. Choisissez une notion :</strong></label>
-                <select id="select-notion" onchange="updateSujets()">
-                    <option value="">-- Sélectionnez une notion --</option>
-                </select>
+                <div id="dissertation-predefined">
+                    <label><strong>1. Choisissez une notion :</strong></label>
+                    <select id="select-notion" onchange="updateSujets()">
+                        <option value="">-- Sélectionnez une notion --</option>
+                    </select>
 
-                <label style="margin-top:15px; display:block;"><strong>2. Choisissez un sujet :</strong></label>
-                <select id="select-sujet" disabled>
-                    <option value="">-- Sélectionnez d'abord une notion --</option>
-                </select>
+                    <label style="margin-top:15px; display:block;"><strong>2. Choisissez un sujet :</strong></label>
+                    <select id="select-sujet" disabled>
+                        <option value="">-- Sélectionnez d'abord une notion --</option>
+                    </select>
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleDissertationMode(true)">✍
+                            Saisir un sujet personnalisé</button>
+                    </div>
+                </div>
+                <div id="dissertation-custom" style="display:none;">
+                    <label><strong>Saisir votre sujet personnalisé :</strong></label>
+                    <input type="text" id="input-custom-sujet" placeholder="Ex: Peut-on être libre sans l'État ?"
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="toggleDissertationMode(false)">📋 Choisir dans la liste</button>
+                    </div>
+                </div>
             </div>
 
             <div id="selector-explication" style="display:none;">
-                <label><strong>Choisissez un texte à expliquer :</strong></label>
-                <select id="select-explic-text" onchange="selectExplicText(this.value)">
-                    <option value="">-- Sélectionnez un texte --</option>
-                </select>
+                <div id="explication-predefined">
+                    <label><strong>Choisissez un texte à expliquer :</strong></label>
+                    <select id="select-explic-text" onchange="selectExplicText(this.value)">
+                        <option value="">-- Sélectionnez un texte --</option>
+                    </select>
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleExplicationMode(true)">✍
+                            Saisir un texte personnalisé</button>
+                    </div>
+                </div>
+                <div id="explication-custom" style="display:none;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <label><strong>Auteur :</strong></label>
+                            <input type="text" id="input-custom-author" placeholder="Ex: Descartes"
+                                oninput="updateCustomExplication()"
+                                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label><strong>Œuvre :</strong></label>
+                            <input type="text" id="input-custom-work" placeholder="Ex: Discours de la méthode"
+                                oninput="updateCustomExplication()"
+                                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
+                        </div>
+                    </div>
+                    <label><strong>Texte à expliquer :</strong></label>
+                    <textarea id="textarea-custom-text" rows="6" placeholder="Collez le texte ici..."
+                        oninput="updateCustomExplication()"
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px; resize: vertical; font-family: inherit;"></textarea>
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleExplicationMode(false)">📋
+                            Choisir dans la liste</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -490,7 +544,20 @@
             "17. La vérité": ["À quoi peut-on reconnaître la vérité ?", "Doit-on rechercher la vérité pour elle-même ?", "Doit-on toujours dire la vérité ?", "Faut-il chercher la vérité à tout prix ?", "L’unanimité est-elle un critère de vérité ?", "La vérité est-elle toujours préférable à l’illusion ?", "La vérité s’impose-t-elle d’elle-même ?", "Pourquoi vouloir à tout prix connaître la vérité ?", "L’art est-il un moyen d’accéder à la vérité ?", "La vérité rend-elle heureux ?", "Connaître la vérité nous rend-il plus libres ?", "La raison est-elle la source de toute vérité ?", "N’y a-t-il de vérité que dans les sciences ?", "L’expérience est-elle source de vérité ?", "La vérité n’est-elle qu’un question d’interprétation ?"]
         };
 
-        let state = { exerciseType: 'dissertation', mode: 'intro', tab: 'methodo', training: { dissertation: { intro: null, dev: null }, explic: { intro: null, dev: null } }, explicTexts: [], currentExplicTextIndex: null, currentExplicText: null };
+        let state = {
+            exerciseType: 'dissertation',
+            mode: 'intro',
+            tab: 'methodo',
+            training: {
+                dissertation: { intro: null, dev: null },
+                explic: { intro: null, dev: null }
+            },
+            explicTexts: [],
+            currentExplicTextIndex: null,
+            currentExplicText: null,
+            isCustomDissertation: false,
+            isCustomExplication: false
+        };
 
         const content = {
             explic: {
@@ -647,6 +714,54 @@
             render();
         }
 
+        function toggleDissertationMode(isCustom) {
+            state.isCustomDissertation = isCustom;
+            document.getElementById('dissertation-predefined').style.display = isCustom ? 'none' : 'block';
+            document.getElementById('dissertation-custom').style.display = isCustom ? 'block' : 'none';
+            if (!isCustom) {
+                document.getElementById('input-custom-sujet').value = '';
+            }
+            render();
+        }
+
+        function toggleExplicationMode(isCustom) {
+            state.isCustomExplication = isCustom;
+            document.getElementById('explication-predefined').style.display = isCustom ? 'none' : 'block';
+            document.getElementById('explication-custom').style.display = isCustom ? 'block' : 'none';
+            if (!isCustom) {
+                document.getElementById('input-custom-author').value = '';
+                document.getElementById('input-custom-work').value = '';
+                document.getElementById('textarea-custom-text').value = '';
+                selectExplicText(document.getElementById('select-explic-text').value);
+            } else {
+                updateCustomExplication();
+            }
+            render();
+        }
+
+        function updateCustomExplication() {
+            const author = document.getElementById("input-custom-author").value.trim();
+            const work = document.getElementById("input-custom-work").value.trim();
+            const text = document.getElementById("textarea-custom-text").value.trim();
+
+            if (!text) {
+                state.currentExplicText = null;
+            } else {
+                let htmlContent = "";
+                if (author || work) {
+                    htmlContent += `<h3>${author || ''}${author && work ? ', ' : ''}<em>${work || ''}</em></h3>`;
+                }
+                htmlContent += `<p>${text.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+                state.currentExplicText = {
+                    author,
+                    work,
+                    label: (author && work) ? `${author}, ${work}` : (author || work || "Texte personnalisé"),
+                    html: htmlContent
+                };
+            }
+            render();
+        }
+
         function setTab(t) {
             preserveTrainingText();
             state.tab = t;
@@ -733,19 +848,31 @@
             let selectedTextTitle = null;
 
             if (state.exerciseType === 'dissertation') {
-                sujet = document.getElementById("select-sujet").value;
-                if (!sujet) {
-                    alert("Veuillez sélectionner un sujet avant de demander la correction.");
-                    return;
+                if (state.isCustomDissertation) {
+                    sujet = document.getElementById("input-custom-sujet").value.trim();
+                    if (!sujet) {
+                        alert("Veuillez saisir votre sujet personnalisé avant de demander la correction.");
+                        return;
+                    }
+                } else {
+                    sujet = document.getElementById("select-sujet").value;
+                    if (!sujet) {
+                        alert("Veuillez sélectionner un sujet avant de demander la correction.");
+                        return;
+                    }
                 }
             } else {
                 // explication de texte
                 if (!state.currentExplicText) {
-                    alert("Veuillez sélectionner un texte en haut de la page avant de demander la correction.");
+                    if (state.isCustomExplication) {
+                        alert("Veuillez saisir le texte à expliquer avant de demander la correction.");
+                    } else {
+                        alert("Veuillez sélectionner un texte en haut de la page avant de demander la correction.");
+                    }
                     return;
                 }
                 selectedTextHtml = state.currentExplicText.html;
-                selectedTextTitle = state.currentExplicText.title;
+                selectedTextTitle = state.currentExplicText.label || state.currentExplicText.title;
             }
 
             let trainingText = document.getElementById("training-textarea") ? document.getElementById("training-textarea").value.trim() : '';
