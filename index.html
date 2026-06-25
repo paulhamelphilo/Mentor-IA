@@ -1005,7 +1005,7 @@
                 <div class="workspace-layout">
                     <div class="editor-column">
                         <div class="form-group">
-                            <label>Rédigez votre exercice sans enlever les balises ci-dessous :</label>
+                            <label>Rédigez sans enlever les balises ci-dessous</label>
                             <textarea id="training-textarea" rows="18" maxlength="${maxLength}" oninput="preserveAndCount(this)">${currentText}</textarea>
                             <div id="char-count" style="text-align: right; font-size: 13px; color: ${charInfo.color}; font-weight: ${charInfo.fontWeight}; margin-top: 5px;">${charInfo.label}</div>
                         </div>
@@ -1077,11 +1077,21 @@
                 return;
             }
 
+            // Vérifier si l'utilisateur a écrit du contenu réel en dehors des balises [BALISE]
+            const cleanTextForValidation = trainingText.replace(/\[[^\]]+\]/g, '').trim();
+            if (cleanTextForValidation.length < 10) {
+                alert("Veuillez rédiger votre travail avant de demander la correction.");
+                return;
+            }
+
+            // Nettoyer les balises vides (sans contenu rédigé par l'élève) pour éviter les hallucinations du correcteur IA
+            const cleanedTrainingText = trainingText.replace(/\[[^\]]+\]\s*(?=\[[^\]]+\]|$)/g, '').trim();
+
             document.getElementById("loading-msg").style.display = "block";
             document.getElementById("correction-box").style.display = "none";
 
             try {
-                const body = { sujet, type: state.exerciseType, mode: state.mode, texte: trainingText };
+                const body = { sujet, type: state.exerciseType, mode: state.mode, texte: cleanedTrainingText };
                 if (state.exerciseType === 'explication') {
                     body.selectedTextTitle = selectedTextTitle;
                     body.selectedTextHtml = selectedTextHtml;
