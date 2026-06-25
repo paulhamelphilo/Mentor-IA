@@ -1060,7 +1060,7 @@
                     }
                 }
             } else {
-                // explication de texte
+                // Explication de texte
                 if (!state.currentExplicText) {
                     if (state.isCustomExplication) {
                         alert("Veuillez saisir le texte à expliquer avant de demander la correction.");
@@ -1086,6 +1086,17 @@
                 return;
             }
 
+            // ==========================================
+            // 🛠️ ÉTAPE 1 : RETOUR VISUEL ET SÉCURISATION DU BOUTON
+            // ==========================================
+            const btnSubmit = document.querySelector(".btn-submit");
+            if (btnSubmit) {
+                btnSubmit.disabled = true;          // Bloque les clics frénétiques
+                btnSubmit.innerText = "⏳ Analyse en cours..."; // Indique que l'IA travaille
+                btnSubmit.style.opacity = "0.6";    // Grise légèrement le bouton
+                btnSubmit.style.cursor = "not-allowed";
+            }
+
             document.getElementById("loading-msg").style.display = "block";
             document.getElementById("correction-box").style.display = "none";
 
@@ -1104,27 +1115,54 @@
 
                 if (!response.ok) throw new Error("Le serveur a rencontré un problème.");
 
-                const data = await response.json();
-                const correctionHtml = marked.parse(data.correction || "Aucune correction disponible.");
-                if (state.exerciseType === 'dissertation') {
-                    state.corrections.dissertation[state.mode] = correctionHtml;
-                } else {
-                    state.corrections.explic[state.mode] = correctionHtml;
-                }
-                document.getElementById("correction-text").innerHTML = correctionHtml;
+                // Configuration pour lire le flux progressif
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
 
-                // 1. On affiche la boîte de correction
+                // Vider et afficher la boîte de correction dès le début
+                document.getElementById("correction-text").innerHTML = "";
                 document.getElementById("correction-box").style.display = "block";
-
-                // 2. On fait défiler l'écran doucement jusqu'à elle
                 document.getElementById("correction-box").scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
+
+                let texteCumule = "";
+
+                // Boucle de lecture du flux en temps réel
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break; // Fin du flux
+
+                    // Convertir le morceau de binaire en texte et l'ajouter
+                    const chunk = decoder.decode(value, { stream: true });
+                    texteCumule += chunk;
+
+                    // Mettre à jour l'affichage Markdown à la volée grâce à marked
+                    document.getElementById("correction-text").innerHTML = marked.parse(texteCumule);
+                }
+
+                // Sauvegarder la correction finale dans le state de l'application
+                const correctionHtmlFinale = marked.parse(texteCumule);
+                if (state.exerciseType === 'dissertation') {
+                    state.corrections.dissertation[state.mode] = correctionHtmlFinale;
+                } else {
+                    state.corrections.explic[state.mode] = correctionHtmlFinale;
+                }
             } catch (error) {
                 alert("Erreur lors de la communication avec le correcteur : " + error.message);
             } finally {
                 document.getElementById("loading-msg").style.display = "none";
+
+                // ==========================================
+                // 🛠️ ÉTAPE 2 : RÉACTIVATION OBLIGATOIRE DU BOUTON (MÊME SI BUG)
+                // ==========================================
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;         // Le bouton redevient cliquable
+                    btnSubmit.innerText = "Correction IA"; // Reprend son texte d'origine
+                    btnSubmit.style.opacity = "1";       // Reprend son opacité normale
+                    btnSubmit.style.cursor = "pointer";
+                }
             }
         }
     </script>
