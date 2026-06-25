@@ -356,7 +356,7 @@
         <h1>Mentor IA philo</h1>
 
         <div class="global-selector">
-            <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Mode :</strong></label>
+            <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Mode</strong></label>
             <div class="exercise-type-nav">
                 <button id="btn-ex-type-dis" class="btn active"
                     onclick="setExerciseType('dissertation')">Dissertation</button>
@@ -366,14 +366,14 @@
 
             <div id="selector-dissertation">
                 <div id="dissertation-predefined">
-                    <label><strong>1. Choisissez une notion :</strong></label>
+                    <label><strong>Notion</strong></label>
                     <select id="select-notion" onchange="updateSujets()">
                         <option value="">-- Sélectionnez une notion --</option>
                     </select>
 
-                    <label style="margin-top:15px; display:block;"><strong>2. Choisissez un sujet :</strong></label>
+                    <label style="margin-top:15px; display:block;"><strong>Sujet à travailler</strong></label>
                     <select id="select-sujet" disabled>
-                        <option value="">-- Sélectionnez d'abord une notion --</option>
+                        <option value="">-- Sélectionnez d’abord une notion --</option>
                     </select>
 
                     <div style="margin-top:12px; text-align:right;">
@@ -395,7 +395,7 @@
 
             <div id="selector-explication" style="display:none;">
                 <div id="explication-predefined">
-                    <label><strong>Choisissez un texte à expliquer :</strong></label>
+                    <label><strong>Texte à expliquer</strong></label>
                     <select id="select-explic-text" onchange="selectExplicText(this.value)">
                         <option value="">-- Sélectionnez un texte --</option>
                     </select>
@@ -408,19 +408,19 @@
                 <div id="explication-custom" style="display:none;">
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                         <div style="flex: 1;">
-                            <label><strong>Auteur :</strong></label>
+                            <label><strong>Auteur</strong></label>
                             <input type="text" id="input-custom-author" placeholder="Ex: Descartes"
                                 oninput="updateCustomExplication()"
                                 style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
                         </div>
                         <div style="flex: 1;">
-                            <label><strong>Œuvre :</strong></label>
+                            <label><strong>Œuvre</strong></label>
                             <input type="text" id="input-custom-work" placeholder="Ex: Discours de la méthode"
                                 oninput="updateCustomExplication()"
                                 style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
                         </div>
                     </div>
-                    <label><strong>Texte à expliquer :</strong></label>
+                    <label><strong>Texte à expliquer</strong></label>
                     <textarea id="textarea-custom-text" rows="6" placeholder="Collez le texte ici..."
                         oninput="updateCustomExplication()"
                         style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px; resize: vertical; font-family: inherit;"></textarea>
@@ -687,7 +687,7 @@
         const content = {
             explic: {
                 intro: {
-                    methodo: `<h2>Méthodologie de l'introduction de l'explication de texte</h2>
+                    methodo: `<h2>Méthodologie de l’introduction de l’explication de texte</h2>
                 <div class="methodo-block"><h3>Thème</h3><p>Présenter le texte et son thème, en se rapportant si possible à une ou deux notions du programme. Le thème, c’est ce dont le texte parle, son objet.</p></div>
                 <div class="methodo-block"><h3>Problème</h3><p>Formuler le problème philosophique que l’auteur affronte. Le problème est la question générale à laquelle l’auteur répond en défendant sa thèse tout au long du texte.</p></div>
                 <div class="methodo-block"><h3>Thèse</h3><p>Énoncer la position originale que l’auteur défend pour répondre à ce qui fait problème sur le thème abordé.</p></div>
@@ -696,7 +696,7 @@
                     trainingTemplate: `[THEME]\n[PROBLÈME]\n[THÈSE]\n[ENJEUX]\n[ANNONCE DU PLAN]`
                 },
                 dev: {
-                    methodo: `<h2>Méthodologie du développement de l'explication de texte</h2>
+                    methodo: `<h2>Méthodologie du développement de l’explication de texte</h2>
                 <div class="methodo-block"><h3>Structure générale</h3><p>Chaque partie du développement correspond à une étape du raisonnement (en général entre 2 et 4). Au sein d’une partie, aller à la ligne pour chaque expression à expliquer, chaque argument à discuter, chaque concept à analyser.</p></div>
                 <div class="methodo-block"><h3>Ligne directrice</h3><p>Commencer chaque partie en annonçant ce que l’auteur fait et la fonction de cette étape du raisonnement.</p></div>
                 <div class="methodo-block"><h3>Explication linéaire détaillée</h3><p>Expliquer consiste à déplier et mettre en évidence ce qui demeure implicite dans le texte. Tout doit être passé au crible : ce qui n’est pas expliqué n’est pas compris. Chaque élément doit être expliqué dans le détail, dans son rapport à ce qui précède et à ce qui suit, et dans son rapport au sens global du texte.</p>
@@ -713,7 +713,7 @@
             },
 
             intro: {
-                methodo: `<h2>Méthodologie de l'introduction de la dissertation</h2>
+                methodo: `<h2>Méthodologie de l’introduction de la dissertation</h2>
             <div class="methodo-block"><h3>Amorce</h3><p>Le sujet ne tombe pas du ciel. Il faut montrer qu’une expérience concrète impose de se poser cette question (présentation d’une situation que tout le monde peut vivre, d’un évènement historique, d’une scène de roman, de film, d’un mythe, d’une citation, etc.).</p></div>
             <div class="methodo-block"><h3>Sujet</h3><p>Énoncer le sujet sans le modifier.</p></div>
             <div class="methodo-block"><h3>Évidence du sens commun</h3><p>Apporter une réponse franche et unilatérale au sujet en se fondant uniquement sur les définitions des termes principaux du sujet.</p></div>
@@ -971,9 +971,20 @@
                 ? state.corrections.dissertation[state.mode]
                 : state.corrections.explic[state.mode];
 
+            let exerciseTitle = '';
+            if (state.exerciseType === 'dissertation') {
+                exerciseTitle = state.mode === 'intro'
+                    ? "Entraînement à l’introduction de la dissertation"
+                    : "Entraînement au développement de la dissertation";
+            } else {
+                exerciseTitle = state.mode === 'intro'
+                    ? "Entraînement à l’introduction de l’explication de texte"
+                    : "Entraînement au développement de l’explication de texte";
+            }
+
             let workspaceHtml = `
                 <div class="workspace-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                    <h2 style="margin: 0;">Entraînement : ${state.mode === 'intro' ? 'Introduction' : 'Développement'}</h2>
+                    <h2 style="margin: 0;">${exerciseTitle}</h2>
                     <button class="btn btn-help ${state.showHelp ? 'active' : ''}" onclick="toggleHelp()">
                         💡 Aide méthodologique
                     </button>
