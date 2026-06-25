@@ -371,7 +371,7 @@
                         <option value="">-- Sélectionnez une notion --</option>
                     </select>
 
-                    <label style="margin-top:15px; display:block;"><strong>Sujet à travailler</strong></label>
+                    <label style="margin-top:15px; display:block;"><strong>Sujet à traiter</strong></label>
                     <select id="select-sujet" disabled>
                         <option value="">-- Sélectionnez d’abord une notion --</option>
                     </select>
@@ -693,7 +693,8 @@
                 <div class="methodo-block"><h3>Thèse</h3><p>Énoncer la position originale que l’auteur défend pour répondre à ce qui fait problème sur le thème abordé.</p></div>
                 <div class="methodo-block"><h3>Enjeux</h3><p>Faire apparaître les motivations rendant nécessaire et légitime le traitement du problème abordé, c’est-à-dire ce qu’il y a à gagner ou à perdre à accepter ou rejeter la thèse de l’auteur.</p></div>
                 <div class="methodo-block"><h3>Annonce du plan</h3><p>Présenter l’articulation logique du raisonnement de l’auteur pour prouver sa thèse. Pour chaque partie du texte, il faut présenter : d'une part, sa fonction logique dans l’argumentation générale ; d'autre part son contenu thématique propre.</p></div>`,
-                    trainingTemplate: `[THEME]\n[PROBLÈME]\n[THÈSE]\n[ENJEUX]\n[ANNONCE DU PLAN]`
+                    trainingTemplate: `[THÈME]\n[PROBLÈME]\n[THÈSE]\n[ENJEUX]\n[ANNONCE DU PLAN]`,
+                    fields: ["THÈME", "PROBLÈME", "THÈSE", "ENJEUX", "ANNONCE DU PLAN"]
                 },
                 dev: {
                     methodo: `<h2>Méthodologie du développement de l’explication de texte</h2>
@@ -708,7 +709,8 @@
                 </ul></div>
                 <div class="methodo-block"><h3>Conclusion</h3><p>Faire la synthèse de ce que l’auteur a montré dans la partie concernée et exposer les apports de l’explication : que sait-on à ce stade de l’explication ?</p></div>
                 <div class="methodo-block"><h3>Objection et transition</h3><p>Montrer ce qui fait encore défaut pour comprendre le texte, en pointant ce qu’on peut objecter au raisonnement de l’auteur au regard de sa thèse générale. Sur cette base, amorcer la transition vers la suite du raisonnement, généralement sous forme de question.</p></div>`,
-                    trainingTemplate: `[LIGNE DIRECTRICE]\n[EXPLICATION LINÉAIRE DÉTAILLÉE]\n[CONCLUSION]\n[OBJECTION ET TRANSITION]`
+                    trainingTemplate: `[LIGNE DIRECTRICE]\n[EXPLICATION SOUS-MOMENT 1]\n[EXPLICATION SOUS-MOMENT 2]\n[EXPLICATION SOUS-MOMENT 3]\n[CONCLUSION]\n[OBJECTION ET TRANSITION]`,
+                    fields: ["LIGNE DIRECTRICE", "EXPLICATION SOUS-MOMENT 1", "EXPLICATION SOUS-MOMENT 2", "EXPLICATION SOUS-MOMENT 3", "CONCLUSION", "OBJECTION ET TRANSITION"]
                 }
             },
 
@@ -727,14 +729,14 @@
             dev: {
                 methodo: `<h2>Méthodologie du développement de la dissertation</h2>
             <div class="methodo-block"><h3>Thèse</h3><p>Commencer par annoncer la thèse qui va être défendue dans la partie.</p></div>
-            <div class="methodo-block"><h3>Sous-parties (Argument & Exemple)</h3>
-            <p><strong>Argument :</strong> Justifier la thèse par une raison générale ou passer par des exemples particuliers pour en tirer une loi générale.<br>
-            <strong>Référence/Exemple :</strong> Mobiliser une référence philosophique (auteur, ouvrage, chapitre) ou un exemple général solide.</p></div>
+            <div class="methodo-block"><h3>Sous-parties (Argument & Référence/Exemple)</h3>
+            <p><strong>Argument :</strong> justifier la thèse par une raison générale ou passer par des exemples particuliers pour en tirer une loi générale.<br>
+            <strong>Référence/Exemple :</strong> mobiliser une référence philosophique (auteur, ouvrage, chapitre) ou un exemple général solide.</p></div>
             <div class="methodo-block"><h3>Conclusion de partie</h3><p>Rappel synthétique de l'analyse proposée : puisque [Arg1], que [Arg2] et que [Arg n], alors [thèse de la partie].</p></div>
             <div class="methodo-block"><h3>Objection de partie</h3><p>Montrer que la thèse est attaquable (contradiction interne, réfutation des hypothèses, ou réfutation externe).</p></div>
-            <div class="methodo-block"><h3>Transition</h3><p>Amorcer le retournement de point de vue par une question.</p></div>`,
-                trainingTemplate: `[THÈSE]\n[ARGUMENT] [RÉFÉRENCE OU EXEMPLE]\n[ARGUMENT] [RÉFÉRENCE OU EXEMPLE]\n[ARGUMENT] [RÉFÉRENCE OU EXEMPLE]\n[CONCLUSION]\n[OBJECTION]\n[TRANSITION]`,
-                fields: ["THÈSE", "ARGUMENT", "RÉFÉRENCE OU EXEMPLE", "CONCLUSION", "OBJECTION DE PARTIE", "TRANSITION"]
+            <div class="methodo-block"><h3>Transition</h3><p>Amorcer le changement de point de vue par une question.</p></div>`,
+                trainingTemplate: `[THÈSE]\n[ARGUMENT 1] [RÉF/EX 1]\n[ARGUMENT 2] [RÉF/EX 2]\n[ARGUMENT 3] [RÉF/EX 3]\n[CONCLUSION]\n[OBJECTION]\n[TRANSITION]`,
+                fields: ["THÈSE", "ARGUMENT 1", "RÉF/EX 1", "ARGUMENT 2", "RÉF/EX 2", "ARGUMENT 3", "RÉF/EX 3", "CONCLUSION", "OBJECTION", "TRANSITION"]
             }
         };
 
@@ -1084,14 +1086,11 @@
                 return;
             }
 
-            // Nettoyer les balises vides (sans contenu rédigé par l'élève) pour éviter les hallucinations du correcteur IA
-            const cleanedTrainingText = trainingText.replace(/\[[^\]]+\]\s*(?=\[[^\]]+\]|$)/g, '').trim();
-
             document.getElementById("loading-msg").style.display = "block";
             document.getElementById("correction-box").style.display = "none";
 
             try {
-                const body = { sujet, type: state.exerciseType, mode: state.mode, texte: cleanedTrainingText };
+                const body = { sujet, type: state.exerciseType, mode: state.mode, texte: trainingText };
                 if (state.exerciseType === 'explication') {
                     body.selectedTextTitle = selectedTextTitle;
                     body.selectedTextHtml = selectedTextHtml;
@@ -1113,7 +1112,15 @@
                     state.corrections.explic[state.mode] = correctionHtml;
                 }
                 document.getElementById("correction-text").innerHTML = correctionHtml;
+
+                // 1. On affiche la boîte de correction
                 document.getElementById("correction-box").style.display = "block";
+
+                // 2. On fait défiler l'écran doucement jusqu'à elle
+                document.getElementById("correction-box").scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             } catch (error) {
                 alert("Erreur lors de la communication avec le correcteur : " + error.message);
             } finally {
