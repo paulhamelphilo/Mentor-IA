@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor IA pour le bac de philosophie</title>
+    <title>Mentor IA philo</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
@@ -78,12 +78,25 @@
         }
 
         .main-nav,
-        .sub-nav {
+        .sub-nav,
+        .exercise-type-nav {
             display: flex;
             justify-content: center;
             gap: 10px;
             margin-bottom: 20px;
             flex-wrap: wrap;
+        }
+
+        .exercise-type-nav {
+            margin-bottom: 12px;
+        }
+
+        .main-nav .btn,
+        .sub-nav .btn,
+        .exercise-type-nav .btn {
+            flex: 1;
+            max-width: 200px;
+            text-align: center;
         }
 
         .btn {
@@ -94,6 +107,7 @@
             font-weight: bold;
             background: #ddd;
             transition: 0.3s;
+            box-sizing: border-box;
         }
 
         .btn.active {
@@ -230,9 +244,8 @@
         <h1>Mentor IA philo</h1>
 
         <div class="global-selector">
-            <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Mode d'entraînement
-                    :</strong></label>
-            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:12px;">
+            <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Mode :</strong></label>
+            <div class="exercise-type-nav">
                 <button id="btn-ex-type-dis" class="btn active"
                     onclick="setExerciseType('dissertation')">Dissertation</button>
                 <button id="btn-ex-type-exp" class="btn" onclick="setExerciseType('explication')">Explication de
@@ -331,7 +344,7 @@
                 work: "Discours de la méthode",
                 theme: "Les règles de la méthode",
                 label: "Descartes, Discours de la méthode — Les règles de la méthode",
-                html: "<h3>Descartes, <em>Discours de la méthode</em></h3><p>Et, comme la multitude des lois fournit souvent des excuses aux vices, en sorte qu’un État est bien mieux réglé lorsque, n’en ayant que fort peu, elles y sont fort étroitement observées ; ainsi, au lieu de ce grand nombre de préceptes dont la logique est composée, je crus que j’aurais assez des quatre suivants, pourvu que je prisse une ferme et constante résolution de ne manquer pas une seule fois de les observer.</p><p>Le premier était de ne recevoir jamais aucune chose pour vraie que je ne la connusse évidemment être telle ; c’est-à-dire d’éviter soigneusement la précipitation et la prévention ; et de ne comprendre rien de plus en mes jugements que ce qui se présenterait si clairement et si distinctement à mon esprit que je n’eusse aucune occasion de le mettre en doute.</p><p>Le second, de diviser chacune des difficultés que j’examinerais en autant de parcelles qu’il se pourrait et qu’il serait requis pour les mieux résoudre.</p><p>Le troisième, de conduire par ordre mes pensées, en commençant par les objets les plus simples et les plus aisés à connaître, pour monter peu à peu, comme par degrés, jusques à la connaissance des plus composés ; et supposant même de l’ordre entre ceux qui ne précèdent point naturellement les uns les autres.</p><p>Et le dernier, de faire partout des dénombrements si entiers, et des revues si générales, que je fusse assuré de ne rien omettre.</p><p>Ces longues chaînes de raisons, toutes simples et faciles, dont les géomètres ont coutume de se servir, pour parvenir à leurs plus difficiles démonstrations, m’avaient donné occasion de m’imaginer que toutes les choses qui peuvent tomber sous la connaissance des hommes s’entresuivent en même façon, et que, pourvu seulement qu’on s’abstienne d’en recevoir aucune pour vraie qui ne le soit, et qu’on garde toujours l’ordre qu’il faut pour les déduire les unes des autres, il n’y en peut avoir de si éloignées auxquelles enfin on ne parvienne, ni de si cachées qu’on ne découvre.</p>"
+                html: "<p>Et, comme la multitude des lois fournit souvent des excuses aux vices, en sorte qu’un État est bien mieux réglé lorsque, n’en ayant que fort peu, elles y sont fort étroitement observées ; ainsi, au lieu de ce grand nombre de préceptes dont la logique est composée, je crus que j’aurais assez des quatre suivants, pourvu que je prisse une ferme et constante résolution de ne manquer pas une seule fois de les observer.</p><p>Le premier était de ne recevoir jamais aucune chose pour vraie que je ne la connusse évidemment être telle ; c’est-à-dire d’éviter soigneusement la précipitation et la prévention ; et de ne comprendre rien de plus en mes jugements que ce qui se présenterait si clairement et si distinctement à mon esprit que je n’eusse aucune occasion de le mettre en doute.</p><p>Le second, de diviser chacune des difficultés que j’examinerais en autant de parcelles qu’il se pourrait et qu’il serait requis pour les mieux résoudre.</p><p>Le troisième, de conduire par ordre mes pensées, en commençant par les objets les plus simples et les plus aisés à connaître, pour monter peu à peu, comme par degrés, jusques à la connaissance des plus composés ; et supposant même de l’ordre entre ceux qui ne précèdent point naturellement les uns les autres.</p><p>Et le dernier, de faire partout des dénombrements si entiers, et des revues si générales, que je fusse assuré de ne rien omettre.</p><p>Ces longues chaînes de raisons, toutes simples et faciles, dont les géomètres ont coutume de se servir, pour parvenir à leurs plus difficiles démonstrations, m’avaient donné occasion de m’imaginer que toutes les choses qui peuvent tomber sous la connaissance des hommes s’entresuivent en même façon, et que, pourvu seulement qu’on s’abstienne d’en recevoir aucune pour vraie qui ne le soit, et qu’on garde toujours l’ordre qu’il faut pour les déduire les unes des autres, il n’y en peut avoir de si éloignées auxquelles enfin on ne parvienne, ni de si cachées qu’on ne découvre.</p><p style=\"text-align: right;\">  DESCARTES, <em>Discours de la méthode</em>, 1637</p>"
             },
             {
                 author: "Mill",
@@ -777,6 +790,34 @@
             render();
         }
 
+        function getCharCountInfo(len, max) {
+            let label = `${len} / ${max} caractères`;
+            let color = '#7f8c8d';
+            let fontWeight = 'normal';
+
+            if (len >= max) {
+                label += ' 🚫 (limite atteinte)';
+                color = '#0f4c81';
+                fontWeight = 'bold';
+            } else if (len >= max * 0.9) {
+                label += ' ⚠️ (limite presque atteinte)';
+                color = '#d35400';
+                fontWeight = 'bold';
+            }
+
+            return { label, color, fontWeight };
+        }
+
+        function updateCharCount(textarea) {
+            const counter = document.getElementById('char-count');
+            if (counter) {
+                const info = getCharCountInfo(textarea.value.length, textarea.maxLength);
+                counter.textContent = info.label;
+                counter.style.color = info.color;
+                counter.style.fontWeight = info.fontWeight;
+            }
+        }
+
         function render() {
             // exercise type buttons
             document.getElementById('btn-ex-type-dis').classList.toggle('active', state.exerciseType === 'dissertation');
@@ -791,6 +832,13 @@
 
             const area = document.getElementById('content-area');
 
+            const maxLength = state.mode === 'intro' ? 3000 : 12000;
+            const currentText = (state.exerciseType === 'dissertation')
+                ? (state.training.dissertation[state.mode] || '')
+                : (state.training.explic[state.mode] || '');
+            const currentLength = currentText.length;
+            const charInfo = getCharCountInfo(currentLength, maxLength);
+
             if (state.exerciseType === 'dissertation') {
                 if (state.tab === 'methodo') {
                     area.innerHTML = content[state.mode].methodo;
@@ -799,7 +847,8 @@
                     <h2>Entraînement : ${state.mode === 'intro' ? 'Introduction' : 'Développement'}</h2>
                     <div class="form-group">
                         <label>Rédigez votre exercice sans enlever les balises ci-dessous :</label>
-                        <textarea id="training-textarea" rows="18" oninput="state.training.dissertation[state.mode] = this.value">${state.training.dissertation[state.mode]}</textarea>
+                        <textarea id="training-textarea" rows="18" maxlength="${maxLength}" oninput="state.training.dissertation[state.mode] = this.value; updateCharCount(this)">${state.training.dissertation[state.mode]}</textarea>
+                        <div id="char-count" style="text-align: right; font-size: 13px; color: ${charInfo.color}; font-weight: ${charInfo.fontWeight}; margin-top: 5px;">${charInfo.label}</div>
                     </div>
                     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
                         <button class="btn btn-submit" onclick="envoyerCorrection()">Correction IA</button>
@@ -826,7 +875,8 @@
                     ` : `<div style="margin-top:12px; padding:12px; background:#fff3cd; border:1px solid #ffc107; border-radius:6px;"><strong>⚠ Attention :</strong> Veuillez sélectionner un texte en haut de la page.</div>`}
                     <div class="form-group" style="margin-top:12px;">
                         <label>Rédigez votre exercice sans enlever les balises ci-dessous :</label>
-                        <textarea id="training-textarea" rows="18" oninput="state.training.explic[state.mode] = this.value">${state.training.explic[state.mode]}</textarea>
+                        <textarea id="training-textarea" rows="18" maxlength="${maxLength}" oninput="state.training.explic[state.mode] = this.value; updateCharCount(this)">${state.training.explic[state.mode]}</textarea>
+                        <div id="char-count" style="text-align: right; font-size: 13px; color: ${charInfo.color}; font-weight: ${charInfo.fontWeight}; margin-top: 5px;">${charInfo.label}</div>
                     </div>
                     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
                         <button class="btn btn-submit" onclick="envoyerCorrection()">Correction IA</button>
