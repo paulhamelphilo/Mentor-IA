@@ -359,11 +359,60 @@
 
         <div class="global-selector">
             <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Mode</strong></label>
-            <div class="exercise-type-nav">
-                <button id="btn-ex-type-dis" class="btn active"
-                    onclick="setExerciseType('dissertation')">Dissertation</button>
-                <button id="btn-ex-type-exp" class="btn" onclick="setExerciseType('explication')">Explication de
-                    texte</button>
+            <div class="exercise-type-nav"
+                style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: center; width: 100%;">
+                    <button id="btn-ex-type-arg" class="btn"
+                        onclick="setExerciseType('argumentation')">Argumentation</button>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 10px; width: 100%; flex-wrap: wrap;">
+                    <button id="btn-ex-type-dis" class="btn active"
+                        onclick="setExerciseType('dissertation')">Dissertation</button>
+                    <button id="btn-ex-type-exp" class="btn" onclick="setExerciseType('explication')">Explication de
+                        texte</button>
+                </div>
+            </div>
+
+            <div id="selector-argumentation" style="display:none;">
+                <div id="argumentation-predefined">
+                    <label><strong>Notion</strong></label>
+                    <select id="select-notion-arg" onchange="updateSujetsArg()">
+                        <option value="">-- Sélectionnez une notion --</option>
+                    </select>
+
+                    <label style="margin-top:15px; display:block;"><strong>Sujet d'étude</strong></label>
+                    <select id="select-sujet-arg" onchange="updateArgThesisButtons()" disabled>
+                        <option value="">-- Sélectionnez d’abord une notion --</option>
+                    </select>
+
+                    <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" id="btn-arg-thesis" class="btn"
+                            style="flex:1; display:none; white-space: normal; height: auto; text-align: left; padding: 10px;"
+                            onclick="selectArgPosition('thesis')"></button>
+                        <button type="button" id="btn-arg-antithesis" class="btn"
+                            style="flex:1; display:none; white-space: normal; height: auto; text-align: left; padding: 10px;"
+                            onclick="selectArgPosition('antithesis')"></button>
+                    </div>
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleArgumentationMode(true)">✍
+                            Saisir une thèse personnalisée à argumenter</button>
+                    </div>
+                </div>
+                <div id="argumentation-custom" style="display:none;">
+                    <label><strong>Saisir votre thèse personnalisée :</strong></label>
+                    <input type="text" id="input-custom-thesis" placeholder="Ex: L’art est utile."
+                        oninput="updateCustomArgPosition()"
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="toggleArgumentationMode(false)">📋 Choisir dans la liste</button>
+                    </div>
+                </div>
+                <div id="display-selected-thesis"
+                    style="margin-top: 15px; padding: 12px; background-color: #e8f4f8; border-left: 5px solid var(--accent-color); border-radius: 4px; font-weight: bold; color: var(--primary-color); display: none;">
+                </div>
             </div>
 
             <div id="selector-dissertation">
@@ -648,23 +697,1315 @@
         ];
 
         const sujetsPhilo = {
-            "1. L’art": ["À quoi bon expliquer une œuvre d’art ?", "À quoi reconnaît-on une œuvre d’art ?", "Apprécier une œuvre d’art, cela s’apprend-il ?", "Avons-nous besoin d’art ?", "Créer, est-ce rompre avec la tradition ?", "L’art est-il inutile ?", "L’art est-il une affaire de goût personnel ?", "L’art peut-il nous apprendre à voir le monde autrement ?", "L’artiste est-il un créateur ?", "L’œuvre d’art est-elle nécessairement belle ?", "Pourquoi l’homme crée-t-il des œuvres d’art ?", "Qu’est-ce qui fait la valeur d’une œuvre d’art ?", "L’art est-il un langage ?", "L’art existerait-il sans la technique ?", "Y a-t-il une vérité dans l’art ?"],
-            "2. Le bonheur": ["Chercher à être heureux, est-ce une quête égoïste ?", "Décide-t-on d’être heureux ?", "Dépend-il de nous d’être heureux ?", "Le bonheur est-il inaccessible à l’homme ?", "Le bonheur est-il une succession de plaisirs ?", "Le bonheur peut-il être durable ?", "Peut-on être méchant et heureux ?", "Suis-je responsable de mon bonheur ?", "La conscience fait-elle obstacle au bonheur ?", "Est-ce un devoir d’être heureux ?", "L’État doit-il garantir le bonheur des citoyens ?", "Faut-il choisir entre être heureux et être libre ?", "Pour être heureux, faut-il être raisonnable ?", "Faut-il préférer la vérité au bonheur ?", "Puis-je être heureux si les autres ne le sont pas ?"],
-            "3. La conscience": ["Être conscient, est-ce savoir ?", "La conscience de soi est-elle une connaissance ?", "La conscience peut-elle être un fardeau ?", "Suis-je le mieux placé pour me connaître ?", "La conscience fait-elle le malheur de l’homme ?", "L’inconscient n’est-il qu’un moindre degré de conscience ?", "Sait-on toujours ce que l’on dit ?", "La conscience est-elle ce qui me rend libre ?", "Prendre conscience, est-ce se libérer ?", "Peut-on se mentir à soi-même ?", "Avons-nous besoin d’autrui pour avoir conscience de nous-mêmes ?", "L’homme est-il condamné à se faire des illusions sur lui-même ?", "Le sujet se définit-il par sa conscience ?", "Peut-on se connaître soi-même ?", "Suis-je ce que j’ai conscience d’être ?"],
-            "4. Le devoir": ["Agir par devoir est-ce agir contre son intérêt ?", "Peut-on accomplir son devoir sans réfléchir ?", "Pourquoi faire son devoir ?", "Qui peut me dire ce que je dois faire ?", "Avons-nous le devoir de faire le bonheur des autres ?", "Accomplir son devoir, est-ce agir librement ?", "Avons-nous le devoir d’être libres ?", "Nos obligations portent-elles atteinte à notre liberté ?", "Avons-nous des devoirs envers la nature ?", "Faut-il suivre sa raison pour agir moralement ?", "Avons-nous le devoir de chercher la vérité ?", "N’avons-nous de devoirs qu’envers autrui ?", "Se cultiver, est-ce un devoir ?", "Tout droit implique-t-il un devoir ?", "A-t-on des devoirs envers soi-même ?"],
-            "5. L’État": ["Au nom de quoi peut-on s’opposer à l’État ?", "Doit-on tout attendre de l’État ?", "L’État est-il l’ennemi de l’individu ?", "L’État est-il un mal nécessaire ?", "La fonction de l’État est-elle de nous protéger ?", "Le but de l’état est-il de limiter la violence ?", "Est-ce à l’État de faire régner la justice ?", "Le but de l’État est-il de rendre la société plus juste ?", "L’autorité de l’état s’oppose-t-elle à la liberté des individus ?", "L’État peut-il assurer à la fois la liberté et la sécurité des individus ?", "Obéir à l’État, est-ce renoncer à sa liberté ?", "Serions-nous plus libres sans l’État ?", "L’usage de la force par l’État est-il légitime ?", "L’État est-il au-dessus des lois ?", "Peut-on concevoir une société sans État ?"],
-            "6. L’inconscient": ["L’idée d’inconscient remet-elle en cause la responsabilité ?", "Peut-on connaître l’inconscient ?", "Pourquoi s’intéresser à l’inconscient ?", "L’hypothèse de l’inconscient est-elle nécessaire à la connaissance de soi ?", "L’inconscient échappe-t-il à toute forme de connaissance ?", "L’inconscient pense-t-il ?", "Peut-on s’excuser en disant : « j’ai agi inconsciemment » ?", "Une pensée peut-elle être inconsciente ?", "L’idée d’inconscient remet-elle en cause la liberté ?", "L’inconscient me gouverne-t-il ?", "L’inconscient pèse-t-il sur nous comme un destin ?", "L’hypothèse de l’inconscient a-t-elle une valeur scientifique ?", "Y a-t-il un sens à parler de désirs inconscients ?", "Puis-je invoquer l’inconscient sans ruiner la morale ?", "Si l’inconscient existe, puis-je savoir qui je suis ?"],
-            "7. La justice": ["Comment savoir ce qui est juste ?", "Demander justice, est-ce réclamer vengeance ?", "Des inégalités peuvent-elles être justes ?", "Être juste, est-ce vouloir l’égalité ?", "La justice a-t-elle besoin de la force ?", "La justice consiste-t-elle à traiter également tous les hommes ?", "Pourquoi être juste ?", "L’homme injuste peut-il être heureux ?", "Peut-on préférer la justice à son bonheur personnel ?", "Revient-il à l’État de décider de ce qui est juste ?", "La liberté est-elle menacée par l’égalité ?", "Le droit peut-il être injuste ?", "Est-ce la loi qui définit ce qui est juste ?", "Peut-il être juste de désobéir à la loi ?", "La justice n’est-elle qu’un idéal ?"],
-            "8. Le langage": ["Bien parler, est-ce bien penser ?", "En quoi l’homme est-il un être de parole ?", "La parole peut-elle être un instrument de domination ?", "Le langage déforme-t-il la pensée ?", "Le langage peut-il exprimer ce que nous vivons ?", "Peut-on tout dire ?", "L’art sait-il montrer ce que le langage ne peut pas dire ?", "Penser, est-ce se parler à soi-même ?", "Y a-t-il des limites à la liberté d’expression ?", "La vérité peut-elle se passer des mots ?", "Le langage ne sert-il qu’à communiquer ?", "Le langage trahit-il la pensée ?", "Peut-on penser sans les mots ?", "Le langage détermine-t-il notre rapport au réel ?", "Suis-je l’auteur de ce que je dis ?"],
-            "9. La liberté": ["Choisir, est-ce renoncer à sa liberté ?", "Être libre, est-ce faire ce que l’on veut ?", "La liberté est-elle une donnée ou une conquête ?", "La liberté est-elle une illusion ?", "Peut-on forcer un homme à être libre ?", "S’engager, est-ce perdre sa liberté ?", "Toute contrainte est-elle un obstacle à la liberté ?", "La conscience d’être libre peut-elle être illusoire ?", "La science est-elle au service de notre liberté ?", "La technique nous rend-elle plus libre ?", "Le travail peut-il rendre libre ?", "La vérité est-elle libératrice ?", "Ma liberté exclut-elle celle des autres, ou bien la suppose-t-elle ?", "Sommes-nous maîtres de notre histoire ?", "La loi constitue-t-elle, pour la liberté, un obstacle ou une condition ?"],
-            "10. La nature": ["Au nom de quoi devrions-nous préserver la nature ?", "Est-il vrai que la nature fait bien les choses ?", "L’homme est-il une exception dans la nature ?", "L’art doit-il suivre la nature ?", "La nature nous impose-t-elle des devoirs ?", "La nature est-elle injuste ?", "Transformer la nature nous rend-il plus libres ?", "Pouvons-nous vraiment connaître la nature ?", "La technique est-elle une violence infligée à la nature ?", "Le projet de maîtriser la nature est-il raisonnable ?", "Est-il naturel à l’homme de travailler ?", "La culture dénature-t-elle l’homme ?", "La culture est-elle une seconde nature ?", "Le droit peut-il être fondé sur la nature ?", "Y a-t-il une différence de nature entre l’homme et l’animal ?"],
-            "11. La raison": ["À quoi sert la raison ?", "Faut-il douter de tout ?", "La raison peut-elle rendre raison de tout ?", "Peut-on être trop raisonnable ?", "Peut-on toujours se fier à la raison ?", "Pour être heureux, faut-il être raisonnable ?", "Faut-il être raisonnable pour être libre ?", "La religion est-elle contraire à la raison ?", "La technique échappe-t-elle à la raison ?", "Est-ce seulement par la raison qu’on peut accéder à la vérité ?", "La raison s’oppose-t-elle à toute forme de croyance ?", "La raison s’oppose-t-elle nécessairement au désir ?", "La raison est-elle plus fiable que l’expérience ?", "La raison peut-elle comprendre le réel ?", "Toute passion est-elle déraisonnable ?"],
-            "12. La religion": ["À quoi tient la force des religions ?", "L’humanité peut-elle se concevoir sans religion ?", "La religion a-t-elle pour but de consoler les hommes ?", "La religion permet-elle de mieux vivre ?", "Peut-on se passer de toute religion ?", "L’homme est-il par nature un être religieux ?", "Est-il déraisonnable de croire en Dieu ?", "Science et religion s’opposent-elles ?", "Peut-on expliquer la croyance religieuse sans la détruire ?", "La religion n’est-elle qu’un fait de culture ?", "La morale peut-elle se passer d’un fondement religieux ?", "La religion et la morale ont-elles la même finalité ?", "La religion n’a-t-elle de fonction que sociale ?", "Une société sans religion est-elle possible ?", "Une religion peut-elle se fonder sur la raison ?"],
-            "13. La science": ["À quoi servent les sciences ?", "Faut-il attendre de la science qu’elle ait réponse à tout ?", "La science a-t-elle toujours raison ?", "N’y a-t-il de connaissance que scientifique ?", "Pourquoi faut-il se fier à la science ?", "Le savoir me libère-t-il ?", "La rationalité scientifique satisfait-elle tous les besoins de la raison ?", "La technique n’est-elle qu’une application de la science ?", "La science a-t-elle le monopole de la vérité ?", "La connaissance scientifique abolit-elle toute croyance ?", "Faire des expériences, est-ce le seul moyen de connaître ?", "L’histoire peut-elle être une science ?", "La morale doit-elle imposer des limites à la science ?", "La science nous livre-t-elle le réel tel qu’il est ?", "Une connaissance scientifique du vivant est-elle possible ?"],
-            "14. La technique": ["À quoi sert la technique ?", "Ce qui est techniquement possible est-il toujours souhaitable ?", "La technique est-elle le propre de l’homme ?", "La technique nous déshumanise-t-elle ?", "Peut-on renoncer au progrès technique ?", "Y a-t-il plus à espérer qu’à craindre de la technique ?", "Un objet technique peut-il être une œuvre d’art ?", "Le progrès technique est-il une assurance de bonheur ?", "La technique nous libère-t-elle ?", "La technique nous éloigne-t-elle de la nature ?", "La technique résout-elle tous les problèmes qui se posent au travail ?", "Les objets techniques font-ils partie de notre culture ?", "Les machines peuvent-elles penser ?", "La technique est-elle moralement neutre ?", "Un être vivant peut-il être assimilé à une machine ?"],
-            "15. Le temps": ["Est-il possible de vivre au présent ?", "Le temps est-il destructeur ?", "Peut-on se rendre maître du temps ?", "Pourquoi le temps est-il précieux ?", "L’art échappe-t-il au temps ?", "Ne peut-on être heureux qu’au passé ?", "Peut-on se libérer du passé ?", "La vérité est-elle soumise au temps ?", "Est-il juste de dire que seul le présent existe ?", "Prendre son temps est-ce le perdre ?", "L’histoire peut-elle éclairer l’avenir ?", "Mon passé détermine-t-il mon avenir ?", "Quelle réalité peut-on attribuer au temps ?", "Suis-je ce que mon passé a fait de moi ?", "Une passion peut-elle résister au temps ?"],
-            "16. Le travail": ["Le travail nous rend-il plus humain ?", "Peut-on aimer travailler ?", "Pourquoi le travail est-il spécifiquement humain ?", "Que gagnons-nous à travailler ?", "Travailler est-ce seulement produire ?", "La création artistique est-elle un travail ?", "Faut-il travailler pour être heureux ?", "Le travail permet-il de prendre conscience de soi ?", "Est-ce un devoir de travailler ?", "Le travail est-il en lui-même aliénation ?", "Les machines nous libèrent-elles du travail ?", "Peut-on désirer travailler ?", "Le travail a-t-il une valeur morale ?", "Une société sans travail est-elle souhaitable ?", "Travailler, est-ce s’accomplir ?"],
-            "17. La vérité": ["À quoi peut-on reconnaître la vérité ?", "Doit-on rechercher la vérité pour elle-même ?", "Doit-on toujours dire la vérité ?", "Faut-il chercher la vérité à tout prix ?", "L’unanimité est-elle un critère de vérité ?", "La vérité est-elle toujours préférable à l’illusion ?", "La vérité s’impose-t-elle d’elle-même ?", "Pourquoi vouloir à tout prix connaître la vérité ?", "L’art est-il un moyen d’accéder à la vérité ?", "La vérité rend-elle heureux ?", "Connaître la vérité nous rend-il plus libres ?", "La raison est-elle la source de toute vérité ?", "N’y a-t-il de vérité que dans les sciences ?", "L’expérience est-elle source de vérité ?", "La vérité n’est-elle qu’un question d’interprétation ?"]
+            "1. L’art": [
+                {
+                    "question": "À quoi bon expliquer une œuvre d’art ?",
+                    "thesis": "Il est utile d'expliquer une œuvre d'art.",
+                    "antithesis": "Il est inutile d'expliquer une œuvre d'art."
+                },
+                {
+                    "question": "À quoi reconnaît-on une œuvre d’art ?",
+                    "thesis": "On reconnaît une œuvre d'art à des critères déterminés.",
+                    "antithesis": "On ne reconnaît pas une œuvre d'art à des critères précis."
+                },
+                {
+                    "question": "Apprécier une œuvre d’art, cela s’apprend-il ?",
+                    "thesis": "Apprécier une œuvre d'art, cela s'apprend.",
+                    "antithesis": "Apprécier une œuvre d'art, cela ne s'apprend pas."
+                },
+                {
+                    "question": "Avons-nous besoin d’art ?",
+                    "thesis": "Nous avons besoin d'art.",
+                    "antithesis": "Nous n'avons pas besoin d'art."
+                },
+                {
+                    "question": "Créer, est-ce rompre avec la tradition ?",
+                    "thesis": "Créer, c'est rompre avec la tradition.",
+                    "antithesis": "Créer, ce n'est pas rompre avec la tradition."
+                },
+                {
+                    "question": "L’art est-il inutile ?",
+                    "thesis": "L'art est inutile.",
+                    "antithesis": "L'art n'est pas inutile."
+                },
+                {
+                    "question": "L’art est-il une affaire de goût personnel ?",
+                    "thesis": "L'art est une affaire de goût personnel.",
+                    "antithesis": "L'art n'est pas une affaire de goût personnel."
+                },
+                {
+                    "question": "L’art peut-il nous apprendre à voir le monde autrement ?",
+                    "thesis": "L'art peut nous apprendre à voir le monde autrement.",
+                    "antithesis": "L'art ne peut pas nous apprendre à voir le monde autrement."
+                },
+                {
+                    "question": "L’artiste est-il un créateur ?",
+                    "thesis": "L'artiste est un créateur.",
+                    "antithesis": "L'artiste n'est pas un créateur."
+                },
+                {
+                    "question": "L’œuvre d’art est-elle nécessairement belle ?",
+                    "thesis": "L'œuvre d'art est nécessairement belle.",
+                    "antithesis": "L'œuvre d'art n'est pas nécessairement belle."
+                },
+                {
+                    "question": "Pourquoi l’homme crée-t-il des œuvres d’art ?",
+                    "thesis": "L'homme crée des œuvres d'art pour des raisons précises.",
+                    "antithesis": "L'homme ne crée pas des œuvres d'art sans nécessité."
+                },
+                {
+                    "question": "Qu’est-ce qui fait la valeur d’une œuvre d’art ?",
+                    "thesis": "La valeur d'une œuvre d'art est fondée sur des critères réels.",
+                    "antithesis": "Rien ne fait objectivement la valeur d'une œuvre d'art."
+                },
+                {
+                    "question": "L’art est-il un langage ?",
+                    "thesis": "L'art est un langage.",
+                    "antithesis": "L'art n'est pas un langage."
+                },
+                {
+                    "question": "L’art existerait-il sans la technique ?",
+                    "thesis": "L'art existerait sans la technique.",
+                    "antithesis": "L'art n'existerait pas sans la technique."
+                },
+                {
+                    "question": "Y a-t-il une vérité dans l’art ?",
+                    "thesis": "Il y a une vérité dans l'art.",
+                    "antithesis": "Il n’y a pas une vérité dans l'art."
+                }
+            ],
+            "2. Le bonheur": [
+                {
+                    "question": "Chercher à être heureux, est-ce une quête égoïste ?",
+                    "thesis": "Chercher à être heureux, c'est une quête égoïste.",
+                    "antithesis": "Chercher à être heureux, ce n'est pas une quête égoïste."
+                },
+                {
+                    "question": "Décide-t-on d’être heureux ?",
+                    "thesis": "On décide d'être heureux.",
+                    "antithesis": "On ne décide pas d'être heureux."
+                },
+                {
+                    "question": "Dépend-il de nous d’être heureux ?",
+                    "thesis": "Il dépend de nous d'être heureux.",
+                    "antithesis": "Il ne dépend pas de nous d'être heureux."
+                },
+                {
+                    "question": "Le bonheur est-il inaccessible à l’homme ?",
+                    "thesis": "Le bonheur est inaccessible à l'homme.",
+                    "antithesis": "Le bonheur n'est pas inaccessible à l'homme."
+                },
+                {
+                    "question": "Le bonheur est-il une succession de plaisirs ?",
+                    "thesis": "Le bonheur est une succession de plaisirs.",
+                    "antithesis": "Le bonheur n'est pas une succession de plaisirs."
+                },
+                {
+                    "question": "Le bonheur peut-il être durable ?",
+                    "thesis": "Le bonheur peut être durable.",
+                    "antithesis": "Le bonheur ne peut pas être durable."
+                },
+                {
+                    "question": "Peut-on être méchant et heureux ?",
+                    "thesis": "On peut être méchant et heureux.",
+                    "antithesis": "On ne peut pas être méchant et heureux."
+                },
+                {
+                    "question": "Suis-je responsable de mon bonheur ?",
+                    "thesis": "Je suis responsable de mon bonheur.",
+                    "antithesis": "Je ne suis pas responsable de mon bonheur."
+                },
+                {
+                    "question": "La conscience fait-elle obstacle au bonheur ?",
+                    "thesis": "La conscience fait obstacle au bonheur.",
+                    "antithesis": "La conscience ne fait pas obstacle au bonheur."
+                },
+                {
+                    "question": "Est-ce un devoir d’être heureux ?",
+                    "thesis": "C'est un devoir d'être heureux.",
+                    "antithesis": "Ce n'est pas un devoir d'être heureux."
+                },
+                {
+                    "question": "L’État doit-il garantir le bonheur des citoyens ?",
+                    "thesis": "L'État doit garantir le bonheur des citoyens.",
+                    "antithesis": "L'État ne doit pas garantir le bonheur des citoyens."
+                },
+                {
+                    "question": "Faut-il choisir entre être heureux et être libre ?",
+                    "thesis": "Il faut choisir entre être heureux et être libre.",
+                    "antithesis": "Il ne faut pas choisir entre être heureux et être libre."
+                },
+                {
+                    "question": "Pour être heureux, faut-il être raisonnable ?",
+                    "thesis": "Pour être heureux, il faut être raisonnable.",
+                    "antithesis": "Pour être heureux, il ne faut pas nécessairement être raisonnable."
+                },
+                {
+                    "question": "Faut-il préférer la vérité au bonheur ?",
+                    "thesis": "Il faut préférer la vérité au bonheur.",
+                    "antithesis": "Il ne faut pas préférer la vérité au bonheur."
+                },
+                {
+                    "question": "Puis-je être heureux si les autres ne le sont pas ?",
+                    "thesis": "Je peux être heureux si les autres ne le sont pas.",
+                    "antithesis": "Je ne peux pas être heureux si les autres ne le sont pas."
+                }
+            ],
+            "3. La conscience": [
+                {
+                    "question": "Être conscient, est-ce savoir ?",
+                    "thesis": "Être conscient, c'est savoir.",
+                    "antithesis": "Être conscient, ce n'est pas savoir."
+                },
+                {
+                    "question": "La conscience de soi est-elle une connaissance ?",
+                    "thesis": "La conscience de soi est une connaissance.",
+                    "antithesis": "La conscience de soi n'est pas une connaissance."
+                },
+                {
+                    "question": "La conscience peut-elle être un fardeau ?",
+                    "thesis": "La conscience peut être un fardeau.",
+                    "antithesis": "La conscience ne peut pas être un fardeau."
+                },
+                {
+                    "question": "Suis-je le mieux placé pour me connaître ?",
+                    "thesis": "Je suis le mieux placé pour me connaître.",
+                    "antithesis": "Je ne suis pas le mieux placé pour me connaître."
+                },
+                {
+                    "question": "La conscience fait-elle le malheur de l’homme ?",
+                    "thesis": "La conscience fait le malheur de l'homme.",
+                    "antithesis": "La conscience ne fait pas le malheur de l'homme."
+                },
+                {
+                    "question": "L’inconscient n’est-il qu’un moindre degré de conscience ?",
+                    "thesis": "L'inconscient est seulement un moindre degré de conscience.",
+                    "antithesis": "L'inconscient n'est pas seulement un moindre degré de conscience."
+                },
+                {
+                    "question": "Sait-on toujours ce que l’on dit ?",
+                    "thesis": "On sait toujours ce que l'on dit.",
+                    "antithesis": "On ne sait pas toujours ce que l'on dit."
+                },
+                {
+                    "question": "La conscience est-elle ce qui me rend libre ?",
+                    "thesis": "La conscience est ce qui me rend libre.",
+                    "antithesis": "La conscience n'est pas ce qui me rend libre."
+                },
+                {
+                    "question": "Prendre conscience, est-ce se libérer ?",
+                    "thesis": "Prendre conscience, c'est se libérer.",
+                    "antithesis": "Prendre conscience, ce n'est pas se libérer."
+                },
+                {
+                    "question": "Peut-on se mentir à soi-même ?",
+                    "thesis": "On peut se mentir à soi-même.",
+                    "antithesis": "On ne peut pas se mentir à soi-même."
+                },
+                {
+                    "question": "Avons-nous besoin d’autrui pour avoir conscience de nous-mêmes ?",
+                    "thesis": "Nous avons besoin d'autrui pour avoir conscience de nous-mêmes.",
+                    "antithesis": "Nous n'avons pas besoin d'autrui pour avoir conscience de nous-mêmes."
+                },
+                {
+                    "question": "L’homme est-il condamné à se faire des illusions sur lui-même ?",
+                    "thesis": "L'homme est condamné à se faire des illusions sur lui-même.",
+                    "antithesis": "L'homme n'est pas condamné à se faire des illusions sur lui-même."
+                },
+                {
+                    "question": "Le sujet se définit-il par sa conscience ?",
+                    "thesis": "Le sujet se définit par sa conscience.",
+                    "antithesis": "Le sujet ne se définit pas par sa conscience."
+                },
+                {
+                    "question": "Peut-on se connaître soi-même ?",
+                    "thesis": "On peut se connaître soi-même.",
+                    "antithesis": "On ne peut pas se connaître soi-même."
+                },
+                {
+                    "question": "Suis-je ce que j’ai conscience d’être ?",
+                    "thesis": "Je suis ce que j'ai conscience d'être.",
+                    "antithesis": "Je ne suis pas ce que j'ai conscience d'être."
+                }
+            ],
+            "4. Le devoir": [
+                {
+                    "question": "Agir par devoir est-ce agir contre son intérêt ?",
+                    "thesis": "Agir par devoir , c'est agir contre son intérêt.",
+                    "antithesis": "Agir par devoir , ce n'est pas agir contre son intérêt."
+                },
+                {
+                    "question": "Peut-on accomplir son devoir sans réfléchir ?",
+                    "thesis": "On peut accomplir son devoir sans réfléchir.",
+                    "antithesis": "On ne peut pas accomplir son devoir sans réfléchir."
+                },
+                {
+                    "question": "Pourquoi faire son devoir ?",
+                    "thesis": "Il faut faire son devoir.",
+                    "antithesis": "Il n'y a pas d'obligation morale de faire son devoir."
+                },
+                {
+                    "question": "Qui peut me dire ce que je dois faire ?",
+                    "thesis": "Quelqu'un peut me dire ce que je dois faire.",
+                    "antithesis": "Personne ne peut me dire ce que je dois faire."
+                },
+                {
+                    "question": "Avons-nous le devoir de faire le bonheur des autres ?",
+                    "thesis": "Nous avons le devoir de faire le bonheur des autres.",
+                    "antithesis": "Nous n'avons pas le devoir de faire le bonheur des autres."
+                },
+                {
+                    "question": "Accomplir son devoir, est-ce agir librement ?",
+                    "thesis": "Accomplir son devoir, c'est agir librement.",
+                    "antithesis": "Accomplir son devoir, ce n'est pas agir librement."
+                },
+                {
+                    "question": "Avons-nous le devoir d’être libres ?",
+                    "thesis": "Nous avons le devoir d'être libres.",
+                    "antithesis": "Nous n'avons pas le devoir d'être libres."
+                },
+                {
+                    "question": "Nos obligations portent-elles atteinte à notre liberté ?",
+                    "thesis": "Nos obligations portent atteinte à notre liberté.",
+                    "antithesis": "Nos obligations ne portent pas atteinte à notre liberté."
+                },
+                {
+                    "question": "Avons-nous des devoirs envers la nature ?",
+                    "thesis": "Nous avons des devoirs envers la nature.",
+                    "antithesis": "Nous n'avons pas de devoirs envers la nature."
+                },
+                {
+                    "question": "Faut-il suivre sa raison pour agir moralement ?",
+                    "thesis": "Il faut suivre sa raison pour agir moralement.",
+                    "antithesis": "Il ne faut pas suivre sa raison pour agir moralement."
+                },
+                {
+                    "question": "Avons-nous le devoir de chercher la vérité ?",
+                    "thesis": "Nous avons le devoir de chercher la vérité.",
+                    "antithesis": "Nous n'avons pas le devoir de chercher la vérité."
+                },
+                {
+                    "question": "N’avons-nous de devoirs qu’envers autrui ?",
+                    "thesis": "Nous avons des devoirs uniquement envers autrui.",
+                    "antithesis": "Nous n'avons pas de devoirs uniquement envers autrui."
+                },
+                {
+                    "question": "Se cultiver, est-ce un devoir ?",
+                    "thesis": "Se cultiver, c'est un devoir.",
+                    "antithesis": "Se cultiver, ce n'est pas un devoir."
+                },
+                {
+                    "question": "Tout droit implique-t-il un devoir ?",
+                    "thesis": "Tout droit implique un devoir.",
+                    "antithesis": "Tout droit n'implique pas un devoir."
+                },
+                {
+                    "question": "A-t-on des devoirs envers soi-même ?",
+                    "thesis": "On a des devoirs envers soi-même.",
+                    "antithesis": "On n'a pas de devoirs envers soi-même."
+                }
+            ],
+            "5. L’État": [
+                {
+                    "question": "Au nom de quoi peut-on s’opposer à l’État ?",
+                    "thesis": "On peut s'opposer à l'État au nom de principes supérieurs.",
+                    "antithesis": "On ne peut pas s'opposer à l'État au nom de principes personnels."
+                },
+                {
+                    "question": "Doit-on tout attendre de l’État ?",
+                    "thesis": "On doit tout attendre de l'État.",
+                    "antithesis": "On ne doit pas tout attendre de l'État."
+                },
+                {
+                    "question": "L’État est-il l’ennemi de l’individu ?",
+                    "thesis": "L'État est l'ennemi de l'individu.",
+                    "antithesis": "L'État n'est pas l'ennemi de l'individu."
+                },
+                {
+                    "question": "L’État est-il un mal nécessaire ?",
+                    "thesis": "L'État est un mal nécessaire.",
+                    "antithesis": "L'État n'est pas un mal nécessaire."
+                },
+                {
+                    "question": "La fonction de l’État is-elle de nous protéger ?",
+                    "thesis": "La fonction de l'État is de nous protéger.",
+                    "antithesis": "La fonction de l'État n'is pas de nous protéger."
+                },
+                {
+                    "question": "Le but de l’état est-il de limiter la violence ?",
+                    "thesis": "Le but de l'état est de limiter la violence.",
+                    "antithesis": "Le but de l'état n'est pas de limiter la violence."
+                },
+                {
+                    "question": "Est-ce à l’État de faire régner la justice ?",
+                    "thesis": "C'est à l'État de faire régner la justice.",
+                    "antithesis": "Ce n'est pas à l'État de faire régner la justice."
+                },
+                {
+                    "question": "Le but de l’État est-il de rendre la société plus juste ?",
+                    "thesis": "Le but de l'État est de rendre la société plus juste.",
+                    "antithesis": "Le but de l'État n'est pas de rendre la société plus juste."
+                },
+                {
+                    "question": "L’autorité de l’état s’oppose-t-elle à la liberté des individus ?",
+                    "thesis": "L'autorité de l'état s'oppose-t-elle à la liberté des individus.",
+                    "antithesis": "Non l'autorité de l'état s'oppose-t-elle à la liberté des individus."
+                },
+                {
+                    "question": "L’État peut-il assurer à la fois la liberté et la sécurité des individus ?",
+                    "thesis": "L'État peut assurer à la fois la liberté et la sécurité des individus.",
+                    "antithesis": "L'État ne peut pas assurer à la fois la liberté et la sécurité des individus."
+                },
+                {
+                    "question": "Obéir à l’État, est-ce renoncer à sa liberté ?",
+                    "thesis": "Obéir à l'État, c'est renoncer à sa liberté.",
+                    "antithesis": "Obéir à l'État, ce n'est pas renoncer à sa liberté."
+                },
+                {
+                    "question": "Serions-nous plus libres sans l’État ?",
+                    "thesis": "Nous serions plus libres sans l'État.",
+                    "antithesis": "Nous ne serions pas plus libres sans l'État."
+                },
+                {
+                    "question": "L’usage de la force par l’État est-il légitime ?",
+                    "thesis": "L'usage de la force par l'État est légitime.",
+                    "antithesis": "L'usage de la force par l'État n'est pas légitime."
+                },
+                {
+                    "question": "L’État est-il au-dessus des lois ?",
+                    "thesis": "L'État est au-dessus des lois.",
+                    "antithesis": "L'État n'est pas au-dessus des lois."
+                },
+                {
+                    "question": "Peut-on concevoir une société sans État ?",
+                    "thesis": "On peut concevoir une société sans État.",
+                    "antithesis": "On ne peut pas concevoir une société sans État."
+                }
+            ],
+            "6. L’inconscient": [
+                {
+                    "question": "L’idée d’inconscient remet-elle en cause la responsabilité ?",
+                    "thesis": "L'idée d'inconscient remet en cause la responsabilité.",
+                    "antithesis": "L'idée d'inconscient ne remet pas en cause la responsabilité."
+                },
+                {
+                    "question": "Peut-on connaître l’inconscient ?",
+                    "thesis": "On peut connaître l'inconscient.",
+                    "antithesis": "On ne peut pas connaître l'inconscient."
+                },
+                {
+                    "question": "Pourquoi s’intéresser à l’inconscient ?",
+                    "thesis": "Il est utile de s'intéresser à l'inconscient.",
+                    "antithesis": "Il n'est pas nécessaire de s'intéresser à l'inconscient."
+                },
+                {
+                    "question": "L’hypothèse de l’inconscient est-elle nécessaire à la connaissance de soi ?",
+                    "thesis": "L'hypothèse de l'inconscient est nécessaire à la connaissance de soi.",
+                    "antithesis": "L'hypothèse de l'inconscient n'est pas nécessaire à la connaissance de soi."
+                },
+                {
+                    "question": "L’inconscient échappe-t-il à toute forme de connaissance ?",
+                    "thesis": "L'inconscient échappe à toute forme de connaissance.",
+                    "antithesis": "L'inconscient n'échappe pas à toute forme de connaissance."
+                },
+                {
+                    "question": "L’inconscient pense-t-il ?",
+                    "thesis": "L'inconscient pense.",
+                    "antithesis": "L'inconscient ne pense pas."
+                },
+                {
+                    "question": "Peut-on s’excuser en disant : « j’ai agi inconsciemment » ?",
+                    "thesis": "On peut s'excuser en disant : « j'ai agi inconsciemment ».",
+                    "antithesis": "On ne peut pas s'excuser en disant : « j'ai agi inconsciemment »."
+                },
+                {
+                    "question": "Une pensée peut-elle être inconsciente ?",
+                    "thesis": "Une pensée peut être inconsciente.",
+                    "antithesis": "Une pensée ne peut pas être inconsciente."
+                },
+                {
+                    "question": "L’idée d’inconscient remet-elle en cause la liberté ?",
+                    "thesis": "L'idée d'inconscient remet en cause la liberté.",
+                    "antithesis": "L'idée d'inconscient ne remet pas en cause la liberté."
+                },
+                {
+                    "question": "L’inconscient me gouverne-t-il ?",
+                    "thesis": "L'inconscient me gouverne.",
+                    "antithesis": "L'inconscient ne me gouverne pas."
+                },
+                {
+                    "question": "L’inconscient pèse-t-il sur nous comme un destin ?",
+                    "thesis": "L'inconscient pèse sur nous comme un destin.",
+                    "antithesis": "L'inconscient ne pèse pas sur nous comme un destin."
+                },
+                {
+                    "question": "L’hypothèse de l’inconscient a-t-elle une valeur scientifique ?",
+                    "thesis": "L'hypothèse de l'inconscient a une valeur scientifique.",
+                    "antithesis": "L'hypothèse de l'inconscient n'a pas une valeur scientifique."
+                },
+                {
+                    "question": "Y a-t-il un sens à parler de désirs inconscients ?",
+                    "thesis": "Il y a un sens à parler de désirs inconscients.",
+                    "antithesis": "Il n'y a pas un sens à parler de désirs inconscients."
+                },
+                {
+                    "question": "Puis-je invoquer l’inconscient sans ruiner la morale ?",
+                    "thesis": "Je peux invoquer l'inconscient sans ruiner la morale.",
+                    "antithesis": "Je ne peux pas invoquer l'inconscient sans ruiner la morale."
+                },
+                {
+                    "question": "Si l’inconscient existe, puis-je savoir qui je suis ?",
+                    "thesis": "Si l'inconscient existe, je peux savoir qui je suis.",
+                    "antithesis": "Si l'inconscient existe, je ne peux pas savoir qui je suis."
+                }
+            ],
+            "7. La justice": [
+                {
+                    "question": "Comment savoir ce qui est juste ?",
+                    "thesis": "On peut savoir ce qui est juste.",
+                    "antithesis": "On ne peut pas savoir de manière absolue ce qui est juste."
+                },
+                {
+                    "question": "Demander justice, est-ce réclamer vengeance ?",
+                    "thesis": "Demander justice, c'est réclamer vengeance.",
+                    "antithesis": "Demander justice, ce n'est pas réclamer vengeance."
+                },
+                {
+                    "question": "Des inégalités peuvent-elles être justes ?",
+                    "thesis": "Des inégalités peuvent être justes.",
+                    "antithesis": "Des inégalités ne peuvent pas être justes."
+                },
+                {
+                    "question": "Être juste, est-ce vouloir l’égalité ?",
+                    "thesis": "Être juste, c'est vouloir l'égalité.",
+                    "antithesis": "Être juste, ce n'est pas vouloir l'égalité."
+                },
+                {
+                    "question": "La justice a-t-elle besoin de la force ?",
+                    "thesis": "La justice a besoin de la force.",
+                    "antithesis": "La justice n'a pas besoin de la force."
+                },
+                {
+                    "question": "La justice consiste-t-elle à traiter également tous les hommes ?",
+                    "thesis": "La justice consiste à traiter également tous les hommes.",
+                    "antithesis": "La justice ne consiste pas à traiter également tous les hommes."
+                },
+                {
+                    "question": "Pourquoi être juste ?",
+                    "thesis": "Il faut être juste.",
+                    "antithesis": "Il n'y a pas de raison rationnelle d'être juste."
+                },
+                {
+                    "question": "L’homme injuste peut-il être heureux ?",
+                    "thesis": "L'homme injuste peut être heureux.",
+                    "antithesis": "L'homme injuste ne peut pas être heureux."
+                },
+                {
+                    "question": "Peut-on préférer la justice à son bonheur personnel ?",
+                    "thesis": "On peut préférer la justice à son bonheur personnel.",
+                    "antithesis": "On ne peut pas préférer la justice à son bonheur personnel."
+                },
+                {
+                    "question": "Revient-il à l’État de décider de ce qui est juste ?",
+                    "thesis": "Il revient à l'État de décider de ce qui est juste.",
+                    "antithesis": "Il ne revient pas à l'État de décider de ce qui est juste."
+                },
+                {
+                    "question": "La liberté est-elle menacée par l’égalité ?",
+                    "thesis": "La liberté est menacée par l'égalité.",
+                    "antithesis": "La liberté n'est pas menacée par l'égalité."
+                },
+                {
+                    "question": "Le droit peut-il être injuste ?",
+                    "thesis": "Le droit peut être injuste.",
+                    "antithesis": "Le droit ne peut pas être injuste."
+                },
+                {
+                    "question": "Est-ce la loi qui définit ce qui est juste ?",
+                    "thesis": "C'est la loi qui définit ce qui est juste.",
+                    "antithesis": "Ce n'est pas la loi qui définit ce qui est juste."
+                },
+                {
+                    "question": "Peut-il être juste de désobéir à la loi ?",
+                    "thesis": "Peut-il être juste de désobéir à la loi.",
+                    "antithesis": "Non peut-il être juste de désobéir à la loi."
+                },
+                {
+                    "question": "La justice n’est-elle qu’un idéal ?",
+                    "thesis": "La justice est seulement un idéal.",
+                    "antithesis": "La justice n'est pas seulement un idéal."
+                }
+            ],
+            "8. Le langage": [
+                {
+                    "question": "Bien parler, est-ce bien penser ?",
+                    "thesis": "Bien parler, c'est bien penser.",
+                    "antithesis": "Bien parler, ce n'est pas bien penser."
+                },
+                {
+                    "question": "En quoi l’homme est-il un être de parole ?",
+                    "thesis": "En quoi l'homme est un être de parole.",
+                    "antithesis": "En quoi l'homme n'est pas un être de parole."
+                },
+                {
+                    "question": "La parole peut-elle être un instrument de domination ?",
+                    "thesis": "La parole peut être un instrument de domination.",
+                    "antithesis": "La parole ne peut pas être un instrument de domination."
+                },
+                {
+                    "question": "Le langage déforme-t-il la pensée ?",
+                    "thesis": "Le langage déforme la pensée.",
+                    "antithesis": "Le langage ne déforme pas la pensée."
+                },
+                {
+                    "question": "Le langage peut-il exprimer ce que nous vivons ?",
+                    "thesis": "Le langage peut exprimer ce que nous vivons.",
+                    "antithesis": "Le langage ne peut pas exprimer ce que nous vivons."
+                },
+                {
+                    "question": "Peut-on tout dire ?",
+                    "thesis": "On peut tout dire.",
+                    "antithesis": "On ne peut pas tout dire."
+                },
+                {
+                    "question": "L’art sait-il montrer ce que le langage ne peut pas dire ?",
+                    "thesis": "L'art sait montrer ce que le langage ne peut pas dire.",
+                    "antithesis": "L'art ne sait pas montrer ce que le langage ne peut pas dire."
+                },
+                {
+                    "question": "Penser, est-ce se parler à soi-même ?",
+                    "thesis": "Penser, c'est se parler à soi-même.",
+                    "antithesis": "Penser, ce n'est pas se parler à soi-même."
+                },
+                {
+                    "question": "Y a-t-il des limites à la liberté d’expression ?",
+                    "thesis": "Il y a des limites à la liberté d'expression.",
+                    "antithesis": "Il n'y a pas des limites à la liberté d'expression."
+                },
+                {
+                    "question": "La vérité peut-elle se passer des mots ?",
+                    "thesis": "La vérité peut se passer des mots.",
+                    "antithesis": "La vérité ne peut pas se passer des mots."
+                },
+                {
+                    "question": "Le langage ne sert-il qu’à communiquer ?",
+                    "thesis": "Le langage ne sert qu'à communiquer.",
+                    "antithesis": "Le langage ne ne sert pas qu'à communiquer."
+                },
+                {
+                    "question": "Le langage trahit-il la pensée ?",
+                    "thesis": "Le langage trahit la pensée.",
+                    "antithesis": "Le langage ne trahit pas la pensée."
+                },
+                {
+                    "question": "Peut-on penser sans les mots ?",
+                    "thesis": "On peut penser sans les mots.",
+                    "antithesis": "On ne peut pas penser sans les mots."
+                },
+                {
+                    "question": "Le langage détermine-t-il notre rapport au réel ?",
+                    "thesis": "Le langage détermine notre rapport au réel.",
+                    "antithesis": "Le langage ne détermine pas notre rapport au réel."
+                },
+                {
+                    "question": "Suis-je l’auteur de ce que je dis ?",
+                    "thesis": "Je suis l'auteur de ce que je dis.",
+                    "antithesis": "Je ne suis pas l'auteur de ce que je dis."
+                }
+            ],
+            "9. La liberté": [
+                {
+                    "question": "Choisir, est-ce renoncer à sa liberté ?",
+                    "thesis": "Choisir, c'est renoncer à sa liberté.",
+                    "antithesis": "Choisir, ce n'est pas renoncer à sa liberté."
+                },
+                {
+                    "question": "Être libre, est-ce faire ce que l’on veut ?",
+                    "thesis": "Être libre, c'est faire ce que l'on veut.",
+                    "antithesis": "Être libre, ce n'est pas faire ce que l'on veut."
+                },
+                {
+                    "question": "La liberté est-elle une donnée ou une conquête ?",
+                    "thesis": "La liberté est une donnée ou une conquête.",
+                    "antithesis": "La liberté n'est pas une donnée ou une conquête."
+                },
+                {
+                    "question": "La liberté est-elle une illusion ?",
+                    "thesis": "La liberté est une illusion.",
+                    "antithesis": "La liberté n'est pas une illusion."
+                },
+                {
+                    "question": "Peut-on forcer un homme à être libre ?",
+                    "thesis": "On peut forcer un homme à être libre.",
+                    "antithesis": "On ne peut pas forcer un homme à être libre."
+                },
+                {
+                    "question": "S’engager, est-ce perdre sa liberté ?",
+                    "thesis": "S'engager, c'est perdre sa liberté.",
+                    "antithesis": "S'engager, ce n'est pas perdre sa liberté."
+                },
+                {
+                    "question": "Toute contrainte est-elle un obstacle à la liberté ?",
+                    "thesis": "Toute contrainte est un obstacle à la liberté.",
+                    "antithesis": "Toute contrainte n'est pas un obstacle à la liberté."
+                },
+                {
+                    "question": "La conscience d’être libre peut-elle être illusoire ?",
+                    "thesis": "La conscience d'être libre peut être illusoire.",
+                    "antithesis": "La conscience d'être libre ne peut pas être illusoire."
+                },
+                {
+                    "question": "La science est-elle au service de notre liberté ?",
+                    "thesis": "La science est au service de notre liberté.",
+                    "antithesis": "La science n'est pas au service de notre liberté."
+                },
+                {
+                    "question": "La technique nous rend-elle plus libre ?",
+                    "thesis": "La technique nous rend plus libre.",
+                    "antithesis": "La technique ne nous rend pas plus libre."
+                },
+                {
+                    "question": "Le travail peut-il rendre libre ?",
+                    "thesis": "Le travail peut rendre libre.",
+                    "antithesis": "Le travail ne peut pas rendre libre."
+                },
+                {
+                    "question": "La vérité est-elle libératrice ?",
+                    "thesis": "La vérité est libératrice.",
+                    "antithesis": "La vérité n'est pas libératrice."
+                },
+                {
+                    "question": "Ma liberté exclut-elle celle des autres, ou bien la suppose-t-elle ?",
+                    "thesis": "Ma liberté exclut celle des autres.",
+                    "antithesis": "Ma liberté suppose celle des autres."
+                },
+                {
+                    "question": "Sommes-nous maîtres de notre histoire ?",
+                    "thesis": "Nous sommes maîtres de notre histoire.",
+                    "antithesis": "Nous ne sommes pas maîtres de notre histoire."
+                },
+                {
+                    "question": "La loi constitue-t-elle, pour la liberté, un obstacle ou une condition ?",
+                    "thesis": "La loi constitue, pour la liberté, un obstacle.",
+                    "antithesis": "La loi constitue, pour la liberté, une condition."
+                }
+            ],
+            "10. La nature": [
+                {
+                    "question": "Au nom de quoi devrions-nous préserver la nature ?",
+                    "thesis": "Nous devrions préserver la nature au nom de notre survie et du respect de la vie.",
+                    "antithesis": "Nous ne devrions pas préserver la nature au détriment du progrès humain."
+                },
+                {
+                    "question": "Est-il vrai que la nature fait bien les choses ?",
+                    "thesis": "Il est vrai que la nature fait bien les choses.",
+                    "antithesis": "Il n'est pas vrai que la nature fait bien les choses."
+                },
+                {
+                    "question": "L’homme est-il une exception dans la nature ?",
+                    "thesis": "L'homme est une exception dans la nature.",
+                    "antithesis": "L'homme n'est pas une exception dans la nature."
+                },
+                {
+                    "question": "L’art doit-il suivre la nature ?",
+                    "thesis": "L'art doit suivre la nature.",
+                    "antithesis": "L'art ne doit pas suivre la nature."
+                },
+                {
+                    "question": "La nature nous impose-t-elle des devoirs ?",
+                    "thesis": "La nature nous impose des devoirs.",
+                    "antithesis": "La nature ne nous impose pas des devoirs."
+                },
+                {
+                    "question": "La nature est-elle injuste ?",
+                    "thesis": "La nature est injuste.",
+                    "antithesis": "La nature n'est pas injuste."
+                },
+                {
+                    "question": "Transformer la nature nous rend-il plus libres ?",
+                    "thesis": "Transformer la nature nous rend plus libres.",
+                    "antithesis": "Transformer la nature ne nous rend pas plus libres."
+                },
+                {
+                    "question": "Pouvons-nous vraiment connaître la nature ?",
+                    "thesis": "Pouvons-nous vraiment connaître la nature.",
+                    "antithesis": "Non pouvons-nous vraiment connaître la nature."
+                },
+                {
+                    "question": "La technique est-elle une violence infligée à la nature ?",
+                    "thesis": "La technique est une violence infligée à la nature.",
+                    "antithesis": "La technique n'est pas une violence infligée à la nature."
+                },
+                {
+                    "question": "Le projet de maîtriser la nature est-il raisonnable ?",
+                    "thesis": "Le projet de maîtriser la nature est raisonnable.",
+                    "antithesis": "Le projet de maîtriser la nature n'est pas raisonnable."
+                },
+                {
+                    "question": "Est-il naturel à l’homme de travailler ?",
+                    "thesis": "Est-il naturel à l'homme de travailler.",
+                    "antithesis": "Non est-il naturel à l'homme de travailler."
+                },
+                {
+                    "question": "La culture dénature-t-elle l’homme ?",
+                    "thesis": "La culture dénature l'homme.",
+                    "antithesis": "La culture ne dénature pas l'homme."
+                },
+                {
+                    "question": "La culture est-elle une seconde nature ?",
+                    "thesis": "La culture est une seconde nature.",
+                    "antithesis": "La culture n'est pas une seconde nature."
+                },
+                {
+                    "question": "Le droit peut-il être fondé sur la nature ?",
+                    "thesis": "Le droit peut être fondé sur la nature.",
+                    "antithesis": "Le droit ne peut pas être fondé sur la nature."
+                },
+                {
+                    "question": "Y a-t-il une différence de nature entre l’homme et l’animal ?",
+                    "thesis": "Il y a une différence de nature entre l'homme et l'animal.",
+                    "antithesis": "Il n'y a pas une différence de nature entre l'homme et l'animal."
+                }
+            ],
+            "11. La raison": [
+                {
+                    "question": "À quoi sert la raison ?",
+                    "thesis": "À quoi sert la raison.",
+                    "antithesis": "Non à quoi sert la raison."
+                },
+                {
+                    "question": "Faut-il douter de tout ?",
+                    "thesis": "Il faut douter de tout.",
+                    "antithesis": "Il ne faut pas douter de tout."
+                },
+                {
+                    "question": "La raison peut-elle rendre raison de tout ?",
+                    "thesis": "La raison peut rendre raison de tout.",
+                    "antithesis": "La raison ne peut pas rendre raison de tout."
+                },
+                {
+                    "question": "Peut-on être trop raisonnable ?",
+                    "thesis": "On peut être trop raisonnable.",
+                    "antithesis": "On ne peut pas être trop raisonnable."
+                },
+                {
+                    "question": "Peut-on toujours se fier à la raison ?",
+                    "thesis": "On peut toujours se fier à la raison.",
+                    "antithesis": "On ne peut pas toujours se fier à la raison."
+                },
+                {
+                    "question": "Pour être heureux, faut-il être raisonnable ?",
+                    "thesis": "Pour être heureux, il faut être raisonnable.",
+                    "antithesis": "Pour être heureux, il ne faut pas nécessairement être raisonnable."
+                },
+                {
+                    "question": "Faut-il être raisonnable pour être libre ?",
+                    "thesis": "Il faut être raisonnable pour être libre.",
+                    "antithesis": "Il ne faut pas être raisonnable pour être libre."
+                },
+                {
+                    "question": "La religion est-elle contraire à la raison ?",
+                    "thesis": "La religion est contraire à la raison.",
+                    "antithesis": "La religion n'est pas contraire à la raison."
+                },
+                {
+                    "question": "La technique échappe-t-elle à la raison ?",
+                    "thesis": "La technique échappe à la raison.",
+                    "antithesis": "La technique n'échappe pas à la raison."
+                },
+                {
+                    "question": "Est-ce seulement par la raison qu’on peut accéder à la vérité ?",
+                    "thesis": "Est-ce seulement par la raison qu'on peut accéder à la vérité.",
+                    "antithesis": "Non est-ce seulement par la raison qu'on peut accéder à la vérité."
+                },
+                {
+                    "question": "La raison s’oppose-t-elle à toute forme de croyance ?",
+                    "thesis": "La raison s'oppose-t-elle à toute forme de croyance.",
+                    "antithesis": "Non la raison s'oppose-t-elle à toute forme de croyance."
+                },
+                {
+                    "question": "La raison s’oppose-t-elle nécessairement au désir ?",
+                    "thesis": "La raison s'oppose-t-elle nécessairement au désir.",
+                    "antithesis": "Non la raison s'oppose-t-elle nécessairement au désir."
+                },
+                {
+                    "question": "La raison est-elle plus fiable que l’expérience ?",
+                    "thesis": "La raison est plus fiable que l'expérience.",
+                    "antithesis": "La raison n'est pas plus fiable que l'expérience."
+                },
+                {
+                    "question": "La raison peut-elle comprendre le réel ?",
+                    "thesis": "La raison peut comprendre le réel.",
+                    "antithesis": "La raison ne peut pas comprendre le réel."
+                },
+                {
+                    "question": "Toute passion est-elle déraisonnable ?",
+                    "thesis": "Toute passion est déraisonnable.",
+                    "antithesis": "Toute passion n'est pas déraisonnable."
+                }
+            ],
+            "12. La religion": [
+                {
+                    "question": "À quoi tient la force des religions ?",
+                    "thesis": "La force des religions tient à leur capacité de donner du sens.",
+                    "antithesis": "La force des religions ne tient qu'à des illusions rassurantes."
+                },
+                {
+                    "question": "L’humanité peut-elle se concevoir sans religion ?",
+                    "thesis": "L'humanité peut se concevoir sans religion.",
+                    "antithesis": "L'humanité ne peut pas se concevoir sans religion."
+                },
+                {
+                    "question": "La religion a-t-elle pour but de consoler les hommes ?",
+                    "thesis": "La religion a pour but de consoler les hommes.",
+                    "antithesis": "La religion n'a pas pour but de consoler les hommes."
+                },
+                {
+                    "question": "La religion permet-elle de mieux vivre ?",
+                    "thesis": "La religion permet de mieux vivre.",
+                    "antithesis": "La religion ne permet pas de mieux vivre."
+                },
+                {
+                    "question": "Peut-on se passer de toute religion ?",
+                    "thesis": "On peut se passer de toute religion.",
+                    "antithesis": "On ne peut pas se passer de toute religion."
+                },
+                {
+                    "question": "L’homme est-il par nature un être religieux ?",
+                    "thesis": "L'homme est par nature un être religieux.",
+                    "antithesis": "L'homme n'est pas par nature un être religieux."
+                },
+                {
+                    "question": "Est-il déraisonnable de croire en Dieu ?",
+                    "thesis": "Il est déraisonnable de croire en Dieu.",
+                    "antithesis": "Il n'est pas déraisonnable de croire en Dieu."
+                },
+                {
+                    "question": "Science et religion s’opposent-elles ?",
+                    "thesis": "Science et religion s'opposent-elles.",
+                    "antithesis": "Non science et religion s'opposent-elles."
+                },
+                {
+                    "question": "Peut-on expliquer la croyance religieuse sans la détruire ?",
+                    "thesis": "On peut expliquer la croyance religieuse sans la détruire.",
+                    "antithesis": "On ne peut pas expliquer la croyance religieuse sans la détruire."
+                },
+                {
+                    "question": "La religion n’est-elle qu’un fait de culture ?",
+                    "thesis": "La religion est seulement un fait de culture.",
+                    "antithesis": "La religion n'est pas seulement un fait de culture."
+                },
+                {
+                    "question": "La morale peut-elle se passer d’un fondement religieux ?",
+                    "thesis": "La morale peut se passer d'un fondement religieux.",
+                    "antithesis": "La morale ne peut pas se passer d'un fondement religieux."
+                },
+                {
+                    "question": "La religion et la morale ont-elles la même finalité ?",
+                    "thesis": "La religion et la morale ont la même finalité.",
+                    "antithesis": "La religion et la morale n'ont pas la même finalité."
+                },
+                {
+                    "question": "La religion n’a-t-elle de fonction que sociale ?",
+                    "thesis": "La religion a seulement une fonction sociale.",
+                    "antithesis": "La religion n'a pas seulement une fonction sociale."
+                },
+                {
+                    "question": "Une société sans religion est-elle possible ?",
+                    "thesis": "Une société sans religion est possible.",
+                    "antithesis": "Une société sans religion n'est pas possible."
+                },
+                {
+                    "question": "Une religion peut-elle se fonder sur la raison ?",
+                    "thesis": "Une religion peut se fonder sur la raison.",
+                    "antithesis": "Une religion ne peut pas se fonder sur la raison."
+                }
+            ],
+            "13. La science": [
+                {
+                    "question": "À quoi servent les sciences ?",
+                    "thesis": "Les sciences servent à expliquer le réel.",
+                    "antithesis": "Les sciences ne servent qu'à dominer la nature."
+                },
+                {
+                    "question": "Faut-il attendre de la science qu’elle ait réponse à tout ?",
+                    "thesis": "Il faut attendre de la science qu'elle ait réponse à tout.",
+                    "antithesis": "Il ne faut pas attendre de la science qu'elle ait réponse à tout."
+                },
+                {
+                    "question": "La science a-t-elle toujours raison ?",
+                    "thesis": "La science a toujours raison.",
+                    "antithesis": "La science n'a pas toujours raison."
+                },
+                {
+                    "question": "N’y a-t-il de connaissance que scientifique ?",
+                    "thesis": "N'y a de connaissance que scientifique.",
+                    "antithesis": "N'y n'a pas de connaissance que scientifique."
+                },
+                {
+                    "question": "Pourquoi faut-il se fier à la science ?",
+                    "thesis": "Il faut se fier à la science.",
+                    "antithesis": "Il ne faut pas se fier aveuglément à la science."
+                },
+                {
+                    "question": "Le savoir me libère-t-il ?",
+                    "thesis": "Le savoir me libère.",
+                    "antithesis": "Le savoir ne me libère pas."
+                },
+                {
+                    "question": "La rationalité scientifique satisfait-elle tous les besoins de la raison ?",
+                    "thesis": "La rationalité scientifique satisfait tous les besoins de la raison.",
+                    "antithesis": "La rationalité scientifique ne satisfait pas tous les besoins de la raison."
+                },
+                {
+                    "question": "La technique n’est-elle qu’une application de la science ?",
+                    "thesis": "La technique est seulement une application de la science.",
+                    "antithesis": "La technique n'est pas seulement une application de la science."
+                },
+                {
+                    "question": "La science a-t-elle le monopole de la vérité ?",
+                    "thesis": "La science a le monopole de la vérité.",
+                    "antithesis": "La science n'a pas le monopole de la vérité."
+                },
+                {
+                    "question": "La connaissance scientifique abolit-elle toute croyance ?",
+                    "thesis": "La connaissance scientifique abolit toute croyance.",
+                    "antithesis": "La connaissance scientifique n'abolit pas toute croyance."
+                },
+                {
+                    "question": "Faire des expériences, est-ce le seul moyen de connaître ?",
+                    "thesis": "Faire des expériences, c'est le seul moyen de connaître.",
+                    "antithesis": "Faire des expériences, ce n'est pas le seul moyen de connaître."
+                },
+                {
+                    "question": "L’histoire peut-elle être une science ?",
+                    "thesis": "L'histoire peut être une science.",
+                    "antithesis": "L'histoire ne peut pas être une science."
+                },
+                {
+                    "question": "La morale doit-elle imposer des limites à la science ?",
+                    "thesis": "La morale doit imposer des limites à la science.",
+                    "antithesis": "La morale ne doit pas imposer des limites à la science."
+                },
+                {
+                    "question": "La science nous livre-t-elle le réel tel qu’il est ?",
+                    "thesis": "La science nous livre le réel tel qu'il est.",
+                    "antithesis": "La science ne nous livre pas le réel tel qu'il est."
+                },
+                {
+                    "question": "Une connaissance scientifique du vivant est-elle possible ?",
+                    "thesis": "Une connaissance scientifique du vivant est possible.",
+                    "antithesis": "Une connaissance scientifique du vivant n'est pas possible."
+                }
+            ],
+            "14. La technique": [
+                {
+                    "question": "À quoi sert la technique ?",
+                    "thesis": "La technique sert à libérer l'homme de la nécessité matérielle.",
+                    "antithesis": "La technique ne sert qu'à asservir l'homme à de nouveaux besoins."
+                },
+                {
+                    "question": "Ce qui est techniquement possible est-il toujours souhaitable ?",
+                    "thesis": "Ce qui est techniquement possible est toujours souhaitable.",
+                    "antithesis": "Ce qui est techniquement possible n'est pas toujours souhaitable."
+                },
+                {
+                    "question": "La technique est-elle le propre de l’homme ?",
+                    "thesis": "La technique est le propre de l'homme.",
+                    "antithesis": "La technique n'est pas le propre de l'homme."
+                },
+                {
+                    "question": "La technique nous déshumanise-t-elle ?",
+                    "thesis": "La technique nous déshumanise.",
+                    "antithesis": "La technique ne nous déshumanise pas."
+                },
+                {
+                    "question": "Peut-on renoncer au progrès technique ?",
+                    "thesis": "On peut renoncer au progrès technique.",
+                    "antithesis": "On ne peut pas renoncer au progrès technique."
+                },
+                {
+                    "question": "Y a-t-il plus à espérer qu’à craindre de la technique ?",
+                    "thesis": "Il y a plus à espérer qu'à craindre de la technique.",
+                    "antithesis": "Il n'y a pas plus à espérer qu'à craindre de la technique."
+                },
+                {
+                    "question": "Un objet technique peut-il être une œuvre d’art ?",
+                    "thesis": "Un objet technique peut être une œuvre d'art.",
+                    "antithesis": "Un objet technique ne peut pas être une œuvre d'art."
+                },
+                {
+                    "question": "Le progrès technique est-il une assurance de bonheur ?",
+                    "thesis": "Le progrès technique est une assurance de bonheur.",
+                    "antithesis": "Le progrès technique n'est pas une assurance de bonheur."
+                },
+                {
+                    "question": "La technique nous libère-t-elle ?",
+                    "thesis": "La technique nous libère.",
+                    "antithesis": "La technique ne nous libère pas."
+                },
+                {
+                    "question": "La technique nous éloigne-t-elle de la nature ?",
+                    "thesis": "La technique nous éloigne de la nature.",
+                    "antithesis": "La technique ne nous éloigne pas de la nature."
+                },
+                {
+                    "question": "La technique résout-elle tous les problèmes qui se posent au travail ?",
+                    "thesis": "La technique résout tous les problèmes qui se posent au travail.",
+                    "antithesis": "La technique ne résout pas tous les problèmes qui se posent au travail."
+                },
+                {
+                    "question": "Les objets techniques font-ils partie de notre culture ?",
+                    "thesis": "Les objets techniques font partie de notre culture.",
+                    "antithesis": "Les objets techniques ne font pas partie de notre culture."
+                },
+                {
+                    "question": "Les machines peuvent-elles penser ?",
+                    "thesis": "Les machines peuvent penser.",
+                    "antithesis": "Les machines ne peuvent pas penser."
+                },
+                {
+                    "question": "La technique est-elle moralement neutre ?",
+                    "thesis": "La technique est moralement neutre.",
+                    "antithesis": "La technique n'est pas moralement neutre."
+                },
+                {
+                    "question": "Un être vivant peut-il être assimilé à une machine ?",
+                    "thesis": "Un être vivant peut être assimilé à une machine.",
+                    "antithesis": "Un être vivant ne peut pas être assimilé à une machine."
+                }
+            ],
+            "15. Le temps": [
+                {
+                    "question": "Est-il possible de vivre au présent ?",
+                    "thesis": "Il est possible de vivre au présent.",
+                    "antithesis": "Il n'est pas possible de vivre au présent."
+                },
+                {
+                    "question": "Le temps est-il destructeur ?",
+                    "thesis": "Le temps est destructeur.",
+                    "antithesis": "Le temps n'est pas destructeur."
+                },
+                {
+                    "question": "Peut-on se rendre maître du temps ?",
+                    "thesis": "On peut se rendre maître du temps.",
+                    "antithesis": "On ne peut pas se rendre maître du temps."
+                },
+                {
+                    "question": "Pourquoi le temps est-il précieux ?",
+                    "thesis": "Pourquoi le temps est précieux.",
+                    "antithesis": "Pourquoi le temps n'est pas précieux."
+                },
+                {
+                    "question": "L’art échappe-t-il au temps ?",
+                    "thesis": "L'art échappe au temps.",
+                    "antithesis": "L'art n'échappe pas au temps."
+                },
+                {
+                    "question": "Ne peut-on être heureux qu’au passé ?",
+                    "thesis": "On ne peut être heureux qu'au passé.",
+                    "antithesis": "On peut être heureux autrement qu'au passé."
+                },
+                {
+                    "question": "Peut-on se libérer du passé ?",
+                    "thesis": "On peut se libérer du passé.",
+                    "antithesis": "On ne peut pas se libérer du passé."
+                },
+                {
+                    "question": "La vérité est-elle soumise au temps ?",
+                    "thesis": "La vérité est soumise au temps.",
+                    "antithesis": "La vérité n'est pas soumise au temps."
+                },
+                {
+                    "question": "Est-il juste de dire que seul le présent existe ?",
+                    "thesis": "Il est juste de dire que seul le présent existe.",
+                    "antithesis": "Il n'est pas juste de dire que seul le présent existe."
+                },
+                {
+                    "question": "Prendre son temps est-ce le perdre ?",
+                    "thesis": "Prendre son temps, c'est le perdre.",
+                    "antithesis": "Prendre son temps, ce n'est pas le perdre."
+                },
+                {
+                    "question": "L’histoire peut-elle éclairer l’avenir ?",
+                    "thesis": "L'histoire peut éclairer l'avenir.",
+                    "antithesis": "L'histoire ne peut pas éclairer l'avenir."
+                },
+                {
+                    "question": "Mon passé détermine-t-il mon avenir ?",
+                    "thesis": "Mon passé détermine mon avenir.",
+                    "antithesis": "Mon passé ne détermine pas mon avenir."
+                },
+                {
+                    "question": "Quelle réalité peut-on attribuer au temps ?",
+                    "thesis": "Le temps a une réalité objective.",
+                    "antithesis": "Le temps n'a pas de réalité objective."
+                },
+                {
+                    "question": "Suis-je ce que mon passé a fait de moi ?",
+                    "thesis": "Je suis ce que mon passé a fait de moi.",
+                    "antithesis": "Je ne suis pas ce que mon passé a fait de moi."
+                },
+                {
+                    "question": "Une passion peut-elle résister au temps ?",
+                    "thesis": "Une passion peut résister au temps.",
+                    "antithesis": "Une passion ne peut pas résister au temps."
+                }
+            ],
+            "16. Le travail": [
+                {
+                    "question": "Le travail nous rend-il plus humain ?",
+                    "thesis": "Le travail nous rend plus humain.",
+                    "antithesis": "Le travail ne nous rend pas plus humain."
+                },
+                {
+                    "question": "Peut-on aimer travailler ?",
+                    "thesis": "On peut aimer travailler.",
+                    "antithesis": "On ne peut pas aimer travailler."
+                },
+                {
+                    "question": "Pourquoi le travail est-il spécifiquement humain ?",
+                    "thesis": "Pourquoi le travail est spécifiquement humain.",
+                    "antithesis": "Pourquoi le travail n'est pas spécifiquement humain."
+                },
+                {
+                    "question": "Que gagnons-nous à travailler ?",
+                    "thesis": "On gagne de la liberté et de la dignité à travailler.",
+                    "antithesis": "On ne gagne rien d'autre que la subsistance matérielle à travailler."
+                },
+                {
+                    "question": "Travailler est-ce seulement produire ?",
+                    "thesis": "Travailler , c'est seulement produire.",
+                    "antithesis": "Travailler , ce n'est pas seulement produire."
+                },
+                {
+                    "question": "La création artistique est-elle un travail ?",
+                    "thesis": "La création artistique est un travail.",
+                    "antithesis": "La création artistique n'est pas un travail."
+                },
+                {
+                    "question": "Faut-il travailler pour être heureux ?",
+                    "thesis": "Il faut travailler pour être heureux.",
+                    "antithesis": "Il ne faut pas travailler pour être heureux."
+                },
+                {
+                    "question": "Le travail permet-il de prendre conscience de soi ?",
+                    "thesis": "Le travail permet de prendre conscience de soi.",
+                    "antithesis": "Le travail ne permet pas de prendre conscience de soi."
+                },
+                {
+                    "question": "Est-ce un devoir de travailler ?",
+                    "thesis": "Est-ce un devoir de travailler.",
+                    "antithesis": "Non est-ce un devoir de travailler."
+                },
+                {
+                    "question": "Le travail est-il en lui-même aliénation ?",
+                    "thesis": "Le travail est en lui-même aliénation.",
+                    "antithesis": "Le travail n'est pas en lui-même aliénation."
+                },
+                {
+                    "question": "Les machines nous libèrent-elles du travail ?",
+                    "thesis": "Les machines nous libèrent du travail.",
+                    "antithesis": "Les machines ne nous libèrent pas du travail."
+                },
+                {
+                    "question": "Peut-on désirer travailler ?",
+                    "thesis": "On peut désirer travailler.",
+                    "antithesis": "On ne peut pas désirer travailler."
+                },
+                {
+                    "question": "Le travail a-t-il une valeur morale ?",
+                    "thesis": "Le travail a une valeur morale.",
+                    "antithesis": "Le travail n'a pas une valeur morale."
+                },
+                {
+                    "question": "Une société sans travail est-elle souhaitable ?",
+                    "thesis": "Une société sans travail est souhaitable.",
+                    "antithesis": "Une société sans travail n'est pas souhaitable."
+                },
+                {
+                    "question": "Travailler, est-ce s’accomplir ?",
+                    "thesis": "Travailler, c'est s'accomplir.",
+                    "antithesis": "Travailler, ce n'est pas s'accomplir."
+                }
+            ],
+            "17. La vérité": [
+                {
+                    "question": "À quoi peut-on reconnaître la vérité ?",
+                    "thesis": "On peut reconnaître la vérité à la cohérence et à la preuve.",
+                    "antithesis": "On ne peut pas reconnaître la vérité de manière absolue."
+                },
+                {
+                    "question": "Doit-on rechercher la vérité pour elle-même ?",
+                    "thesis": "On doit rechercher la vérité pour elle-même.",
+                    "antithesis": "On ne doit pas rechercher la vérité pour elle-même."
+                },
+                {
+                    "question": "Doit-on toujours dire la vérité ?",
+                    "thesis": "On doit toujours dire la vérité.",
+                    "antithesis": "On ne doit pas toujours dire la vérité."
+                },
+                {
+                    "question": "Faut-il chercher la vérité à tout prix ?",
+                    "thesis": "Il faut chercher la vérité à tout prix.",
+                    "antithesis": "Il ne faut pas chercher la vérité à tout prix."
+                },
+                {
+                    "question": "L’unanimité est-elle un critère de vérité ?",
+                    "thesis": "L'unanimité est un critère de vérité.",
+                    "antithesis": "L'unanimité n'est pas un critère de vérité."
+                },
+                {
+                    "question": "La vérité est-elle toujours préférable à l’illusion ?",
+                    "thesis": "La vérité est toujours préférable à l'illusion.",
+                    "antithesis": "La vérité n'est pas toujours préférable à l'illusion."
+                },
+                {
+                    "question": "La vérité s’impose-t-elle d’elle-même ?",
+                    "thesis": "La vérité s'impose-t-elle d'elle-même.",
+                    "antithesis": "Non la vérité s'impose-t-elle d'elle-même."
+                },
+                {
+                    "question": "Pourquoi vouloir à tout prix connaître la vérité ?",
+                    "thesis": "Il faut vouloir connaître la vérité à tout prix.",
+                    "antithesis": "Il ne faut pas vouloir connaître la vérité à tout prix."
+                },
+                {
+                    "question": "L’art est-il un moyen d’accéder à la vérité ?",
+                    "thesis": "L'art est un moyen d'accéder à la vérité.",
+                    "antithesis": "L'art n'est pas un moyen d'accéder à la vérité."
+                },
+                {
+                    "question": "La vérité rend-elle heureux ?",
+                    "thesis": "La vérité rend heureux.",
+                    "antithesis": "La vérité ne rend pas heureux."
+                },
+                {
+                    "question": "Connaître la vérité nous rend-il plus libres ?",
+                    "thesis": "Connaître la vérité nous rend plus libres.",
+                    "antithesis": "Connaître la vérité ne nous rend pas plus libres."
+                },
+                {
+                    "question": "La raison est-elle la source de toute vérité ?",
+                    "thesis": "La raison est la source de toute vérité.",
+                    "antithesis": "La raison n'est pas la source de toute vérité."
+                },
+                {
+                    "question": "N’y a-t-il de vérité que dans les sciences ?",
+                    "thesis": "N'y a de vérité que dans les sciences.",
+                    "antithesis": "N'y n'a pas de vérité que dans les sciences."
+                },
+                {
+                    "question": "L’expérience est-elle source de vérité ?",
+                    "thesis": "L'expérience est source de vérité.",
+                    "antithesis": "L'expérience n'est pas source de vérité."
+                },
+                {
+                    "question": "La vérité n’est-elle qu’une question d’interprétation ?",
+                    "thesis": "La vérité n'est-elle qu'une question d'interprétation.",
+                    "antithesis": "Non la vérité n'est-elle qu'une question d'interprétation."
+                }
+            ]
         };
 
         let state = {
@@ -673,17 +2014,22 @@
             showHelp: false,
             training: {
                 dissertation: { intro: null, dev: null },
-                explic: { intro: null, dev: null }
+                explic: { intro: null, dev: null },
+                argumentation: { argumentation: null }
             },
             corrections: {
                 dissertation: { intro: null, dev: null },
-                explic: { intro: null, dev: null }
+                explic: { intro: null, dev: null },
+                argumentation: { argumentation: null }
             },
             explicTexts: [],
             currentExplicTextIndex: null,
             currentExplicText: null,
             isCustomDissertation: false,
-            isCustomExplication: false
+            isCustomExplication: false,
+            isCustomArgumentation: false,
+            activeThesis: null,
+            thesisOrientation: null
         };
 
         const content = {
@@ -739,6 +2085,13 @@
             <div class="methodo-block"><h3>Transition</h3><p>Amorcer le changement de point de vue par une question.</p></div>`,
                 trainingTemplate: `[THÈSE]\n[ARGUMENT 1] [RÉF/EX 1]\n[ARGUMENT 2] [RÉF/EX 2]\n[ARGUMENT 3] [RÉF/EX 3]\n[CONCLUSION]\n[OBJECTION]\n[TRANSITION]`,
                 fields: ["THÈSE", "ARGUMENT 1", "RÉF/EX 1", "ARGUMENT 2", "RÉF/EX 2", "ARGUMENT 3", "RÉF/EX 3", "CONCLUSION", "OBJECTION", "TRANSITION"]
+            },
+            argumentation: {
+                methodo: `<h2>Méthodologie de l’argumentation</h2>
+            <div class="methodo-block"><h3>Argument</h3><p>Rédiger un argument rigoureux, c'est-à-dire une preuve conceptuelle et abstraite qui justifie la thèse choisie. Attention à ne pas raconter d'histoires ni donner d'exemples concrets dans cette partie : argumenter, c'est prouver en théorie.</p></div>
+            <div class="methodo-block"><h3>Référence / Exemple</h3><p>Illustrer et approfondir l'argument à l'aide d'un exemple concret ou d'une référence philosophique précise, pour montrer la pertinence pratique de la thèse choisie.</p></div>`,
+                trainingTemplate: `[ARGUMENT]\n[RÉF/EX]`,
+                fields: ["ARGUMENT", "RÉF/EX"]
             }
         };
 
@@ -746,6 +2099,8 @@
         state.training.dissertation.dev = content.dev.trainingTemplate;
         state.training.explic.intro = content.explic.intro.trainingTemplate;
         state.training.explic.dev = content.explic.dev.trainingTemplate;
+        state.training.argumentation = { argumentation: content.argumentation.trainingTemplate };
+        state.corrections.argumentation = { argumentation: null };
 
         window.onload = () => {
             // Initialize explication texts
@@ -758,6 +2113,14 @@
                 const opt = document.createElement("option"); opt.value = n; opt.textContent = n;
                 select.appendChild(opt);
             });
+
+            // Initialize argumentation notions
+            const selectArg = document.getElementById("select-notion-arg");
+            Object.keys(sujetsPhilo).forEach(n => {
+                const opt = document.createElement("option"); opt.value = n; opt.textContent = n;
+                selectArg.appendChild(opt);
+            });
+
             render();
         };
 
@@ -768,7 +2131,7 @@
             if (notion) {
                 selectSujet.disabled = false;
                 sujetsPhilo[notion].forEach(s => {
-                    const opt = document.createElement("option"); opt.value = s; opt.textContent = s;
+                    const opt = document.createElement("option"); opt.value = s.question; opt.textContent = s.question;
                     selectSujet.appendChild(opt);
                 });
             } else {
@@ -781,8 +2144,10 @@
             if (textarea) {
                 if (state.exerciseType === 'dissertation') {
                     state.training.dissertation[state.mode] = textarea.value;
-                } else {
+                } else if (state.exerciseType === 'explication') {
                     state.training.explic[state.mode] = textarea.value;
+                } else if (state.exerciseType === 'argumentation') {
+                    state.training.argumentation.argumentation = textarea.value;
                 }
             }
         }
@@ -796,12 +2161,25 @@
         function setExerciseType(t) {
             preserveTrainingText();
             state.exerciseType = t;
-            // toggle active class
             document.getElementById('btn-ex-type-dis').classList.toggle('active', t === 'dissertation');
             document.getElementById('btn-ex-type-exp').classList.toggle('active', t === 'explication');
+            document.getElementById('btn-ex-type-arg').classList.toggle('active', t === 'argumentation');
             // toggle selectors
             document.getElementById('selector-dissertation').style.display = t === 'dissertation' ? 'block' : 'none';
             document.getElementById('selector-explication').style.display = t === 'explication' ? 'block' : 'none';
+            document.getElementById('selector-argumentation').style.display = t === 'argumentation' ? 'block' : 'none';
+
+            const mainNav = document.querySelector('.main-nav');
+            if (t === 'argumentation') {
+                state.mode = 'argumentation';
+                if (mainNav) mainNav.style.display = 'none';
+                toggleArgumentationMode(false);
+            } else {
+                if (state.mode === 'argumentation') {
+                    state.mode = 'intro';
+                }
+                if (mainNav) mainNav.style.display = 'flex';
+            }
             render();
         }
 
@@ -901,9 +2279,12 @@
             if (state.exerciseType === 'dissertation') {
                 state.training.dissertation[state.mode] = content[state.mode].trainingTemplate;
                 state.corrections.dissertation[state.mode] = null;
-            } else {
+            } else if (state.exerciseType === 'explication') {
                 state.training.explic[state.mode] = content.explic[state.mode].trainingTemplate;
                 state.corrections.explic[state.mode] = null;
+            } else if (state.exerciseType === 'argumentation') {
+                state.training.argumentation.argumentation = content.argumentation.trainingTemplate;
+                state.corrections.argumentation.argumentation = null;
             }
             render();
         }
@@ -939,8 +2320,10 @@
         function preserveAndCount(textarea) {
             if (state.exerciseType === 'dissertation') {
                 state.training.dissertation[state.mode] = textarea.value;
-            } else {
+            } else if (state.exerciseType === 'explication') {
                 state.training.explic[state.mode] = textarea.value;
+            } else if (state.exerciseType === 'argumentation') {
+                state.training.argumentation.argumentation = textarea.value;
             }
             updateCharCount(textarea);
         }
@@ -949,6 +2332,7 @@
             // exercise type buttons
             document.getElementById('btn-ex-type-dis').classList.toggle('active', state.exerciseType === 'dissertation');
             document.getElementById('btn-ex-type-exp').classList.toggle('active', state.exerciseType === 'explication');
+            document.getElementById('btn-ex-type-arg').classList.toggle('active', state.exerciseType === 'argumentation');
 
             document.querySelectorAll('.main-nav .btn').forEach(b => b.classList.toggle('active', b.id === (state.mode === 'intro' ? 'btn-mode-intro' : 'btn-mode-dev')));
 
@@ -964,26 +2348,33 @@
 
             const area = document.getElementById('content-area');
 
-            const maxLength = state.mode === 'intro' ? 3000 : 12000;
-            const currentText = (state.exerciseType === 'dissertation')
-                ? (state.training.dissertation[state.mode] || '')
-                : (state.training.explic[state.mode] || '');
+            const maxLength = state.exerciseType === 'argumentation' ? 6000 : (state.mode === 'intro' ? 3000 : 12000);
+            let currentText = '';
+            let savedCorrection = null;
+            if (state.exerciseType === 'dissertation') {
+                currentText = state.training.dissertation[state.mode] || '';
+                savedCorrection = state.corrections.dissertation[state.mode];
+            } else if (state.exerciseType === 'explication') {
+                currentText = state.training.explic[state.mode] || '';
+                savedCorrection = state.corrections.explic[state.mode];
+            } else if (state.exerciseType === 'argumentation') {
+                currentText = state.training.argumentation.argumentation || '';
+                savedCorrection = state.corrections.argumentation.argumentation;
+            }
             const currentLength = currentText.length;
             const charInfo = getCharCountInfo(currentLength, maxLength);
-
-            const savedCorrection = (state.exerciseType === 'dissertation')
-                ? state.corrections.dissertation[state.mode]
-                : state.corrections.explic[state.mode];
 
             let exerciseTitle = '';
             if (state.exerciseType === 'dissertation') {
                 exerciseTitle = state.mode === 'intro'
                     ? "Entraînement à l’introduction de la dissertation"
                     : "Entraînement au développement de la dissertation";
-            } else {
+            } else if (state.exerciseType === 'explication') {
                 exerciseTitle = state.mode === 'intro'
                     ? "Entraînement à l’introduction de l’explication de texte"
                     : "Entraînement au développement de l’explication de texte";
+            } else if (state.exerciseType === 'argumentation') {
+                exerciseTitle = "Entraînement à l’argumentation";
             }
 
             let workspaceHtml = `
@@ -1027,9 +2418,14 @@
 
             // If help is active, render the help column
             if (state.showHelp) {
-                const helpContent = (state.exerciseType === 'dissertation')
-                    ? content[state.mode].methodo
-                    : content.explic[state.mode].methodo;
+                let helpContent = '';
+                if (state.exerciseType === 'dissertation') {
+                    helpContent = content[state.mode].methodo;
+                } else if (state.exerciseType === 'explication') {
+                    helpContent = content.explic[state.mode].methodo;
+                } else if (state.exerciseType === 'argumentation') {
+                    helpContent = content.argumentation.methodo;
+                }
                 workspaceHtml += `
                     <div class="help-column">
                         ${helpContent}
@@ -1046,6 +2442,8 @@
             let sujet = '';
             let selectedTextHtml = null;
             let selectedTextTitle = null;
+            let thesisOrientation = null;
+            let positionTexte = null;
 
             if (state.exerciseType === 'dissertation') {
                 if (state.isCustomDissertation) {
@@ -1061,7 +2459,7 @@
                         return;
                     }
                 }
-            } else {
+            } else if (state.exerciseType === 'explication') {
                 // Explication de texte
                 if (!state.currentExplicText) {
                     if (state.isCustomExplication) {
@@ -1073,6 +2471,22 @@
                 }
                 selectedTextHtml = state.currentExplicText.html;
                 selectedTextTitle = state.currentExplicText.label || state.currentExplicText.title;
+            } else if (state.exerciseType === 'argumentation') {
+                if (!state.activeThesis) {
+                    alert("Veuillez choisir ou saisir une thèse à défendre avant de demander la correction.");
+                    return;
+                }
+                thesisOrientation = state.thesisOrientation;
+                positionTexte = state.activeThesis;
+                if (!state.isCustomArgumentation) {
+                    const notion = document.getElementById("select-notion-arg").value;
+                    const idx = parseInt(document.getElementById("select-sujet-arg").value, 10);
+                    if (notion && !isNaN(idx)) {
+                        sujet = sujetsPhilo[notion][idx].question;
+                    }
+                } else {
+                    sujet = "Thèse personnalisée";
+                }
             }
 
             let trainingText = document.getElementById("training-textarea") ? document.getElementById("training-textarea").value.trim() : '';
@@ -1107,6 +2521,10 @@
                 if (state.exerciseType === 'explication') {
                     body.selectedTextTitle = selectedTextTitle;
                     body.selectedTextHtml = selectedTextHtml;
+                }
+                if (state.exerciseType === 'argumentation') {
+                    body.thesisOrientation = thesisOrientation;
+                    body.positionTexte = positionTexte;
                 }
 
                 const response = await fetch(CLOUD_FUNCTION_URL, {
@@ -1151,8 +2569,10 @@
                 const correctionHtmlFinale = marked.parse(texteCumule);
                 if (state.exerciseType === 'dissertation') {
                     state.corrections.dissertation[state.mode] = correctionHtmlFinale;
-                } else {
+                } else if (state.exerciseType === 'explication') {
                     state.corrections.explic[state.mode] = correctionHtmlFinale;
+                } else if (state.exerciseType === 'argumentation') {
+                    state.corrections.argumentation.argumentation = correctionHtmlFinale;
                 }
             } catch (error) {
                 alert("Erreur lors de la communication avec le correcteur : " + error.message);
@@ -1168,6 +2588,126 @@
                     btnSubmit.style.opacity = "1";       // Reprend son opacité normale
                     btnSubmit.style.cursor = "pointer";
                 }
+            }
+        }
+
+        function updateSujetsArg() {
+            const notion = document.getElementById("select-notion-arg").value;
+            const selectSujet = document.getElementById("select-sujet-arg");
+            selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet --</option>';
+
+            // Hide buttons and clear selection state since the notion changed
+            document.getElementById('btn-arg-thesis').style.display = 'none';
+            document.getElementById('btn-arg-antithesis').style.display = 'none';
+            state.activeThesis = null;
+            state.thesisOrientation = null;
+            updateDisplaySelectedThesis();
+
+            if (notion) {
+                selectSujet.disabled = false;
+                selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet d’étude --</option>';
+                sujetsPhilo[notion].forEach((s, idx) => {
+                    const opt = document.createElement("option");
+                    opt.value = idx;
+                    opt.textContent = s.question;
+                    selectSujet.appendChild(opt);
+                });
+            } else {
+                selectSujet.disabled = true;
+            }
+        }
+
+        function updateArgThesisButtons() {
+            const notion = document.getElementById("select-notion-arg").value;
+            const idx = parseInt(document.getElementById("select-sujet-arg").value, 10);
+
+            const btnThesis = document.getElementById('btn-arg-thesis');
+            const btnAntithesis = document.getElementById('btn-arg-antithesis');
+
+            if (notion && !isNaN(idx)) {
+                const subject = sujetsPhilo[notion][idx];
+
+                btnThesis.textContent = subject.thesis;
+                btnAntithesis.textContent = subject.antithesis;
+
+                btnThesis.style.display = 'block';
+                btnAntithesis.style.display = 'block';
+
+                // Clear active button styles
+                btnThesis.classList.remove('active');
+                btnAntithesis.classList.remove('active');
+            } else {
+                btnThesis.style.display = 'none';
+                btnAntithesis.style.display = 'none';
+            }
+            // Clear current selection since subject changed
+            state.activeThesis = null;
+            state.thesisOrientation = null;
+            updateDisplaySelectedThesis();
+        }
+
+        function selectArgPosition(orientation) {
+            const notion = document.getElementById("select-notion-arg").value;
+            const idx = parseInt(document.getElementById("select-sujet-arg").value, 10);
+            if (!notion || isNaN(idx)) return;
+
+            const subject = sujetsPhilo[notion][idx];
+            state.thesisOrientation = orientation;
+            state.activeThesis = orientation === 'thesis' ? subject.thesis : subject.antithesis;
+
+            // Toggle active classes on buttons
+            document.getElementById('btn-arg-thesis').classList.toggle('active', orientation === 'thesis');
+            document.getElementById('btn-arg-antithesis').classList.toggle('active', orientation === 'antithesis');
+
+            updateDisplaySelectedThesis();
+        }
+
+        function updateCustomArgPosition() {
+            const text = document.getElementById("input-custom-thesis").value.trim();
+            if (text) {
+                state.activeThesis = text;
+                state.thesisOrientation = 'custom';
+            } else {
+                state.activeThesis = null;
+                state.thesisOrientation = null;
+            }
+            updateDisplaySelectedThesis();
+        }
+
+        function toggleArgumentationMode(isCustom) {
+            state.isCustomArgumentation = isCustom;
+            document.getElementById('argumentation-predefined').style.display = isCustom ? 'none' : 'block';
+            document.getElementById('argumentation-custom').style.display = isCustom ? 'block' : 'none';
+
+            if (isCustom) {
+                // Switch to custom: read from input
+                updateCustomArgPosition();
+            } else {
+                // Switch to predefined list: reset input and update from active button
+                document.getElementById('input-custom-thesis').value = '';
+                const btnThesis = document.getElementById('btn-arg-thesis');
+                const btnAntithesis = document.getElementById('btn-arg-antithesis');
+                if (btnThesis.classList.contains('active')) {
+                    selectArgPosition('thesis');
+                } else if (btnAntithesis.classList.contains('active')) {
+                    selectArgPosition('antithesis');
+                } else {
+                    state.activeThesis = null;
+                    state.thesisOrientation = null;
+                    updateDisplaySelectedThesis();
+                }
+            }
+        }
+
+        function updateDisplaySelectedThesis() {
+            const display = document.getElementById('display-selected-thesis');
+            if (state.activeThesis) {
+                const prefix = "<strong>Position à défendre :</strong> ";
+                display.innerHTML = prefix + state.activeThesis;
+                display.style.display = 'block';
+            } else {
+                display.innerHTML = '';
+                display.style.display = 'none';
             }
         }
     </script>
