@@ -2478,11 +2478,13 @@
 
             // If explication de texte, show the text block first
             if (state.exerciseType === 'explication') {
-                workspaceHtml += state.currentExplicText ? `
-                    <div style="margin-top:12px; margin-bottom: 15px; padding:15px; background:#fafafa; border:1px solid #ddd; border-radius:6px; line-height:1.8;">
-                        ${state.currentExplicText.html}
-                    </div>
-                ` : `<div style="margin-top:12px; margin-bottom: 15px; padding:12px; background:#fff3cd; border:1px solid #ffc107; border-radius:6px;"><strong>⚠ Attention :</strong> Veuillez sélectionner un texte en haut de la page.</div>`;
+                if (state.currentExplicText) {
+                    workspaceHtml += `
+                        <div style="margin-top:12px; margin-bottom: 15px; padding:15px; background:#fafafa; border:1px solid #ddd; border-radius:6px; line-height:1.8;">
+                            ${state.currentExplicText.html}
+                        </div>
+                    `;
+                }
             }
 
             // Workspace split layout
