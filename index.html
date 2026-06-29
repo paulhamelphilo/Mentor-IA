@@ -385,42 +385,69 @@
             </div>
 
             <div id="selector-argumentation" style="display:none;">
-                <div id="argumentation-predefined">
-                    <label><strong>Notion</strong></label>
-                    <select id="select-notion-arg" onchange="updateSujetsArg()">
-                        <option value="">-- Sélectionnez une notion --</option>
-                    </select>
+                <!-- Commutateur de sous-mode -->
+                <div class="arg-submode-nav" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" id="btn-arg-submode-dis" class="btn active" style="flex: 1;"
+                        onclick="setArgSubMode('dissertation')">Argumenter une thèse de dissertation</button>
+                    <button type="button" id="btn-arg-submode-frag" class="btn" style="flex: 1;"
+                        onclick="setArgSubMode('fragment')">Expliquer un fragment de texte</button>
+                </div>
 
-                    <label style="margin-top:15px; display:block;"><strong>Sujet</strong></label>
-                    <select id="select-sujet-arg" onchange="updateArgThesisButtons()" disabled>
-                        <option value="">-- Sélectionnez d’abord une notion --</option>
-                    </select>
+                <!-- Bloc Dissertation Thèse -->
+                <div id="argumentation-dissertation-block">
+                    <div id="argumentation-predefined">
+                        <label><strong>Notion</strong></label>
+                        <select id="select-notion-arg" onchange="updateSujetsArg()">
+                            <option value="">-- Sélectionnez une notion --</option>
+                        </select>
 
-                    <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
-                        <button type="button" id="btn-arg-thesis" class="btn"
-                            style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
-                            onclick="selectArgPosition('thesis')"></button>
-                        <button type="button" id="btn-arg-antithesis" class="btn"
-                            style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
-                            onclick="selectArgPosition('antithesis')"></button>
+                        <label style="margin-top:15px; display:block;"><strong>Sujet</strong></label>
+                        <select id="select-sujet-arg" onchange="updateArgThesisButtons()" disabled>
+                            <option value="">-- Sélectionnez d’abord une notion --</option>
+                        </select>
+
+                        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" id="btn-arg-thesis" class="btn"
+                                style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
+                                onclick="selectArgPosition('thesis')"></button>
+                            <button type="button" id="btn-arg-antithesis" class="btn"
+                                style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
+                                onclick="selectArgPosition('antithesis')"></button>
+                        </div>
+
+                        <div style="margin-top:12px; text-align:right;">
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                onclick="toggleArgumentationMode(true)">✍
+                                Saisir une thèse personnalisée à argumenter</button>
+                        </div>
                     </div>
+                    <div id="argumentation-custom" style="display:none;">
+                        <label><strong>Saisir votre thèse personnalisée :</strong></label>
+                        <input type="text" id="input-custom-thesis" placeholder="Ex: L’art est utile."
+                            oninput="updateCustomArgPosition()"
+                            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
 
-                    <div style="margin-top:12px; text-align:right;">
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleArgumentationMode(true)">✍
-                            Saisir une thèse personnalisée à argumenter</button>
+                        <div style="margin-top:12px; text-align:right;">
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                onclick="toggleArgumentationMode(false)">📋 Choisir dans la liste</button>
+                        </div>
                     </div>
                 </div>
-                <div id="argumentation-custom" style="display:none;">
-                    <label><strong>Saisir votre thèse personnalisée :</strong></label>
-                    <input type="text" id="input-custom-thesis" placeholder="Ex: L’art est utile."
-                        oninput="updateCustomArgPosition()"
-                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
 
-                    <div style="margin-top:12px; text-align:right;">
-                        <button type="button" class="btn btn-secondary btn-sm"
-                            onclick="toggleArgumentationMode(false)">📋 Choisir dans la liste</button>
+                <!-- Bloc Fragment de texte -->
+                <div id="argumentation-fragment-block" style="display:none;">
+                    <label><strong>Texte philosophique</strong></label>
+                    <select id="select-explic-text-arg" onchange="selectExplicTextArg(this.value)">
+                        <option value="">-- Sélectionnez un texte --</option>
+                    </select>
+
+                    <div id="argumentation-fragment-text-display"
+                        style="margin-top: 15px; padding: 15px; background: #fafafa; border: 1px solid #ddd; border-radius: 6px; line-height: 1.8;">
+                        <p style="color: #7f8c8d; font-style: italic; margin: 0;">Veuillez sélectionner un texte pour
+                            afficher les fragments cliquables.</p>
                     </div>
                 </div>
+
                 <div id="display-selected-thesis"
                     style="margin-top: 15px; padding: 12px; background-color: #e8f4f8; border-left: 5px solid var(--accent-color); border-radius: 4px; font-weight: bold; color: var(--primary-color); display: none;">
                 </div>
@@ -511,200 +538,1013 @@
         // Textes d'explication intégrés
         const explicTextsData = [
             {
-                author: "Descartes",
-                work: "Discours de la méthode",
-                theme: "Les règles de la méthode",
-                label: "Descartes, Discours de la méthode — Les règles de la méthode",
-                html: "<p>Et, comme la multitude des lois fournit souvent des excuses aux vices, en sorte qu’un État est bien mieux réglé lorsque, n’en ayant que fort peu, elles y sont fort étroitement observées ; ainsi, au lieu de ce grand nombre de préceptes dont la logique est composée, je crus que j’aurais assez des quatre suivants, pourvu que je prisse une ferme et constante résolution de ne manquer pas une seule fois de les observer.</p><p>Le premier était de ne recevoir jamais aucune chose pour vraie que je ne la connusse évidemment être telle ; c’est-à-dire d’éviter soigneusement la précipitation et la prévention ; et de ne comprendre rien de plus en mes jugements que ce qui se présenterait si clairement et si distinctement à mon esprit que je n’eusse aucune occasion de le mettre en doute.</p><p>Le second, de diviser chacune des difficultés que j’examinerais en autant de parcelles qu’il se pourrait et qu’il serait requis pour les mieux résoudre.</p><p>Le troisième, de conduire par ordre mes pensées, en commençant par les objets les plus simples et les plus aisés à connaître, pour monter peu à peu, comme par degrés, jusques à la connaissance des plus composés ; et supposant même de l’ordre entre ceux qui ne précèdent point naturellement les uns les autres.</p><p>Et le dernier, de faire partout des dénombrements si entiers, et des revues si générales, que je fusse assuré de ne rien omettre.</p><p>Ces longues chaînes de raisons, toutes simples et faciles, dont les géomètres ont coutume de se servir, pour parvenir à leurs plus difficiles démonstrations, m’avaient donné occasion de m’imaginer que toutes les choses qui peuvent tomber sous la connaissance des hommes s’entresuivent en même façon, et que, pourvu seulement qu’on s’abstienne d’en recevoir aucune pour vraie qui ne le soit, et qu’on garde toujours l’ordre qu’il faut pour les déduire les unes des autres, il n’y en peut avoir de si éloignées auxquelles enfin on ne parvienne, ni de si cachées qu’on ne découvre.</p><p style=\"text-align: right;\">  DESCARTES, <em>Discours de la méthode</em>, 1637</p>"
+                "author": "Descartes",
+                "work": "Discours de la méthode",
+                "theme": "Les règles de la méthode",
+                "label": "Descartes, Discours de la méthode — Les règles de la méthode",
+                "source": "DESCARTES, <em>Discours de la méthode</em>, 1637",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Et, comme la multitude des lois fournit souvent des excuses aux vices, en sorte qu’un État est bien mieux réglé lorsque, n’en ayant que fort peu, elles y sont fort étroitement observées ; ainsi, au lieu de ce grand nombre de préceptes dont la logique est composée, je crus que j’aurais assez des quatre suivants, pourvu que je prisse une ferme et constante résolution de ne manquer pas une seule fois de les observer.",
+                            "Le premier était de ne recevoir jamais aucune chose pour vraie que je ne la connusse évidemment être telle ; c’est-à-dire d’éviter soigneusement la précipitation et la prévention ; et de ne comprendre rien de plus en mes jugements que ce qui se présenterait si clairement et si distinctement à mon esprit que je n’eusse aucune occasion de le mettre en doute."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Le second, de diviser chacune des difficultés que j’examinerais en autant de parcelles qu’il se pourrait et qu’il serait requis pour les mieux résoudre.",
+                            "Le troisième, de conduire par ordre mes pensées, en commençant par les objets les plus simples et les plus aisés à connaître, pour monter peu à peu, comme par degrés, jusques à la connaissance des plus composés ; et supposant même de l’ordre entre ceux qui ne précèdent point naturellement les uns les autres.",
+                            "Et le dernier, de faire partout des dénombrements si entiers, et des revues si générales, que je fusse assuré de ne rien omettre."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Ces longues chaînes de raisons, toutes simples et faciles, dont les géomètres ont coutume de se servir, pour parvenir à leurs plus difficiles démonstrations, m’avaient donné occasion de m’imaginer que toutes les choses qui peuvent tomber sous la connaissance des hommes s’entresuivent en même façon,",
+                            "et que, pourvu seulement qu’on s’abstienne d’en recevoir aucune pour vraie qui ne le soit, et qu’on garde toujours l’ordre qu’il faut pour les déduire les unes des autres, il n’y en peut avoir de si éloignées auxquelles enfin on ne parvienne, ni de si cachées qu’on ne découvre."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        1
+                    ],
+                    [
+                        1,
+                        0
+                    ],
+                    [
+                        1,
+                        1
+                    ],
+                    [
+                        1,
+                        2
+                    ],
+                    [
+                        2,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Mill",
-                work: "De la liberté",
-                theme: "La liberté d’expression",
-                label: "Mill, De la liberté — La liberté d’expression",
-                html: "<p>Si tous les hommes moins un partageaient la même opinion, ils n’en auraient pas pour autant le droit d’imposer silence à cette personne, pas plus que celle-ci, d’imposer silence aux hommes si elle en avait le pouvoir. Si une opinion n’était qu’une possession personnelle, sans valeur pour d’autres que son possesseur ; si d’être gêné dans la jouissance (1) de cette possession n’était qu’un dommage (2) privé, il y aurait une différence à ce que ce dommage fût infligé à peu ou à beaucoup de personnes. Mais ce qu’il y a de particulièrement néfaste à imposer silence à l’expression d’une opinion, c’est que cela revient à voler l’humanité : tant la postérité que la génération présente, les adversaires de cette opinion davantage encore que ses défenseurs. Si l’opinion est juste, on les prive de l’occasion d’échanger l’erreur pour la vérité ; si elle est fausse, ils perdent un bénéfice presque aussi considérable : une perception plus claire et une impression plus vive de la vérité que produit sa confrontation avec l’erreur.</p><p>Il est nécessaire de considérer séparément ces deux hypothèses, à chacune desquelles correspond une branche distincte de l’argument. On ne peut jamais être sûr que l’opinion qu’on s’efforce d’étouffer est fausse ; et si nous l’étions, ce serait encore un mal.</p><p style=\"text-align: right;\">  MILL, <em>De la liberté</em>, 1859</p><div>(1) « jouissance » : usage<br> (2) « dommage » : nuisance, mal</div>"
+                "author": "Mill",
+                "work": "De la liberté",
+                "theme": "La liberté d’expression",
+                "label": "Mill, De la liberté — La liberté d’expression",
+                "source": "MILL, <em>De la liberté</em>, 1859",
+                "notes": "(1) « jouissance » : usage<br> (2) « dommage » : nuisance, mal",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Si tous les hommes moins un partageaient la même opinion, ils n’en auraient pas pour autant le droit d’imposer silence à cette personne, pas plus que celle-ci, d’imposer silence aux hommes si elle en avait le pouvoir. ",
+                            "Si une opinion n’était qu’une possession personnelle, sans valeur pour d’autres que son possesseur ; si d’être gêné dans la jouissance (1) de cette possession n’était qu’un dommage (2) privé, il y aurait une différence à ce que ce dommage fût infligé à peu ou à beaucoup de personnes."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Mais ce qu’il y a de particulièrement néfaste à imposer silence à l’expression d’une opinion, c’est que cela revient à voler l’humanité : tant la postérité que la génération présente, les adversaires de cette opinion davantage encore que ses défenseurs.",
+                            "Si l’opinion est juste, on les prive de l’occasion d’échanger l’erreur pour la vérité ; si elle est fausse, ils perdent un bénéfice presque aussi considérable : une perception plus claire et une impression plus vive de la vérité que produit sa confrontation avec l’erreur."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Il est nécessaire de considérer séparément ces deux hypothèses, à chacune desquelles correspond une branche distincte de l’argument.",
+                            "On ne peut jamais être sûr que l’opinion qu’on s’efforce d’étouffer est fausse ; et si nous l’étions, ce serait encore un mal."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        2,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Aristote",
-                work: "Éthique à Nicomaque",
-                theme: "Le plaisir et la vertu",
-                label: "Aristote, Éthique à Nicomaque — Le plaisir et la vertu",
-                html: "<p>On admet, en effet, d’ordinaire que le plaisir est ce qui touche le plus près à notre humaine nature ; et c’est pourquoi dans l’éducation des jeunes gens, c’est par le plaisir et la peine qu’on les gouverne. On est également d’avis que pour former l’excellence du caractère, le facteur le plus important est de se plaire aux choses qu’il faut et de détester celles qui doivent l’être. En effet, plaisir et peine s’étendent tout au long de la vie, et sont d’un grand poids et d’une grande force pour la vertu comme pour la vie heureuse, puisqu’on élit ce qui est agréable et qu’on évite ce qui est pénible.</p><p>Et les facteurs de cette importance ne doivent d’aucune façon, semblera-t-il, être passés sous silence, étant donné surtout le grand débat qui s’élève à leur sujet. Les uns, en effet, prétendent que le plaisir est le bien ; d’autres, au contraire, qu’il est entièrement mauvais ; parmi ces derniers, certains sont sans doute persuadés qu’il en est réellement ainsi, tandis que d’autres pensent qu’il est préférable dans l’intérêt de notre vie morale de placer ouvertement le plaisir au nombre des choses mauvaises, même s’il n’en est rien : car la plupart des hommes ayant pour lui une forte inclination et étant esclaves de leurs plaisirs, il convient, disent-ils, de les mener dans la direction contraire, car ils atteindront ainsi le juste milieu.</p><p>Mais il est à craindre que cette manière de voir ne soit pas exacte. En effet, quand il s’agit des sentiments et des actions, les arguments sont d’une crédibilité moindre que les faits, et ainsi lorsqu’ils sont en désaccord avec les données de la perception ils sont rejetés avec mépris et entraînent la vérité dans leur ruine. Car, une fois qu’on s’est aperçu que le contempteur du plaisir (1) y a lui-même tendance, son inclination au plaisir semble bien indiquer que tout plaisir est digne d’être poursuivi.</p><p style=\"text-align: right;\">ARISTOTE, <em>Éthique à Nicomaque</em>, IVe siècle av. J.-C.</p><div>(1) « le contempteur du plaisir » : celui qui méprise le plaisir</div>"
+                "author": "Aristote",
+                "work": "Éthique à Nicomaque",
+                "theme": "Le plaisir et la vertu",
+                "label": "Aristote, Éthique à Nicomaque — Le plaisir et la vertu",
+                "source": "ARISTOTE, <em>Éthique à Nicomaque</em>, IVe siècle av. J.-C.",
+                "notes": "(1) « le contempteur du plaisir » : celui qui méprise le plaisir",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "On admet, en effet, d’ordinaire que le plaisir est ce qui touche le plus près à notre humaine nature ; et c’est pourquoi dans l’éducation des jeunes gens, c’est par le plaisir et la peine qu’on les gouverne.",
+                            "On est également d’avis que pour former l’excellence du caractère, le facteur le plus important est de se plaire aux choses qu’il faut et de détester celles qui doivent l’être.",
+                            "En effet, plaisir et peine s’étendent tout au long de la vie, et sont d’un grand poids et d’une grande force pour la vertu comme pour la vie heureuse, puisqu’on élit ce qui est agréable et qu’on évite ce qui est pénible."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Et les facteurs de cette importance ne doivent d’aucune façon, semblera-t-il, être passés sous silence, étant donné surtout le grand débat qui s’élève à leur sujet.",
+                            "Les uns, en effet, prétendent que le plaisir est le bien ; d’autres, au contraire, qu’il est entièrement mauvais ;",
+                            "parmi ces derniers, certains sont sans doute persuadés qu’il en est réellement ainsi, tandis que d’autres pensent qu’il est préférable dans l’intérêt de notre vie morale de placer ouvertement le plaisir au nombre des choses mauvaises, même s’il n’en est rien : car la plupart des hommes ayant pour lui une forte inclination et étant esclaves de leurs plaisirs, il convient, disent-ils, de les mener dans la direction contraire, car ils atteindront ainsi le juste milieu."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Mais il est à craindre que cette manière de voir ne soit pas exacte.",
+                            "En effet, quand il s’agit des sentiments et des actions, les arguments sont d’une crédibilité moindre que les faits, et ainsi lorsqu’ils sont en désaccord avec les données de la perception ils sont rejetés avec mépris et entraînent la vérité dans leur ruine.",
+                            "Car, une fois qu’on s’est aperçu que le contempteur du plaisir (1) y a lui-même tendance, son inclination au plaisir semble bien indiquer que tout plaisir est digne d’être poursuivi."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ],
+                    [
+                        2,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Sartre",
-                work: "L’Être et le néant",
-                theme: "La liberté et la signification du passé",
-                label: "Sartre, L’Être et le néant — La liberté et la signification du passé",
-                html: "<p>La signification du passé est étroitement dépendante de mon projet présent. Cela ne signifie nullement que je puis faire varier au gré de mes caprices le sens de mes actes antérieurs, mais bien au contraire que le projet fondamental que je suis décide absolument de la signification que peut avoir pour moi et pour les autres le passé que j’ai à être. Moi seul en effet peux décider à chaque moment de la portée du passé : non pas en discutant, en délibérant et en appréciant en chaque cas l’importance de tel ou tel événement, mais en me projetant vers mes buts, je sauve le passé avec moi et je décide par l’action de sa signification.</p><p>Cette crise mystique de ma quinzième année, qui décidera si elle « a été » pur accident de puberté ou au contraire premier signe d’une conversion future ? Moi, selon que je déciderai – à vingt ans, à trente ans – de me convertir. Le projet de conversion confère d’un seul coup à une crise d’adolescence la valeur d’une prémonition que je n’avais pas prise au sérieux. Qui décidera si le séjour en prison que j’ai fait après un vol, a été fructueux ou déplorable ? Moi, selon que je renonce à voler ou que je m’endurcis. Qui peut décider de la valeur d’enseignement d’un voyage, de la sincérité d’un serment d’amour, de la pureté d’une intention passée, etc. ? C’est moi, toujours moi, selon les fins par lesquelles je les éclaire.</p><p style=\"text-align: right;\">SARTRE, <em>L’Être et le néant</em>, 1943</p>"
+                "author": "Sartre",
+                "work": "L’Être et le néant",
+                "theme": "La liberté et la signification du passé",
+                "label": "Sartre, L’Être et le néant — La liberté et la signification du passé",
+                "source": "SARTRE, <em>L’Être et le néant</em>, 1943",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "La signification du passé est étroitement dépendante de mon projet présent.",
+                            "Cela ne signifie nullement que je puis faire varier au gré de mes caprices le sens de mes actes antérieurs, mais bien au contraire que le projet fondamental que je suis décide absolument de la signification que peut avoir pour moi et pour les autres le passé que j’ai à être.",
+                            "Moi seul en effet peux décider à chaque moment de la portée du passé : non pas en discutant, en délibérant et en appréciant en chaque cas l’importance de tel ou tel événement, mais en me projetant vers mes buts, je sauve le passé avec moi et je décide par l’action de sa signification."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Cette crise mystique de ma quinzième année, qui décidera si elle « a été » pur accident de puberté ou au contraire premier signe d’une conversion future ? Moi, selon que je déciderai – à vingt ans, à trente ans – de me convertir.",
+                            "Le projet de conversion confère d’un seul coup à une crise d’adolescence la valeur d’une prémonition que je n’avais pas prise au sérieux.",
+                            "Qui décidera si le séjour en prison que j’ai fait après un vol, a été fructueux ou déplorable ? Moi, selon que je renonce à voler ou que je m’endurcis.",
+                            "Qui peut décider de la valeur d’enseignement d’un voyage, de la sincérité d’un serment d’amour, de la pureté d’une intention passée, etc. ? C’est moi, toujours moi, selon les fins par lesquelles je les éclaire."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Bentham",
-                work: "Traités de législation civile et pénale",
-                theme: "La religion et le pouvoir de l’État",
-                label: "Bentham, Traités de législation civile et pénale — La religion et le pouvoir de l’État",
-                html: "<p>Pour combattre toutes les espèces de délits dont la nature humaine est capable, l’État n’a que deux grands moyens, les Peines et les Récompenses ; les peines pour être appliquées à tous et dans les occasions ordinaires ; les récompenses pour être réservées à un petit nombre et dans des occasions extraordinaires. Mais cette administration des Peines et des Récompenses est souvent contrariée ou égarée, ou rendue impuissante, parce qu’elle n’a pas des yeux pour tout voir et des mains pour tout atteindre. Pour suppléer (1) à cette insuffisance du pouvoir humain, on a cru nécessaire ou du moins utile d’inculquer dans les esprits la croyance en un pouvoir qui s’applique au même but, et qui n’a pas les mêmes imperfections : le pouvoir d’un Être suprême invisible auquel on attribue la disposition de maintenir les lois de la Société, de punir et de récompenser de manière infaillible les actions que les hommes n’ont pu ni récompenser ni punir. Tout ce qui sert à conserver et fortifier parmi les hommes cette crainte du juge suprême est compris sous le nom général de Religion, et pour la clarté du discours, on parle souvent de la religion comme on parlerait d’un être distinct, d’un personnage allégorique (2), auquel on attribue telle ou telle fonction. Ainsi, diminuer ou pervertir l’influence de la religion, c’est diminuer ou pervertir dans la même proportion les services que l’État en retire pour réprimer le crime ou encourager la vertu.</p><p style=\"text-align: right;\"> BENTHAM, <em>Traités de législation civile et pénale</em>, 1802</p><div>(1) « suppléer » : mettre à la place de<br> (2) « personnage allégorique » : figure qui symbolise une idée, une valeur</div>"
+                "author": "Bentham",
+                "work": "Traités de législation civile et pénale",
+                "theme": "La religion et le pouvoir de l’État",
+                "label": "Bentham, Traités de législation civile et pénale — La religion et le pouvoir de l’État",
+                "source": "BENTHAM, <em>Traités de législation civile et pénale</em>, 1802",
+                "notes": "(1) « suppléer » : mettre à la place de<br> (2) « personnage allégorique » : figure qui symbolise une idée, une valeur",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Pour combattre toutes les espèces de délits dont la nature humaine est capable, l’État n’a que deux grands moyens, les Peines et les Récompenses ; les peines pour être appliquées à tous et dans les occasions ordinaires ; les récompenses pour être réservées à un petit nombre et dans des occasions extraordinaires.",
+                            "Mais cette administration des Peines et des Récompenses est souvent contrariée ou égarée, ou rendue impuissante, parce qu’elle n’a pas des yeux pour tout voir et des mains pour tout atteindre."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Pour suppléer (1) à cette insuffisance du pouvoir humain, on a cru nécessaire ou du moins utile d’inculquer dans les esprits la croyance en un pouvoir qui s’applique au même but, et qui n’a pas les mêmes imperfections : le pouvoir d’un Être suprême invisible auquel on attribue la disposition de maintenir les lois de la Société, de punir et de récompenser de manière infaillible les actions que les hommes n’ont pu ni récompenser ni punir.",
+                            "Tout ce qui sert à conserver et fortifier parmi les hommes cette crainte du juge suprême est compris sous le nom général de Religion, et pour la clarté du discours, on parle souvent de la religion comme on parlerait d’un être distinct, d’un personnage allégorique (2), auquel on attribue telle ou telle fonction."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Ainsi, diminuer ou pervertir l’influence de la religion, c’est diminuer ou pervertir dans la même proportion les services que l’État en retire pour réprimer le crime ou encourager la vertu."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Sartre",
-                work: "Qu’est-ce que la littérature ?",
-                theme: "La nature de l’art",
-                label: "Sartre, Qu’est-ce que la littérature ? — La nature de l’art",
-                html: "<p>Il y a le vert, il y a le rouge, c’est tout ; ce sont des choses, elles existent par elles-mêmes. Il est vrai qu’on peut leur conférer par convention la valeur de signes. Ainsi parle-t-on du langage des fleurs. Mais si, après accord, les roses blanches signifient pour moi « fidélité », c’est que j’ai cessé de les voir comme roses : mon regard les traverse pour viser au-delà d’elles cette vertu abstraite ; je les oublie, je ne prends pas garde à leur foisonnement mousseux, à leur doux parfum croupi (1) ; je ne les ai pas même perçues. Cela veut dire que je ne me suis pas comporté en artiste. Pour l’artiste, la couleur, le bouquet, le tintement de la cuiller sur la soucoupe sont choses au suprême degré ; il s’arrête à la qualité du son ou de la forme, il y revient sans cesse et s’en enchante ; c’est cette couleur-objet qu’il va transporter sur sa toile et la seule modification qu’il lui fera subir c’est qu’il la transformera en objet imaginaire. Il est donc le plus éloigné de considérer les couleurs et les sons comme un langage. Ce qui vaut pour les éléments de la création artistique vaut aussi pour leurs combinaisons : le peintre ne veut pas tracer des signes sur sa toile, il veut créer une chose et s’il met ensemble du rouge, du jaune et du vert, il n’y a aucune raison pour que leur assemblage possède une signification définissable, c’est-à-dire renvoie nommément à un autre objet.</p><p style=\"text-align: right;\">SARTRE, <em>Qu’est-ce que la littérature ?</em>, 1948</p><div>(1) « croupi » : qui s’est décomposé</div>"
+                "author": "Sartre",
+                "work": "Qu’est-ce que la littérature ?",
+                "theme": "La nature de l’art",
+                "label": "Sartre, Qu’est-ce que la littérature ? — La nature de l’art",
+                "source": "SARTRE, <em>Qu’est-ce que la littérature ?</em>, 1948",
+                "notes": "(1) « croupi » : qui s’est décomposé",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Il y a le vert, il y a le rouge, c’est tout ; ce sont des choses, elles existent par elles-mêmes.",
+                            "Il est vrai qu’on peut leur conférer par convention la valeur de signes. Ainsi parle-t-on du langage des fleurs.",
+                            "Mais si, après accord, les roses blanches signifient pour moi « fidélité », c’est que j’ai cessé de les voir comme roses : mon regard les traverse pour viser au-delà d’elles cette vertu abstraite ; je les oublie, je ne prends pas garde à leur foisonnement mousseux, à leur doux parfum croupi (1) ; je ne les ai pas même perçues. Cela veut dire que je ne me suis pas comporté en artiste."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Pour l’artiste, la couleur, le bouquet, le tintement de la cuiller sur la soucoupe sont choses au suprême degré ; il s’arrête à la qualité du son ou de la forme, il y revient sans cesse et s’en enchante ;",
+                            "c’est cette couleur-objet qu’il va transporter sur sa toile et la seule modification qu’il lui fera subir c’est qu’il la transformera en objet imaginaire. Il est donc le plus éloigné de considérer les couleurs et les sons comme un langage."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Ce qui vaut pour les éléments de la création artistique vaut aussi pour leurs combinaisons : le peintre ne veut pas tracer des signes sur sa toile, il veut créer une chose et s’il met ensemble du rouge, du jaune et du vert, il n’y a aucune raison pour que leur assemblage possède une signification définissable, c’est-à-dire renvoie nommément à un autre objet."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Platon",
-                work: "Les Lois",
-                theme: "L’amour de soi et l’ignorance",
-                label: "Platon, Les Lois — L’amour de soi et l’ignorance",
-                html: "<p>Mais il y a, implanté dans l’âme de la plupart des hommes, un mal qui est plus grave que tous les autres, celui qui fait que chacun est pour lui-même plein d’indulgence, et auquel personne ne prend les moyens d’échapper : ce mal, on l’appelle « amour de soi », en ajoutant que cette indulgence est naturelle à tout homme et qu’il est dans l’ordre des choses qu’il en aille ainsi. Oui, mais en réalité, chacune de nos fautes a en toute occasion pour cause un excès d’amour de soi. Car celui qui aime fait preuve d’aveuglement à l’égard de ce qu’il aime, de sorte que son jugement est erroné quand il porte sur ce qui est juste, bon et beau, car il est convaincu que son intérêt doit toujours mériter plus d’estime que le vrai. Ce n’est en effet ni soi-même ni son intérêt que l’on doit chérir si l’on veut être un grand homme, mais c’est le juste, que l’action juste soit la sienne ou plutôt celle d’autrui. Or, c’est cette même erreur qui explique aussi que tous les hommes prennent leur ignorance pour de la sagesse. De là vient que, alors que nous ne savons pour ainsi dire rien, nous estimons tout savoir et, parce que nous ne laissons pas faire aux autres ce que nous ne savons pas faire, nous nous trompons forcément en le faisant nous-mêmes. Aussi tout homme doit-il fuir l’amour excessif qu’il se porte à lui-même et rechercher toujours quelqu’un qui soit meilleur que lui-même, sans s’abriter en pareille occasion derrière aucun sentiment de honte.</p><p style=\"text-align: right;\"> PLATON, <em>Les Lois</em>, IVe siècle avant J.-C.</p>"
+                "author": "Platon",
+                "work": "Les Lois",
+                "theme": "L’amour de soi et l’ignorance",
+                "label": "Platon, Les Lois — L’amour de soi et l’ignorance",
+                "source": "PLATON, <em>Les Lois</em>, IVe siècle avant J.-C.",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Mais il y a, implanté dans l’âme de la plupart des hommes, un mal qui est plus grave que tous les autres, celui qui fait que chacun est pour lui-même plein d’indulgence, et auquel personne ne prend les moyens d’échapper : ce mal, on l’appelle « amour de soi », en ajoutant que cette indulgence est naturelle à tout homme et qu’il est dans l’ordre des choses qu’il en aille ainsi.",
+                            "Oui, mais en réalité, chacune de nos fautes a en toute occasion pour cause un excès d’amour de soi. Car celui qui aime fait preuve d’aveuglement à l’égard de ce qu’il aime, de sorte que son jugement est erroné quand il porte sur ce qui est juste, bon et beau, car il est convaincu que son intérêt doit toujours mériter plus d’estime que le vrai."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Ce n’est en effet ni soi-même ni son intérêt que l’on doit chérir si l’on veut être un grand homme, mais c’est le juste, que l’action juste soit la sienne ou plutôt celle d’autrui."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Or, c’est cette même erreur qui explique aussi que tous les hommes prennent leur ignorance pour de la sagesse. De là vient que, alors que nous ne savons pour ainsi dire rien, nous estimons tout savoir et, parce que nous ne laissons pas faire aux autres ce que nous ne savons pas faire, nous nous trompons forcément en le faisant nous-mêmes.",
+                            "Aussi tout homme doit-il fuir l’amour excessif qu’il se porte à lui-même et rechercher toujours quelqu’un qui soit meilleur que lui-même, sans s’abriter en pareille occasion derrière aucun sentiment de honte."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Smith",
-                work: "Théorie des sentiments moraux",
-                theme: "La justice comme fondement de la société",
-                label: "Smith, Théorie des sentiments moraux — La justice comme fondement de la société",
-                html: "<p>La société peut se maintenir entre différents hommes comme entre différents marchands, à partir du sens de son utilité, sans aucun lien réciproque d’amour ou d’affection. Et quoique l’homme qui en est membre ne soit lié par aucune obligation, ni par aucune forme de gratitude vis-à-vis d’autrui, la société peut toujours être soutenue par l’échange mercenaire (1) de bons services selon des valeurs convenues.</p><p>La société, toutefois, ne peut subsister entre ceux qui sont toujours prêts à se nuire et à se causer du tort. Dès que surviennent les préjudices (2), dès que s’installent le ressentiment réciproque et l’animosité (3), tous les liens de la société sont déchirés, et les différents membres en quoi elle consistait sont, en quelque sorte, disséminés et dispersés à l’entour par la violence et l’opposition de leurs sentiments discordants. S’il y a une société entre des brigands et des assassins, ils doivent au moins, selon l’observation commune, s’abstenir de se voler ou de s’assassiner les uns les autres. La bienfaisance est donc moins essentielle à l’existence de la société que la justice. La société peut se maintenir sans bienfaisance, quoique dans un état qui ne soit pas le plus confortable ; mais la prédominance de l’injustice la détruira absolument.</p><p style=\"text-align: right;\">SMITH, <em>Théorie des sentiments moraux</em>, 1759</p><div>(1) « mercenaire » : qui se fait payer<br>(2) « préjudices » : perte, dommage ou atteinte causée par l’action de quelqu’un<br>(3) « animosité » : sentiment hostile</div>"
+                "author": "Smith",
+                "work": "Théorie des sentiments moraux",
+                "theme": "La justice comme fondement de la société",
+                "label": "Smith, Théorie des sentiments moraux — La justice comme fondement de la société",
+                "source": "SMITH, <em>Théorie des sentiments moraux</em>, 1759",
+                "notes": "(1) « mercenaire » : qui se fait payer<br>(2) « préjudices » : perte, dommage ou atteinte causée par l’action de quelqu’un<br>(3) « animosité » : sentiment hostile",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "La société peut se maintenir entre différents hommes comme entre différents marchands, à partir du sens de son utilité, sans aucun lien réciproque d’amour ou d’affection.",
+                            "Et quoique l’homme qui en est membre ne soit lié par aucune obligation, ni par aucune forme de gratitude vis-à-vis d’autrui, la société peut toujours être soutenue par l’échange mercenaire (1) de bons services selon des valeurs convenues."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "La société, toutefois, ne peut subsister entre ceux qui sont toujours prêts à se nuire et à se causer du tort. Dès que surviennent les préjudices (2), dès que s’installent le ressentiment réciproque et l’animosité (3), tous les liens de la société sont déchirés, et les différents membres en quoi elle consistait sont, en quelque sorte, disséminés et dispersés à l’entour par la violence et l’opposition de leurs sentiments discordants.",
+                            "S’il y a une société entre des brigands et des assassins, ils doivent au moins, selon l’observation commune, s’abstenir de se voler ou de s’assassiner les uns les autres.",
+                            "La bienfaisance est donc moins essentielle à l’existence de la société que la justice. La société peut se maintenir sans bienfaisance, quoique dans un état qui ne soit pas le plus confortable ; mais la prédominance de l’injustice la détruira absolument."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Hegel",
-                work: "Esthétique",
-                theme: "La supériorité de l’art sur la nature",
-                label: "Hegel, Esthétique — La supériorité de l’art sur la nature",
-                html: "<p>Une œuvre d’art, dit-on, étant un produit humain, est inférieure aux produits de la nature. Certes, une œuvre d’art n’est pas douée de sentiment, ne déborde pas de vie, est tout à fait superficielle, alors que les produits de la nature sont des produits vivants. Et c’est ainsi que les produits de la nature, étant l’œuvre de Dieu, seraient supérieurs aux œuvres d’art qui sont des produits humains. En ce qui concerne cette opposition, on doit bien reconnaître qu’en tant qu’objet l’œuvre d’art est privée de vie, de vie extérieure, et peut en conséquence être considérée comme une chose morte. Ce qui est vraiment vivant présente une organisation dont le finalisme (1) s’étend jusqu’aux moindres détails, alors que l’œuvre d’art ne présente une apparence de vie qu’à sa surface, et qu’intérieurement, elle n’est que pierre, bois ou toile vulgaires ou, comme dans la poésie, représentations traduites en mots et en discours. Mais, sous son aspect de chose, d’objet, l’œuvre d’art n’est justement pas une œuvre d’art : elle n’est œuvre d’art qu’en tant que spiritualité, qu’en tant qu’elle a reçu le baptême (2) de l’esprit et représente quelque chose qui participe de l’esprit, qui est accordé à l’esprit.</p><p>L’œuvre d’art vient donc de l’esprit et existe pour l’esprit, et sa supériorité consiste en ce que si le produit naturel est un produit doué de vie, il est périssable, tandis qu’une œuvre d’art est une œuvre qui dure. La durée présente un intérêt plus grand. Les événements arrivent, mais, aussitôt arrivés, ils s’évanouissent ; l’œuvre d’art leur confère de la durée, les représente dans leur vérité impérissable.</p><p style=\"text-align: right;\"> HEGEL, <em>Esthétique</em>, 1835</p><div>(1) « finalisme » : ordonnancement qui dispose harmonieusement l’ensemble des parties d’un tout<br> (2) « baptême » : sacrement de l’Église chrétienne, employé ici au sens imagé</div>"
+                "author": "Hegel",
+                "work": "Esthétique",
+                "theme": "La supériorité de l’art sur la nature",
+                "label": "Hegel, Esthétique — La supériorité de l’art sur la nature",
+                "source": "HEGEL, <em>Esthétique</em>, 1835",
+                "notes": "(1) « finalisme » : ordonnancement qui dispose harmonieusement l’ensemble des parties d’un tout<br> (2) « baptême » : sacrement de l’Église chrétienne, employé ici au sens imagé",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Une œuvre d’art, dit-on, étant un produit humain, est inférieure aux produits de la nature. Certes, une œuvre d’art n’est pas douée de sentiment, ne déborde pas de vie, est tout à fait superficielle, alors que les produits de la nature sont des produits vivants.",
+                            "Et c’est ainsi que les produits de la nature, étant l’œuvre de Dieu, seraient supérieurs aux œuvres d’art qui sont des produits humains.",
+                            "En ce qui concerne cette opposition, on doit bien reconnaître qu’en tant qu’objet l’œuvre d’art est privée de vie, de vie extérieure, et peut en conséquence être considérée comme une chose morte. Ce qui est vraiment vivant présente une organisation dont le finalisme (1) s’étend jusqu’aux moindres détails, alors que l’œuvre d’art ne présente une apparence de vie qu’à sa surface, et qu’intérieurement, elle n’est que pierre, bois ou toile vulgaires ou, comme dans la poésie, représentations traduites en mots et en discours."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Mais, sous son aspect de chose, d’objet, l’œuvre d’art n’est justement pas une œuvre d’art : elle n’est œuvre d’art qu’en tant que spiritualité, qu’en tant qu’elle a reçu le baptême (2) de l’esprit et représente quelque chose qui participe de l’esprit, qui est accordé à l’esprit."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "L’œuvre d’art vient donc de l’esprit et existe pour l’esprit, et sa supériorité consiste en ce que si le produit naturel est un produit doué de vie, il est périssable, tandis qu’une œuvre d’art est une œuvre qui dure.",
+                            "La durée présente un intérêt plus grand. Les événements arrivent, mais, aussitôt arrivés, ils s’évanouissent ; l’œuvre d’art leur confère de la durée, les représente dans leur vérité impérissable."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        2,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Rawls",
-                work: "Théorie de la justice",
-                theme: "La justice sociale",
-                label: "Rawls, Théorie de la justice — La justice sociale",
-                html: "<p>Posons, pour fixer les idées, qu’une société est une association, plus ou moins autosuffisante, de personnes qui, dans leurs relations réciproques, reconnaissent certaines règles de conduite comme obligatoires, et qui, pour la plupart, agissent en conformité avec elles. Supposons, de plus, que ces règles déterminent un système de coopération visant à favoriser le bien de ses membres. Bien qu’une société soit une tentative de coopération en vue de l’avantage mutuel, elle se caractérise donc à la fois par un conflit d’intérêts et par une identité d’intérêts. Il y a identité d’intérêts puisque la coopération sociale procure à tous une vie meilleure que celle que chacun aurait eue en cherchant à vivre seulement grâce à ses propres efforts. Il y a conflit d’intérêts puisque les hommes ne sont pas indifférents à la façon dont sont répartis les fruits de leur collaboration, car, dans la poursuite de leurs objectifs, ils préfèrent tous une part plus grande de ces avantages à une plus petite. On a donc besoin d’un ensemble de principes pour choisir entre les différentes organisations sociales qui déterminent cette répartition des avantages et pour conclure un accord sur une distribution correcte des parts. Ces principes sont ceux de la justice sociale.</p><p style=\"text-align: right;\"> RAWLS, <em>Théorie de la justice</em>, 1971</p>"
+                "author": "Rawls",
+                "work": "Théorie de la justice",
+                "theme": "La justice sociale",
+                "label": "Rawls, Théorie de la justice — La justice sociale",
+                "source": "RAWLS, <em>Théorie de la justice</em>, 1971",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Posons, pour fixer les idées, qu’une société est une association, plus ou moins autosuffisante, de personnes qui, dans leurs relations réciproques, reconnaissent certaines règles de conduite comme obligatoires, et qui, pour la plupart, agissent en conformité avec elles.",
+                            "Supposons, de plus, que ces règles déterminent un système de coopération visant à favoriser le bien de ses membres."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Bien qu’une société soit une tentative de coopération en vue de l’avantage mutuel, elle se caractérise donc à la fois par un conflit d’intérêts et par une identité d’intérêts.",
+                            "Il y a identité d’intérêts puisque la coopération sociale procure à tous une vie meilleure que celle que chacun aurait eue en cherchant à vivre seulement grâce à ses propres efforts.",
+                            "Il y a conflit d’intérêts puisque les hommes ne sont pas indifférents à la façon dont sont répartis les fruits de leur collaboration, car, dans la poursuite de leurs objectifs, ils préfèrent tous une part plus grande de ces avantages à une plus petite."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "On a donc besoin d’un ensemble de principes pour choisir entre les différentes organisations sociales qui déterminent cette répartition des avantages et pour conclure un accord sur une distribution correcte des parts. Ces principes sont ceux de la justice sociale."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Zhuangzi (Tchouang-tseu)",
-                work: "Œuvres complètes",
-                theme: "La liberté naturelle",
-                label: "Zhuangzi (Tchouang-tseu), Œuvres complètes — La liberté naturelle",
-                html: "<p>Les chevaux ont des sabots pour fouler le givre et la neige. Ils ont une robe qui les protège de la bise et de la froidure. Ils broutent l’herbe, boivent l’eau, lèvent les pattes et galopent. Telle est la véritable nature des chevaux. Ils n’ont que faire des manèges et des écuries. Un jour Po lo (1) survint. Il déclara : « Je vais m’occuper des chevaux. » Il les brûla, les tailla, les perça, les brida ; il les lia avec des longes et des entraves ; il les parqua dans des enclos. Il en mourut trois sur dix. Il leur fit endurer la faim et la soif ; il les contraignit à prendre le trot ou le galop. Il les accoutuma à s’aligner et à se mouvoir de concert ; il leur imposa, devant, la torture du mors (2) et leur agita, derrière, la menace de la cravache. Il en mourut la moitié.</p><p>Le potier déclara : « Je sais pétrir la glaise. » Il la façonna au compas et à l’équerre pour obtenir des formes rondes ou carrées. Le charpentier décréta : « Je sais travailler le bois. » Il ploya les parties courbes à la forme à cintrer (3), rectifia les parties droites au cordeau. Était-il dans la nature de la glaise et du bois de se voir appliquer le compas, l’équerre et les instruments pour former des droites et des courbes ? Et pourtant de génération en génération on ne cesse de proclamer : « Po lo sut dresser les chevaux, le potier façonner l’argile, le charpentier courber le bois. » Ceux qui prétendent gouverner le monde présentent le même défaut. Je considère, moi, que ceux qui savent réellement gouverner s’y prennent tout autrement. Si on laisse les gens s’abandonner à leur constitution naturelle, ils se contentent de tisser la toile pour se vêtir, de labourer pour se nourrir ; par là se manifeste une vertu commune, ils sont tous unis et il n’y a pas de partis. C’est ce qu’on appelle la liberté naturelle.</p><p style=\"text-align: right;\">ZHUANGZI (TCHOUANG-TSEU), <em>Œuvres complètes</em>, chapitre 9, IVe siècle av. J.-C.</p><div>(1) Po-lo est un dresseur de chevaux légendaire.<br>(2) le mors est une pièce métallique qui passe dans la bouche du cheval.<br>(3) « forme à cintrer » : instrument pour imposer une forme courbe.</div>"
+                "author": "Zhuangzi (Tchouang-tseu)",
+                "work": "Œuvres complètes",
+                "theme": "La liberté naturelle",
+                "label": "Zhuangzi (Tchouang-tseu), Œuvres complètes — La liberté naturelle",
+                "source": "ZHUANGZI (TCHOUANG-TSEU), <em>Œuvres complètes</em>, chapitre 9, IVe siècle av. J.-C.",
+                "notes": "(1) Po-lo est un dresseur de chevaux légendaire.<br>(2) le mors est une pièce métallique qui passe dans la bouche du cheval.<br>(3) « forme à cintrer » : instrument pour imposer une forme courbe.",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Les chevaux ont des sabots pour fouler le givre et la neige. Ils ont une robe qui les protège de la bise et de la froidure. Ils broutent l’herbe, boivent l’eau, lèvent les pattes et galopent. Telle est la véritable nature des chevaux. Ils n’ont que faire des manèges et des écuries.",
+                            "Un jour Po lo (1) survint. Il déclara : « Je vais m’occuper des chevaux. » Il les brûla, les tailla, les perça, les brida ; il les lia avec des longes et des entraves ; il les parqua dans des enclos. Il en mourut trois sur dix.",
+                            "Il leur fit endurer la faim et la soif ; il les contraignit à prendre le trot ou le galop. Il les accoutuma à s’aligner et à se mouvoir de concert ; il leur imposa, devant, la torture du mors (2) et leur agita, derrière, la menace de la cravache. Il en mourut la moitié."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Le potier déclara : « Je sais pétrir la glaise. » Il la façonna au compas et à l’équerre pour obtenir des formes rondes ou carrées.",
+                            "Le charpentier décréta : « Je sais travailler le bois. » Il ploya les parties courbes à la forme à cintrer (3), rectifia les parties droites au cordeau.",
+                            "Était-il dans la nature de la glaise et du bois de se voir appliquer le compas, l’équerre et les instruments pour former des droites et des courbes ? Et pourtant de génération en génération on ne cesse de proclamer : « Po lo sut dresser les chevaux, le potier façonner l’argile, le charpentier courber le bois. »"
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Ceux qui prétendent gouverner le monde présentent le même défaut. Je considère, moi, que ceux qui savent réellement gouverner s’y prennent tout autrement.",
+                            "Si on laisse les gens s’abandonner à leur constitution naturelle, ils se contentent de tisser la toile pour se vêtir, de labourer pour se nourrir ; par là se manifeste une vertu commune, ils sont tous unis et il n’y a pas de partis. C’est ce qu’on appelle la liberté naturelle."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Plotin",
-                work: "Ennéades",
-                theme: "La beauté et l’art",
-                label: "Plotin, Ennéades — La beauté et l’art",
-                html: "<p>Prenons, si tu veux bien, deux blocs de pierre, tout simplement placés l’un à côté de l’autre ; l’un sans proportion et sur lequel l’art n’est pas intervenu, et l’autre sur lequel l’art a eu prise pour fabriquer la statue d’une divinité ou d’un homme. S’il s’agit d’une divinité, ce sera la statue d’une Grâce (1) ou de l’une des Muses (2) ; s’il s’agit d’un homme, non pas celle de n’importe qui, mais la statue de l’homme que l’art a produite à partir de tout ce qu’il y a de beau. Il est évident que la pierre en laquelle l’art a engendré la beauté de la forme est belle non parce que c’est une pierre, car à ce compte-là une autre pierre eût été aussi belle, mais en raison de la forme que l’art y a fait entrer. Eh bien, cette forme, la matière ne la possédait point, mais elle se trouvait dans la pensée de l’artiste et elle était là avant qu’elle ne fût dans la pierre. Elle se trouvait dans l’artiste, non dans la mesure où il a des yeux ou des mains, mais parce qu’il participe à l’art. Cette beauté était donc dans l’art, et elle y était bien supérieure.</p><p style=\"text-align: right;\"> PLOTIN, <em>Ennéades</em>, IIIe siècle</p><div>(1) « les trois Grâces » : les trois déesses personnifiant le don de plaire, dans la mythologie grecque<br> (2) « Muses » : déesses grecques des arts</div>"
+                "author": "Plotin",
+                "work": "Ennéades",
+                "theme": "La beauté et l’art",
+                "label": "Plotin, Ennéades — La beauté et l’art",
+                "source": "PLOTIN, <em>Ennéades</em>, IIIe siècle",
+                "notes": "(1) « les trois Grâces » : les trois déesses personnifiant le don de plaire, dans la mythologie grecque<br> (2) « Muses » : déesses grecques des arts",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Prenons, si tu veux bien, deux blocs de pierre, tout simplement placés l’un à côté de l’autre ; l’un sans proportion et sur lequel l’art n’est pas intervenu, et l’autre sur lequel l’art a eu prise pour fabriquer la statue d’une divinité ou d’un homme.",
+                            "S’il s’agit d’une divinité, ce sera la statue d’une Grâce (1) ou de l’une des Muses (2) ; s’il s’agit d’un homme, non pas celle de n’importe qui, mais la statue de l’homme que l’art a produite à partir de tout ce qu’il y a de beau."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Il est évident que la pierre en laquelle l’art a engendré la beauté de la forme est belle non parce que c’est une pierre, car à ce compte-là une autre pierre eût été aussi belle, mais en raison de la forme que l’art y a fait entrer."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Eh bien, cette forme, la matière ne la possédait point, mais elle se trouvait dans la pensée de l’artiste et elle était là avant qu’elle ne fût dans la pierre.",
+                            "Elle se trouvait dans l’artiste, non dans la mesure où il a des yeux ou des mains, mais parce qu’il participe à l’art. Cette beauté était donc dans l’art, et elle y était bien supérieure."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Weil",
-                work: "La Condition ouvrière",
-                theme: "Le travail industriel",
-                label: "Weil, La Condition ouvrière — Le travail industriel",
-                html: "<p>Toute action humaine exige un mobile (1) qui fournisse l’énergie nécessaire pour l’accomplir, et elle est bonne ou mauvaise selon que le mobile est élevé ou bas. Pour se plier à la passivité épuisante qu’exige l’usine, il faut chercher des mobiles en soi-même, car il n’y a pas de fouets, pas de chaînes ; des fouets, des chaînes rendraient peut-être la transformation plus facile. Les conditions même du travail empêchent que puissent intervenir d’autres mobiles que la crainte des réprimandes et du renvoi, le désir avide d’accumuler des sous, et, dans une certaine mesure, le goût des records de vitesse. Tout concourt pour rappeler ces mobiles à la pensée et les transformer en obsessions ; il n’est jamais fait appel à rien de plus élevé ; d’ailleurs ils doivent devenir obsédants pour être assez efficaces. En même temps que ces mobiles occupent l’âme, la pensée se rétracte sur un point du temps pour éviter la souffrance, et la conscience s’éteint autant que les nécessités du travail le permettent. Une force presque irrésistible, comparable à la pesanteur, empêche alors de sentir la présence d’autres êtres humains qui peinent eux aussi tout près ; il est presque impossible de ne pas devenir indifférent et brutal comme le système dans lequel on est pris ; et réciproquement la brutalité du système est reflétée et rendue sensible par les gestes, les regards, les paroles de ceux qu’on a autour de soi. Après une journée ainsi passée, un ouvrier n’a qu’une plainte, plainte qui ne parvient pas aux oreilles des hommes étrangers à cette condition et ne leur dirait rien si elle y parvenait ; il a trouvé le temps long.</p><p style=\"text-align: right;\"> WEIL, <em>La Condition ouvrière</em>, 1943</p><div>(1) « mobile » : motivation, ce qui pousse à agir</div>"
+                "author": "Weil",
+                "work": "La Condition ouvrière",
+                "theme": "Le travail industriel",
+                "label": "Weil, La Condition ouvrière — Le travail industriel",
+                "source": "WEIL, <em>La Condition ouvrière</em>, 1943",
+                "notes": "(1) « mobile » : motivation, ce qui pousse à agir",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Toute action humaine exige un mobile (1) qui fournisse l’énergie nécessaire pour l’accomplir, et elle est bonne ou mauvaise selon que le mobile est élevé ou bas.",
+                            "Pour se plier à la passivité épuisante qu’exige l’usine, il faut chercher des mobiles en soi-même, car il n’y a pas de fouets, pas de chaînes ; des fouets, des chaînes rendraient peut-être la transformation plus facile.",
+                            "Les conditions même du travail empêchent que puissent intervenir d’autres mobiles que la crainte des réprimandes et du renvoi, le désir avide d’accumuler des sous, et, dans une certaine mesure, le goût des records de vitesse. Tout concourt pour rappeler ces mobiles à la pensée et les transformer en obsessions ; il n’est jamais fait appel à rien de plus élevé ; d’ailleurs ils doivent devenir obsédants pour être assez efficaces."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "En même temps que ces mobiles occupent l’âme, la pensée se rétracte sur un point du temps pour éviter la souffrance, et la conscience s’éteint autant que les nécessités du travail le permettent.",
+                            "Une force presque irrésistible, comparable à la pesanteur, empêche alors de sentir la présence d’autres êtres humains qui peinent eux aussi tout près ; il est presque impossible de ne pas devenir indifférent et brutal comme le système dans lequel on est pris ; et réciproquement la brutalité du système est reflétée et rendue sensible par les gestes, les regards, les paroles de ceux qu’on a autour de soi."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Après une journée ainsi passée, un ouvrier n’a qu’une plainte, plainte qui ne parvient pas aux oreilles des hommes étrangers à cette condition et ne leur dirait rien si elle y parvenait ; il a trouvé le temps long."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Merleau-Ponty",
-                work: "Phénoménologie de la perception",
-                theme: "La notion de temps",
-                label: "Merleau-Ponty, Phénoménologie de la perception — La notion de temps",
-                html: "<p>On dit que le temps passe ou s’écoule. On parle du cours du temps. L’eau que je vois passer s’est préparée, il y a quelques jours, dans les montagnes, lorsque le glacier a fondu ; elle est devant moi, à présent, elle va vers la mer où elle se jettera. Si le temps est semblable à une rivière, il coule du passé vers le présent et l’avenir. Le présent est la conséquence du passé et l’avenir la conséquence du présent. Cette célèbre métaphore est en réalité très confuse. Car, à considérer les choses elles-mêmes, la fonte des neiges et ce qui en résulte ne sont pas des événements successifs, ou plutôt la notion même d’événement n’a pas de place dans le monde objectif. Quand je dis qu’avant-hier le glacier a produit l’eau qui passe à présent, je sous-entends un témoin assujetti à une certaine place dans le monde et je compare ses vues successives : il a assisté là-bas à la fonte des neiges et il a suivi l’eau dans son décours (1), ou bien, du bord de la rivière, il voit passer après deux jours d’attente les morceaux de bois qu’il avait jetés à la source. Les « événements » sont découpés par un observateur fini (2) dans la totalité spatio-temporelle du monde objectif. Mais, si je considère ce monde lui-même, il n’y a qu’un seul être indivisible et qui ne change pas. Le changement suppose un certain poste où je me place et d’où je vois défiler des choses ; il n’y a pas d’événements sans quelqu’un à qui ils adviennent et dont la perspective finie fonde leur individualité. Le temps suppose une vue sur le temps. Il n’est donc pas comme un ruisseau, il n’est pas une substance fluente (3).</p><p style=\"text-align: right;\">MERLEAU-PONTY, <em>Phénoménologie de la perception</em>, 1945</p><div>(1) « décours » : écoulement<br> (2) « fini » : limité, par opposition à infini<br> (3) « fluente » : qui s’écoule, qui passe</div>"
+                "author": "Merleau-Ponty",
+                "work": "Phénoménologie de la perception",
+                "theme": "La notion de temps",
+                "label": "Merleau-Ponty, Phénoménologie de la perception — La notion de temps",
+                "source": "MERLEAU-PONTY, <em>Phénoménologie de la perception</em>, 1945",
+                "notes": "(1) « décours » : écoulement<br> (2) « fini » : limité, par opposition à infini<br> (3) « fluente » : qui s’écoule, qui passe",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "On dit que le temps passe ou s’écoule. On parle du cours du temps. L’eau que je vois passer s’est préparée, il y a quelques jours, dans les montagnes, lorsque le glacier a fondu ; elle est devant moi, à présent, elle va vers la mer où elle se jettera.",
+                            "Si le temps est semblable à une rivière, il coule du passé vers le présent et l’avenir. Le présent est la conséquence du passé et l’avenir la conséquence du présent.",
+                            "Cette célèbre métaphore est en réalité très confuse. Car, à considérer les choses elles-mêmes, la fonte des neiges et ce qui en résulte ne sont pas des événements successifs, ou plutôt la notion même d’événement n’a pas de place dans le monde objectif."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Quand je dis qu’avant-hier le glacier a produit l’eau qui passe à présent, je sous-entends un témoin assujetti à une certaine place dans le monde et je compare ses vues successives : il a assisté là-bas à la fonte des neiges et il a suivi l’eau dans son décours (1), ou bien, du bord de la rivière, il voit passer après deux jours d’attente les morceaux de bois qu’il avait jetés à la source.",
+                            "Les « événements » sont découpés par un observateur fini (2) dans la totalité spatio-temporelle du monde objectif."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Mais, si je considère ce monde lui-même, il n’y a qu’un seul être indivisible et qui ne change pas.",
+                            "Le changement suppose un certain poste où je me place et d’où je vois défiler des choses ; il n’y a pas d’événements sans quelqu’un à qui ils adviennent et dont la perspective finie fonde leur individualité. Le temps suppose une vue sur le temps. Il n’est donc pas comme un ruisseau, il n’est pas une substance fluente (3)."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
                 "author": "De Beauvoir",
                 "work": "Pour une morale de l’ambiguïté",
                 "theme": "La liberté et l’échec",
                 "label": "De Beauvoir, Pour une morale de l’ambiguïté — La liberté et l’échec",
-                "html": "<p>Il y a des gens à qui l’idée d’échec inspire une telle horreur qu’ils se retiennent de jamais rien vouloir : mais nul ne songerait à considérer cette morne passivité comme le triomphe de la liberté.</p><p>En vérité, pour que ma liberté ne risque pas de venir mourir contre l’obstacle qu’a suscité son engagement même, pour qu’elle puisse encore à travers l’échec poursuivre son mouvement, il faut que, se donnant un contenu singulier, elle vise à travers lui une fin qui ne soit aucune chose, mais précisément le libre mouvement de l’existence. L’opinion publique n’est pas ici mauvais juge, qui admire qu’un homme sache, en cas de ruine, d’accident, prendre le dessus, c’est-à-dire renouveler son engagement dans le monde, affirmant par là hautement l’indépendance de la liberté par rapport à la chose. Ainsi, lorsque Van Gogh malade accepte sereinement la perspective d’un avenir où il ne pourra plus peindre, il n’y a pas là résignation stérile ; la peinture était pour lui un mode de vie personnelle et de communication avec autrui qui pouvait sous une autre forme se perpétuer jusque dans un asile. Dans un tel renoncement le passé se trouvera intégré et la liberté confirmée ; il sera vécu à la fois dans le déchirement et dans la joie : dans le déchirement, puisque le projet se dépouille alors de son visage singulier, il sacrifie sa chair et son sang ; mais dans la joie, puisque, au moment où l’on lâche prise, on se retrouve les mains libres et prêtes à se tendre vers un nouvel avenir. Mais ce dépassement n’est concevable que si le contenu n’est pas visé comme barrant l’avenir, mais au contraire comme dessinant en lui des possibilités neuves.</p><p style=\"text-align: right;\"> DE BEAUVOIR, <em>Pour une morale de l’ambiguïté</em>, 1947</p>"
+                "source": "DE BEAUVOIR, <em>Pour une morale de l’ambiguïté</em>, 1947",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Il y a des gens à qui l’idée d’échec inspire une telle horreur qu’ils se retiennent de jamais rien vouloir : mais nul ne songerait à considérer cette morne passivité comme le triomphe de la liberté."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "En vérité, pour que ma liberté ne risque pas de venir mourir contre l’obstacle qu’a suscité son engagement même, pour qu’elle puisse encore à travers l’échec poursuivre son mouvement, il faut que, se donnant un contenu singulier, elle vise à travers lui une fin qui ne soit aucune chose, mais précisément le libre mouvement de l’existence.",
+                            "L’opinion publique n’est pas ici mauvais juge, qui admire qu’un homme sache, en cas de ruine, d’accident, prendre le dessus, c’est-à-dire renouveler son engagement dans le monde, affirmant par là hautement l’indépendance de la liberté par rapport à la chose."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Ainsi, lorsque Van Gogh malade accepte sereinement la perspective d’un avenir où il ne pourra plus peindre, il n’y a pas là résignation stérile ; la peinture était pour lui un mode de vie personnelle et de communication avec autrui qui pouvait sous une autre forme se perpétuer jusque dans un asile.",
+                            "Dans un tel renoncement le passé se trouvera intégré et la liberté confirmée ; il sera vécu à la fois dans le déchirement et dans la joie : dans le déchirement, puisque le projet se dépouille alors de son visage singulier, il sacrifie sa chair et son sang ; mais dans la joie, puisque, au moment où l’on lâche prise, on se retrouve les mains libres et prêtes à se tendre vers un nouvel avenir.",
+                            "Mais ce dépassement n’est concevable que si le contenu n’est pas visé comme barrant l’avenir, mais au contraire comme dessinant en lui des possibilités neuves."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Épictète",
-                work: "Entretiens",
-                theme: "La nature humaine et le tout",
-                label: "Épictète, Entretiens — La nature humaine et le tout",
-                html: "<p>Comment donc peut-on dire des choses extérieures qu’il y en a de conformes à la nature et que d’autres lui sont contraires ? C’est comme si nous étions isolés. Ainsi je dirai qu’il est de la nature du pied d’être propre, mais, si tu le considères comme pied et non comme une chose isolée, son rôle sera de patauger dans la boue, de marcher sur des épines et parfois même d’être amputé pour sauver le corps entier. Sinon il ne sera plus un pied. C’est une conception analogue qui convient à notre propre sujet. Qu’es-tu ? Un homme. Si tu te considères comme un membre isolé, il est selon la nature de vivre jusqu’à un âge avancé, de t’enrichir, de te bien porter. Mais, si tu te considères comme un homme et comme partie d’un certain tout, c’est dans l’intérêt de ce tout que tu dois tantôt subir la maladie, tantôt entreprendre une traversée et courir des risques, tantôt supporter la pauvreté et parfois même mourir avant l’heure. Pourquoi donc te fâcher ? Ne sais-tu pas qu’isolé, pas plus que le pied ne sera un véritable pied, toi de même tu ne seras plus un homme ? Qu’est-ce, en effet, que l’homme ? Une partie d’une cité, de la première d’abord, de celle qui est constituée par les dieux et par les hommes, puis de celle qui, comme on dit, s’en rapproche le plus, et qui est une petite image de la cité universelle.</p><p style=\"text-align: right;\">ÉPICTÈTE, <em>Entretiens</em>, Ier-IIe siècle</p>"
+                "author": "Épictète",
+                "work": "Entretiens",
+                "theme": "La nature humaine et le tout",
+                "label": "Épictète, Entretiens — La nature humaine et le tout",
+                "source": "ÉPICTÈTE, <em>Entretiens</em>, Ier-IIe siècle",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Comment donc peut-on dire des choses extérieures qu’il y en a de conformes à la nature et que d’autres lui sont contraires ? C’est comme si nous étions isolés.",
+                            "Ainsi je dirai qu’il est de la nature du pied d’être propre, mais, si tu le considères comme pied et non comme une chose isolée, son rôle sera de patauger dans la boue, de marcher sur des épines et parfois même d’être amputé pour sauver le corps entier. Sinon il ne sera plus un pied."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "C’est une conception analogue qui convient à notre propre sujet. Qu’es-tu ? Un homme.",
+                            "Si tu te considères comme un membre isolé, il est selon la nature de vivre jusqu’à un âge avancé, de t’enrichir, de te bien porter.",
+                            "Mais, si tu te considères comme un homme et comme partie d’un certain tout, c’est dans l’intérêt de ce tout que tu dois tantôt subir la maladie, tantôt entreprendre une traversée et courir des risques, tantôt supporter la pauvreté et parfois même mourir avant l’heure. Pourquoi donc te fâcher ?"
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Ne sais-tu pas qu’isolé, pas plus que le pied ne sera un véritable pied, toi de même tu ne seras plus un homme ?",
+                            "Qu’est-ce, en effet, que l’homme ? Une partie d’une cité, de la première d’abord, de celle qui est constituée par les dieux et par les hommes, puis de celle qui, comme on dit, s’en rapproche le plus, et qui est une petite image de la cité universelle."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
                 "author": "Alain",
                 "work": "Humanités",
                 "theme": "La pensée et le langage",
                 "label": "Alain, Humanités — La pensée et le langage",
-                "html": "<p>La langue est un instrument à penser. Les esprits que nous appelons paresseux, somnolents, inertes, sont vraisemblablement surtout incultes, et en ce sens qu’ils n’ont qu’un petit nombre de mots et d’expressions ; et c’est un trait de vulgarité bien frappant que l’emploi d’un mot à tout faire. Cette pauvreté est encore bien riche, comme les bavardages et les querelles le font voir ; toutefois la précipitation du débit et le retour des mêmes mots montrent bien que ce mécanisme n’est nullement dominé. L’expression « ne pas savoir ce qu’on dit » prend alors tout son sens. On observera ce bavardage dans tous les genres d’ivresse et de délire. Et je ne crois même point qu’il arrive à l’homme de déraisonner par d’autres causes ; l’emportement dans le discours fait de la folie avec des lieux communs. Aussi est-il vrai que le premier éclair de pensée, en tout homme et en tout enfant, est de trouver un sens à ce qu’il dit. Si étrange que cela soit, nous sommes dominés par la nécessité de parler sans savoir ce que nous allons dire ; et cet état sibyllin (1) est originaire en chacun ; l’enfant parle naturellement avant de penser, et il est compris des autres bien avant qu’il se comprenne lui-même. Penser c’est donc parler à soi.</p><p style=\"text-align: right;\">ALAIN, <em>« Des Poètes »</em>, in <em>Humanités</em>, 1946</p><div>(1) « sibyllin » : énigmatique</div>"
+                "source": "ALAIN, <em>« Des Poètes »</em>, in <em>Humanités</em>, 1946",
+                "notes": "(1) « sibyllin » : énigmatique",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "La langue est un instrument à penser. Les esprits que nous appelons paresseux, somnolents, inertes, sont vraisemblablement surtout incultes, et en ce sens qu’ils n’ont qu’un petit nombre de mots et d’expressions ; et c’est un trait de vulgarité bien frappant que l’emploi d’un mot à tout faire.",
+                            "Cette pauvreté est encore bien riche, comme les bavardages et les querelles le font voir ; toutefois la précipitation du débit et le retour des mêmes mots montrent bien que ce mécanisme n’est nullement dominé. L’expression « ne pas savoir ce qu’on dit » prend alors tout son sens."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "On observera ce bavardage dans tous les genres d’ivresse et de délire. Et je ne crois même point qu’il arrive à l’homme de déraisonner par d’autres causes ; l’emportement dans le discours fait de la folie avec des lieux communs.",
+                            "Aussi est-il vrai que le premier éclair de pensée, en tout homme et en tout enfant, est de trouver un sens à ce qu’il dit."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Si étrange que cela soit, nous sommes dominés par la nécessité de parler sans savoir ce que nous allons dire ; et cet état sibyllin (1) est originaire en chacun ; l’enfant parle naturellement avant de penser, et il est compris des autres bien avant qu’il se comprenne lui-même. Penser c’est donc parler à soi."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Aristote",
-                work: "Éthique à Nicomaque",
-                theme: "La responsabilité et les actions volontaires",
-                label: "Aristote, Éthique à Nicomaque — La responsabilité et les actions volontaires",
-                html: "<p>S’il est manifeste que l’homme est bien l’auteur de ses propres actions, et si nous ne pouvons pas ramener nos actions à d’autres principes que ceux qui sont en nous, alors les actions dont les principes sont en nous dépendent elles-mêmes de nous et sont volontaires. Semblent en témoigner, aussi bien le comportement des particuliers dans leur vie privée que la pratique des législateurs eux-mêmes. On châtie, en effet, et l’on oblige à réparation ceux qui agissent mal, à moins qu’ils n’aient agi sous la contrainte ou par une ignorance dont ils ne sont pas eux-mêmes causes ; et, d’autre part, on honore ceux qui accomplissent de bonnes actions, encourageant les uns et décourageant les autres. Mais les choses qui ne dépendent pas de nous et ne sont pas volontaires, personne n’incite à les faire, attendu qu’on perdrait son temps à nous persuader de ne pas avoir chaud, de ne pas souffrir, de ne pas avoir faim, et ainsi de suite, car nous n’en serons pas moins affectés par ces impressions. Et, en effet, nous punissons l’acte commis par ignorance, si nous tenons l’auteur pour responsable de son ignorance. Par exemple, en cas d’ébriété, les peines sont doublées, parce que le principe de l’acte réside dans l’agent lui-même, qui était maître de ne pas s’enivrer et qui est ainsi responsable de son ignorance. On punit également ceux qui ignorent telle disposition légale dont la connaissance est obligatoire et qui ne présente aucune difficulté. Et l’on fait de même chaque fois que l’ignorance paraît résulter de la négligence, car il dépend de chacun de ne pas rester ignorant, mais de faire attention à s’instruire.</p><p style=\"text-align: right;\"> ARISTOTE, <em>Éthique à Nicomaque</em>, IVe siècle avant J.-C.</p>"
+                "author": "Aristote",
+                "work": "Éthique à Nicomaque",
+                "theme": "La responsabilité et les actions volontaires",
+                "label": "Aristote, Éthique à Nicomaque — La responsabilité et les actions volontaires",
+                "source": "ARISTOTE, <em>Éthique à Nicomaque</em>, IVe siècle avant J.-C.",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "S’il est manifeste que l’homme est bien l’auteur de ses propres actions, et si nous ne pouvons pas ramener nos actions à d’autres principes que ceux qui sont en nous, alors les actions dont les principes sont en nous dépendent elles-mêmes de nous et sont volontaires.",
+                            "Semblent en témoigner, aussi bien le comportement des particuliers dans leur vie privée que la pratique des législateurs eux-mêmes. On châtie, en effet, et l’on oblige à réparation ceux qui agissent mal, à moins qu’ils n’aient agi sous la contrainte ou par une ignorance dont ils ne sont pas eux-mêmes causes ; et, d’autre part, on honore ceux qui accomplissent de bonnes actions, encourageant les uns et décourageant les autres."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Mais les choses qui ne dépendent pas de nous et ne sont pas volontaires, personne n’incite à les faire, attendu qu’on perdrait son temps à nous persuader de ne pas avoir chaud, de ne pas souffrir, de ne pas avoir faim, et ainsi de suite, car nous n’en serons pas moins affectés par ces impressions.",
+                            "Et, en effet, nous punissons l’acte commis par ignorance, si nous tenons l’auteur pour responsable de son ignorance."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Par exemple, en cas d’ébriété, les peines sont doublées, parce que le principe de l’acte réside dans l’agent lui-même, qui était maître de ne pas s’enivrer et qui est ainsi responsable de son ignorance.",
+                            "On punit également ceux qui ignorent telle disposition légale dont la connaissance est obligatoire et qui ne présente aucune difficulté.",
+                            "Et l’on fait de même chaque fois que l’ignorance paraît résulter de la négligence, car il dépend de chacun de ne pas rester ignorant, mais de faire attention à s’instruire."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Russell",
-                work: "Problèmes de philosophie",
-                theme: "La nature des vérités nécessaires vs généralisations empiriques",
-                label: "Russell, Problèmes de philosophie — La nature des vérités nécessaires",
-                html: "<p>Nous n’avons pas le sentiment que de nouveaux exemples accroissent notre certitude que deux et deux font quatre, parce que dès que la vérité de cette proposition est comprise, notre certitude est si grande qu’elle n’est pas susceptible d’augmenter. De plus, nous éprouvons concernant la proposition « deux et deux font quatre » un sentiment de nécessité qui est absent même dans le cas des généralisations empiriques (1) les mieux attestées. C’est que de telles généralisations restent de simples faits : nous sentons qu’un monde où elles seraient fausses est possible, même s’il se trouve qu’elles sont vraies dans le monde réel. Dans tous les mondes possibles, au contraire, nous éprouvons le sentiment que deux et deux feraient toujours quatre : ce n’est plus un simple fait, mais une nécessité à laquelle tout monde, réel ou possible, doit se conformer.</p><p>Pour éclaircir ce point, prenons une vraie généralisation empirique, comme « Tous les hommes sont mortels ». Nous croyons à cette proposition, d’abord parce qu’il n’y a pas d’exemple connu d’homme ayant vécu au-delà d’un certain âge, ensuite parce que des raisons tirées de la physiologie (2) nous font penser qu’un organisme comme le corps humain doit tôt ou tard se défaire. Laissons de côté le second point, et considérons seulement notre expérience du caractère mortel de l’homme : il est clair que nous ne pouvons nous satisfaire d’un seul exemple, fût-il clairement attesté, de mort d’homme, alors qu’avec « deux et deux font quatre », un seul cas bien compris suffit à nous persuader qu’il en sera toujours de même. Enfin nous devons admettre qu’il peut à la réflexion surgir quelque doute sur la question de savoir si vraiment tous les hommes sont mortels. Imaginons, pour voir clairement la différence, deux mondes, l’un où certains hommes ne meurent pas, l’autre où deux et deux font cinq. Quand Swift (3) nous parle de la race immortelle des Struldbrugs (4), nous pouvons le suivre par l’imagination. Mais un monde où deux et deux feraient cinq semble d’un tout autre niveau. Nous l’éprouverions comme un bouleversement de tout l’édifice de la connaissance, réduit à un état d’incertitude complète.</p><p style=\"text-align: right;\">  RUSSELL, <em>Problèmes de philosophie</em>, 1912</p><div>(1) « empiriques » : issus de l’expérience<br> (2) « physiologie » : science qui étudie les fonctions et propriétés des organismes vivants<br> (3) Swift : écrivain satiriste, auteur en langue anglaise des Voyages de Gulliver (1735)<br> (4) « Struldbrugs » : individus fantastiques, dotés d’immortalité, qui subissent le vieillissement mais ne meurent pas</div>"
+                "author": "Russell",
+                "work": "Problèmes de philosophie",
+                "theme": "La nature des vérités nécessaires vs généralisations empiriques",
+                "label": "Russell, Problèmes de philosophie — La nature des vérités nécessaires",
+                "source": "RUSSELL, <em>Problèmes de philosophie</em>, 1912",
+                "notes": "(1) « empiriques » : issus de l’expérience<br> (2) « physiologie » : science qui étudie les fonctions et propriétés des organismes vivants<br> (3) Swift : écrivain satiriste, auteur en langue anglaise des Voyages de Gulliver (1735)<br> (4) « Struldbrugs » : individus fantastiques, dotés d’immortalité, qui subissent le vieillissement mais ne meurent pas",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Nous n’avons pas le sentiment que de nouveaux exemples accroissent notre certitude que deux et deux font quatre, parce que dès que la vérité de cette proposition est comprise, notre certitude est si grande qu’elle n’est pas susceptible d’augmenter.",
+                            "De plus, nous éprouvons concernant la proposition « deux et deux font quatre » un sentiment de nécessité qui est absent même dans le cas des généralisations empiriques (1) les mieux attestées.",
+                            "C’est que de telles généralisations restent de simples faits : nous sentons qu’un monde où elles seraient fausses est possible, même s’il se trouve qu’elles sont vraies dans le monde réel. Dans tous les mondes possibles, au contraire, nous éprouvons le sentiment que deux et deux feraient toujours quatre : ce n’est plus un simple fait, mais une nécessité à laquelle tout monde, réel ou possible, doit se conformer."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Pour éclaircir ce point, prenons une vraie généralisation empirique, comme « Tous les hommes sont mortels ». Nous croyons à cette proposition, d’abord parce qu’il n’y a pas d’exemple connu d’homme ayant vécu au-delà d’un certain âge, ensuite parce que des raisons tirées de la physiologie (2) nous font penser qu’un organisme comme le corps humain doit tôt ou tard se défaire.",
+                            "Laissons de côté le second point, et considérons seulement notre expérience du caractère mortel de l’homme : il est clair que nous ne pouvons nous satisfaire d’un seul exemple, fût-il clairement attesté, de mort d’homme, alors qu’avec « deux et deux font quatre », un seul cas bien compris suffit à nous persuader qu’il en sera toujours de même."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Enfin nous devons admettre qu’il peut à la réflexion surgir quelque doute sur la question de savoir si vraiment tous les hommes sont mortels.",
+                            "Imaginons, pour voir clairement la différence, deux mondes, l’un où certains hommes ne meurent pas, l’autre où deux et deux font cinq. Quand Swift (3) nous parle de la race immortelle des Struldbrugs (4), nous pouvons le suivre par l’imagination. Mais un monde où deux et deux feraient cinq semble d’un tout autre niveau. Nous l’éprouverions comme un bouleversement de tout l’édifice de la connaissance, réduit à un état d’incertitude complète."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Freud",
-                work: "Le créateur littéraire et la fantaisie",
-                theme: "La création littéraire",
-                label: "Freud, Le créateur littéraire et la fantaisie — La création littéraire",
-                html: "<p>Nous autres profanes (1), nous avons toujours été très curieux de savoir où cette singulière personnalité, le créateur littéraire, va prendre sa matière […] et comment il parvient, par elle, à tellement nous saisir, à provoquer en nous des émotions dont nous ne nous serions peut-être même pas crus capables. Que le créateur, même quand nous l’interrogeons, ne nous donne pas de renseignement, ou pas de renseignement satisfaisant, ne fait qu’attiser notre intérêt pour ce sujet, et cet intérêt ne souffre pas de savoir que les meilleurs aperçus sur les conditions du choix de la matière littéraire et sur l’essence de l’art de la mise en forme poétique ne contribueraient en rien à faire de nous-mêmes des créateurs.</p><p>Si nous pouvions à tout le moins découvrir en nous ou chez nos semblables une activité qui soit d’une manière ou d’une autre apparentée à la création littéraire ! En l’examinant, nous pourrions espérer obtenir un premier éclaircissement sur cette dernière. Et de fait, cette espérance se nourrit de quelque raison, – les écrivains se plaisent eux-mêmes en effet à diminuer la distance qui sépare leur particularité de l’essence humaine générale ; ils nous assurent très fréquemment qu’en chaque homme se cache un poète et que le dernier poète ne mourra qu’avec le dernier homme.</p><p style=\"text-align: right;\">FREUD, <em>« Le créateur littéraire et la fantaisie »</em> in <em>L’inquiétante étrangeté et autres essais</em>, 1908</p><div>(1) « profanes » : ceux qui ne sont pas des connaisseurs ou des spécialistes</div>"
+                "author": "Freud",
+                "work": "Le créateur littéraire et la fantaisie",
+                "theme": "La création littéraire",
+                "label": "Freud, Le créateur littéraire et la fantaisie — La création littéraire",
+                "source": "FREUD, <em>« Le créateur littéraire et la fantaisie »</em> in <em>L’inquiétante étrangeté et autres essais</em>, 1908",
+                "notes": "(1) « profanes » : ceux qui ne sont pas des connaisseurs ou des spécialistes",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Nous autres profanes (1), nous avons toujours été très curieux de savoir où cette singulière personnalité, le créateur littéraire, va prendre sa matière […] et comment il parvient, par elle, à tellement nous saisir, à provoquer en nous des émotions dont nous ne nous serions peut-être même pas crus capables.",
+                            "Que le créateur, même quand nous l’interrogeons, ne nous donne pas de renseignement, ou pas de renseignement satisfaisant, ne fait qu’attiser notre intérêt pour ce sujet, et cet intérêt ne souffre pas de savoir que les meilleurs aperçus sur les conditions du choix de la matière littéraire et sur l’essence de l’art de la mise en forme poétique ne contribueraient en rien à faire de nous-mêmes des créateurs."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Si nous pouvions à tout le moins découvrir en nous ou chez nos semblables une activité qui soit d’une manière ou d’une autre apparentée à la création littéraire ! En l’examinant, nous pourrions espérer obtenir un premier éclaircissement sur cette dernière.",
+                            "Et de fait, cette espérance se nourrit de quelque raison, – les écrivains se plaisent eux-mêmes en effet à diminuer la distance qui sépare leur particularité de l’essence humaine générale ; ils nous assurent très fréquemment qu’en chaque homme se cache un poète et que le dernier poète ne mourra qu’avec le dernier homme."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Bergson",
-                work: "Les Deux Sources de la morale et de la religion",
-                theme: "La société et l’autorité",
-                label: "Bergson, Les Deux Sources de la morale et de la religion — La société et l’autorité",
-                html: "<p>Le souvenir du fruit défendu est ce qu’il y a de plus ancien dans la mémoire de chacun de nous, comme dans celle de l’humanité. Nous nous en apercevrions si ce souvenir n’était recouvert par d’autres, auxquels nous préférons nous reporter. Que n’eût pas été notre enfance si l’on nous avait laissé faire ! Nous aurions volé de plaisirs en plaisirs. Mais voici qu’un obstacle surgissait, ni visible ni tangible : une interdiction. Pourquoi obéissions-nous ? La question ne se posait guère ; nous avions pris l’habitude d’écouter nos parents et nos maîtres. Toutefois nous sentions bien que c’était parce qu’ils étaient nos parents, parce qu’ils étaient nos maîtres. Donc, à nos yeux, leur autorité leur venait moins d’eux-mêmes que de leur situation par rapport à nous. Ils occupaient une certaine place : c’est de là que partait, avec une force de pénétration qu’il n’aurait pas eue s’il avait été lancé d’ailleurs, le commandement. En d’autres termes, parents et maîtres semblaient agir par délégation. Nous ne nous en rendions pas nettement compte, mais derrière nos parents et nos maîtres nous devinions quelque chose d’énorme ou plutôt d’indéfini, qui pesait sur nous de toute sa masse par leur intermédiaire. Nous dirions plus tard que c’est la société. Philosophant alors sur elle, nous la comparerions à un organisme dont les cellules, unies par d’invisibles liens, se subordonnent les unes aux autres dans une hiérarchie savante et se plient naturellement, pour le plus grand bien du tout, à une discipline qui pourra exiger le sacrifice de la partie. Ce ne sera d’ailleurs là qu’une comparaison, car autre chose est un organisme soumis à des lois nécessaires, autre chose une société constituée par des volontés libres.</p><p style=\"text-align: right;\">BERGSON, <em>Les Deux Sources de la morale et de la religion</em>, 1932</p>"
+                "author": "Bergson",
+                "work": "Les Deux Sources de la morale et de la religion",
+                "theme": "La société et l’autorité",
+                "label": "Bergson, Les Deux Sources de la morale et de la religion — La société et l’autorité",
+                "source": "BERGSON, <em>Les Deux Sources de la morale et de la religion</em>, 1932",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Le souvenir du fruit défendu est ce qu’il y a de plus ancien dans la mémoire de chacun de nous, comme dans celle de l’humanité. Nous nous en apercevrions si ce souvenir n’était recouvert par d’autres, auxquels nous préférons nous reporter. Que n’eût pas été notre enfance si l’on nous avait laissé faire ! Nous aurions volé de plaisirs en plaisirs.",
+                            "Mais voici qu’un obstacle surgissait, ni visible ni tangible : une interdiction. Pourquoi obéissions-nous ? La question ne se posait guère ; nous avions pris l’habitude d’écouter nos parents et nos maîtres. Toutefois nous sentions bien que c’était parce qu’ils étaient nos parents, parce qu’ils étaient nos maîtres. Donc, à nos yeux, leur autorité leur venait moins d’eux-mêmes que de leur situation par rapport à nous."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Ils occupaient une certaine place : c’est de là que partait, avec une force de pénétration qu’il n’aurait pas eue s’il avait été lancé d’ailleurs, le commandement. En d’autres termes, parents et maîtres semblaient agir par délégation. Nous ne nous en rendions pas nettement compte, mais derrière nos parents et nos maîtres nous devinions quelque chose d’énorme ou plutôt d’indéfini, qui pesait sur nous de toute sa masse par leur intermédiaire. Nous dirions plus tard que c’est la société."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Philosophant alors sur elle, nous la comparerions à un organisme dont les cellules, unies par d’invisibles liens, se subordonnent les unes aux autres dans une hiérarchie savante et se plient naturellement, pour le plus grand bien du tout, à une discipline qui pourra exiger le sacrifice de la partie.",
+                            "Ce ne sera d’ailleurs là qu’une comparaison, car autre chose est un organisme soumis à des lois nécessaires, autre chose une société constituée par des volontés libres."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Platon",
-                work: "Les Lois",
-                theme: "L’art politique et le bien commun",
-                label: "Platon, Les Lois — L’art politique et le bien commun",
-                html: "<p>Il est nécessaire aux hommes de se donner des lois et de vivre conformément à ces lois, sous peine de ne différer en rien des bêtes les plus sauvages. Voici quelle en est la raison : aucun homme ne naît avec une aptitude naturelle à savoir ce qui est profitable pour la vie humaine en société et, même s’il le savait, à pouvoir toujours faire et souhaiter le meilleur. Car en premier lieu il est difficile de comprendre que l’art politique véritable doit prendre soin, non du bien particulier, mais du bien général – car le bien général rassemble, tandis que le bien particulier déchire les sociétés ; et le bien commun tout autant que le bien particulier gagnent même tous les deux à ce que le premier plutôt que le second soit assuré de façon convenable. En second lieu, même si l’on était assez habile pour se rendre compte que telle est la nature des choses, et qu’on ait à gouverner un État avec un pouvoir absolu et sans rendre aucun compte, on ne pourrait pas rester fidèle à ce principe et faire passer pendant toute sa vie le bien commun de la société au premier rang et le bien particulier au deuxième. En fait la nature mortelle de l’homme le portera toujours à vouloir plus que les autres et à s’occuper de son bien particulier, parce qu’elle fuit la douleur et poursuit le plaisir sans tenir compte de la raison, qu’elle les fera passer l’une et l’autre avant le plus juste et le meilleur, et, s’aveuglant elle-même, elle finira par se remplir, elle et toute la société, de toutes sortes de maux.</p><p style=\"text-align: right;\"> PLATON, <em>Les Lois</em>, IX, IVe siècle avant J.-C.</p>"
+                "author": "Platon",
+                "work": "Les Lois",
+                "theme": "L’art politique et le bien commun",
+                "label": "Platon, Les Lois — L’art politique et le bien commun",
+                "source": "PLATON, <em>Les Lois</em>, IX, IVe siècle avant J.-C.",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Il est nécessaire aux hommes de se donner des lois et de vivre conformément à ces lois, sous peine de ne différer en rien des bêtes les plus sauvages.",
+                            "Voici quelle en est la raison : aucun homme ne naît avec une aptitude naturelle à savoir ce qui est profitable pour la vie humaine en société et, même s’il le savait, à pouvoir toujours faire et souhaiter le meilleur."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Car en premier lieu il est difficile de comprendre que l’art politique véritable doit prendre soin, non du bien particulier, mais du bien général – car le bien général rassemble, tandis que le bien particulier déchire les sociétés ;",
+                            "et le bien commun tout autant que le bien particulier gagnent même tous les deux à ce que le premier plutôt que le second soit assuré de façon convenable."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "En second lieu, même si l’on était assez habile pour se rendre compte que telle est la nature des choses, et qu’on ait à gouverner un État avec un pouvoir absolu et sans rendre aucun compte, on ne pourrait pas rester fidèle à ce principe et faire passer pendant toute sa vie le bien commun de la société au premier rang et le bien particulier au deuxième.",
+                            "En fait la nature mortelle de l’homme le portera toujours à vouloir plus que les autres et à s’occuper de son bien particulier, parce qu’elle fuit la douleur et poursuit le plaisir sans tenir compte de la raison, qu’elle les fera passer l’une et l’autre avant le plus juste et le meilleur, et, s’aveuglant elle-même, elle finira par se remplir, elle et toute la société, de toutes sortes de maux."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Freud",
-                work: "L’Avenir d’une illusion",
-                theme: "La nature et la civilisation",
-                label: "Freud, L’Avenir d’une illusion — La nature et la civilisation",
-                html: "<p>Personne ne s’abuse au point de croire que la nature est dès à présent domptée ; rares sont ceux qui osent espérer qu’un jour elle sera tout entière soumise à l’homme. Il y a les éléments, qui semblent se rire de toute contrainte humaine, la terre qui tremble, démolit, ensevelit tout ce qui est humanité et œuvre humaine ; l’eau qui, déchaînée, submerge et noie tout, et la tempête qui l’emporte d’un souffle ; il y a les maladies, dont nous n’avons compris que récemment qu’elles sont les agressions d’autres êtres vivants, enfin il y a la douloureuse énigme de la mort, contre laquelle on n’a pas trouvé de remède à ce jour et l’on n’en trouvera vraisemblablement pas. Avec ces forces, la nature se dresse contre nous, elle nous remet sous les yeux notre faiblesse désemparée, à laquelle nous pensions pouvoir nous soustraire par le travail de civilisation. C’est l’une des rares impressions réjouissantes et édifiantes (1) qu’on puisse avoir de l’humanité, lorsque, face à l’une de ces catastrophes naturelles, elle oublie tous les imbroglios (2) de la civilisation, toutes ses difficultés et hostilités internes, et se rappelle la grande tâche commune : se maintenir face à la puissance écrasante de la nature.</p><p style=\"text-align: right;\"> FREUD, <em>L’Avenir d’une illusion</em>, 1927</p><div>(1) « édifiantes » : hautement instructive, qui exerce une influence morale positive, qui donne du courage et de la confiance.<br> (2) « imbroglio » : situation confuse ou embrouillée.</div>"
+                "author": "Freud",
+                "work": "L’Avenir d’une illusion",
+                "theme": "La nature et la civilisation",
+                "label": "Freud, L’Avenir d’une illusion — La nature et la civilisation",
+                "source": "FREUD, <em>L’Avenir d’une illusion</em>, 1927",
+                "notes": "(1) « édifiantes » : hautement instructive, qui exerce une influence morale positive, qui donne du courage et de la confiance.<br> (2) « imbroglio » : situation confuse ou embrouillée.",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Personne ne s’abuse au point de croire que la nature est dès à présent domptée ; rares sont ceux qui osent espérer qu’un jour elle sera tout entière soumise à l’homme.",
+                            "Il y a les éléments, qui semblent se rire de toute contrainte humaine, la terre qui tremble, démolit, ensevelit tout ce qui est humanité et œuvre humaine ; l’eau qui, déchaînée, submerge et noie tout, et la tempête qui l’emporte d’un souffle ; il y a les maladies, dont nous n’avons compris que récemment qu’elles sont les agressions d’autres êtres vivants, enfin il y a la douloureuse énigme de la mort, contre laquelle on n’a pas trouvé de remède à ce jour et l’on n’en trouvera vraisemblablement pas."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Avec ces forces, la nature se dresse contre nous, elle nous remet sous les yeux notre faiblesse désemparée, à laquelle nous pensions pouvoir nous soustraire par le travail de civilisation."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "C’est l’une des rares impressions réjouissantes et édifiantes (1) qu’on puisse avoir de l’humanité, lorsque, face à l’une de ces catastrophes naturelles, elle oublie tous les imbroglios (2) de la civilisation, toutes ses difficultés et hostilités internes, et se rappelle la grande tâche commune : se maintenir face à la puissance écrasante de la nature."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Mill",
-                work: "Trois Essais sur la religion",
-                theme: "Religion et poésie",
-                label: "Mill, Trois Essais sur la religion — Religion et poésie",
-                html: "<p>La religion et la poésie s’adressent, au moins par un de leurs aspects, à la même partie de la constitution humaine : elles satisfont toutes deux le même besoin, celui de conceptions idéales plus grandes et plus belles que celles que nous voyons se réaliser dans la vie prosaïque (1) de l’homme. La religion, à la différence de la poésie, est le produit du désir de savoir si ces conceptions imaginatives correspondent à des réalités dans un autre monde que le nôtre. L’esprit, dans cet état, s’empare avidement (2) de toutes les rumeurs concernant d’autres mondes, surtout quand elles sont rapportées par des personnes qu’il estime plus sages que lui. À la poésie du surnaturel s’ajoute ainsi une croyance positive, et une attente que les esprits non poétiques peuvent partager avec les esprits poétiques. La croyance en un Dieu ou en des dieux, et en une vie après la mort, devient ainsi la toile que chaque esprit, selon sa capacité, recouvre d’images idéales qu’il peut inventer ou copier. Dans cette autre vie, chacun espère trouver le bien qu’il n’a pas réussi à trouver sur terre. Plus particulièrement, cette croyance fournit aux esprits les plus fins de la matière pour concevoir des êtres plus terrifiants que ceux qu’ils peuvent avoir connus sur terre, et plus excellents que ceux qu’ils ont probablement connus. Tant que la vie humaine ne suffira pas à satisfaire les aspirations humaines, il y aura un désir pour des choses supérieures, qui trouve sa satisfaction la plus évidente dans la religion. Tant que la vie terrestre sera remplie de souffrances, on aura besoin des consolations que l’espérance du ciel apporte à ceux qui sont égoïstes, et que l’amour de Dieu apporte à ceux qui sont tendres et reconnaissants.</p><p style=\"text-align: right;\">  MILL, <em>Trois Essais sur la religion</em>, 1874</p><div>(1) « vie prosaïque » : vie ordinaire, banale<br> (2) « avidement » : avec un grand désir</div>"
+                "author": "Mill",
+                "work": "Trois Essais sur la religion",
+                "theme": "Religion et poésie",
+                "label": "Mill, Trois Essais sur la religion — Religion et poésie",
+                "source": "MILL, <em>Trois Essais sur la religion</em>, 1874",
+                "notes": "(1) « vie prosaïque » : vie ordinaire, banale<br> (2) « avidement » : avec un grand désir",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "La religion et la poésie s’adressent, au moins par un de leurs aspects, à la même partie de la constitution humaine : elles satisfont toutes deux le même besoin, celui de conceptions idéales plus grandes et plus belles que celles que nous voyons se réaliser dans la vie prosaïque (1) de l’homme.",
+                            "La religion, à la différence de la poésie, est le produit du désir de savoir si ces conceptions imaginatives correspondent à des réalités dans un autre monde que le nôtre. L’esprit, dans cet état, s’empare avidement (2) de toutes les rumeurs concernant d’autres mondes, surtout quand elles sont rapportées par des personnes qu’il estime plus sages que lui. À la poésie du surnaturel s’ajoute ainsi une croyance positive, et une attente que les esprits non poétiques peuvent partager avec les esprits poétiques."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "La croyance en un Dieu ou en des dieux, et en une vie après la mort, devient ainsi la toile que chaque esprit, selon sa capacité, recouvre d’images idéales qu’il peut inventer ou copier. Dans cette autre vie, chacun espère trouver le bien qu’il n’a pas réussi à trouver sur terre. Plus particulièrement, cette croyance fournit aux esprits les plus fins de la matière pour concevoir des êtres plus terrifiants que ceux qu’ils peuvent avoir connus sur terre, et plus excellents que ceux qu’ils ont probablement connus."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Tant que la vie humaine ne suffira pas à satisfaire les aspirations humaines, il y aura un désir pour des choses supérieures, qui trouve sa satisfaction la plus évidente dans la religion.",
+                            "Tant que la vie terrestre sera remplie de souffrances, on aura besoin des consolations que l’espérance du ciel apporte à ceux qui sont égoïstes, et que l’amour de Dieu apporte à ceux qui sont tendres et reconnaissants."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
                 "author": "Platon",
                 "work": "Les Lois",
                 "theme": "L’honnêteté et le devoir civique",
                 "label": "Platon, Les Lois — L’honnêteté et le devoir civique",
-                "html": "<p>Tous les moyens que l’éloge et le blâme, et non pas la loi, ont de rendre les individus plus dociles et mieux disposés à l’égard des lois futures, voilà ce dont nous devons traiter. C’est bien la vérité qui vient en tête de tous les biens, pour les dieux comme pour les hommes. Puisse-t-il dès le point de départ avoir part à la vérité celui qui tend à parvenir à la félicité (1) et au bonheur, afin de vivre le plus longtemps possible dans la vérité. Car cet homme inspire confiance, alors que l’homme qui tend à mentir de son plein gré n’en inspire pas et que celui qui tend à mentir sans l’avoir souhaité, celui-là est dépourvu de raison. Aucune de ces deux catégories n’est enviable. Il est en effet privé d’ami celui en qui on n’a pas confiance ou qui est insensé, et à mesure que le temps qui passe le fait connaître, il se prépare pour la dure vieillesse un isolement complet à la fin de sa vie ; de sorte que sa vie sera presque pareillement privée de partenaires et d’enfants, que ceux-ci soient vivants ou morts.</p><p>À plus forte raison, il mérite qu’on lui décerne des honneurs celui qui n’est coupable d’aucune injustice, mais celui qui ne laisse pas les gens injustes commettre d’injustice, celui-là mérite plus que deux fois plus que le précédent qu’on lui décerne des honneurs. Car le premier ne vaut qu’un homme, alors que le second vaut un grand nombre d’autres hommes, puisqu’il signale aux magistrats l’injustice des autres. Et celui qui, dans la mesure de ses forces, aide les magistrats à réprimer le désordre, qu’on lui décerne le titre de grand homme, d’homme accompli dans la cité, de vainqueur pour son excellence. C’est bien cette même louange qu’il faut aussi décerner à la tempérance (2) et à la réflexion, ainsi qu’à tous les autres biens dont la possession permet non seulement de les avoir pour soi, mais également de les partager avec autrui.</p><p style=\"text-align: right;\"> PLATON, <em>Les lois</em>, IVe siècle avant J.-C.</p><div>(1) « félicité » : joie parfaite<br> (2) « la tempérance » : la modération des désirs</div>"
+                "source": "PLATON, <em>Les lois</em>, IVe siècle avant J.-C.",
+                "notes": "(1) « félicité » : joie parfaite<br> (2) « la tempérance » : la modération des désirs",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Tous les moyens que l’éloge et le blâme, et non pas la loi, ont de rendre les individus plus dociles et mieux disposés à l’égard des lois futures, voilà ce dont nous devons traiter.",
+                            "C’est bien la vérité qui vient en tête de tous les biens, pour les dieux comme pour les hommes. Puisse-t-il dès le point de départ avoir part à la vérité celui qui tend à parvenir à la félicité (1) et au bonheur, afin de vivre le plus longtemps possible dans la vérité."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Car cet homme inspire confiance, alors que l’homme qui tend à mentir de son plein gré n’en inspire pas et que celui qui tend à mentir sans l’avoir souhaité, celui-là est dépourvu de raison.",
+                            "Aucune de ces deux catégories n’est enviable. Il est en effet privé d’ami celui en qui on n’a pas confiance ou qui est insensé, et à mesure que le temps qui passe le fait connaître, il se prépare pour la dure vieillesse un isolement complet à la fin de sa vie ; de sorte que sa vie sera presque pareillement privée de partenaires et d’enfants, que ceux-ci soient vivants ou morts."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "À plus forte raison, il mérite qu’on lui décerne des honneurs celui qui n’est coupable d’aucune injustice, mais celui qui ne laisse pas les gens injustes commettre d’injustice, celui-là mérite plus que deux fois plus que le précédent qu’on lui décerne des honneurs. Car le premier ne vaut qu’un homme, alors que le second vaut un grand nombre d’autres hommes, puisqu’il signale aux magistrats l’injustice des autres.",
+                            "Et celui qui, dans la mesure de ses forces, aide les magistrats à réprimer le désordre, qu’on lui décerne le titre de grand homme, d’homme accompli dans la cité, de vainqueur pour son excellence.",
+                            "C’est bien cette même louange qu’il faut aussi décerner à la tempérance (2) et à la réflexion, ainsi qu’à tous les autres biens dont la possession permet non seulement de les avoir pour soi, mais également de les partager avec autrui."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        2,
+                        0
+                    ]
+                ]
             },
             {
                 "author": "Malebranche",
                 "work": "De la Recherche de la vérité",
                 "theme": "Les passions et la recherche de la vérité",
                 "label": "Malebranche, De la Recherche de la vérité — Les passions et la recherche de la vérité",
-                "html": "<p>Les passions dont il est utile de se servir pour s’exciter à la recherche de la vérité sont celles qui donnent la force et le courage de surmonter la peine que l’on trouve à se rendre attentif. Il y en a de bonnes et de mauvaises : de bonnes, comme le désir de trouver la vérité, d’acquérir assez de lumière pour se conduire, de se rendre utile au prochain, et quelques autres semblables ; de mauvaises ou dangereuses, comme le désir d’acquérir de la réputation, de se faire quelque établissement (1), de s’élever au-dessus de ses semblables, et quelques autres encore plus déréglées dont il n’est pas nécessaire de parler.</p><p>Dans le malheureux état où nous sommes, il arrive souvent que les passions les moins raisonnables nous portent plus vivement à la recherche de la vérité et nous consolent plus agréablement dans les peines que nous y trouvons que les passions les plus justes et les plus raisonnables. La vanité, par exemple, nous agite beaucoup plus que l’amour de la vérité, et l’on voit tous les jours que des personnes s’appliquent continuellement à l’étude lorsqu’elles trouvent des gens à qui elles puissent dire ce qu’elles ont appris, et qui l’abandonnent entièrement lorsqu’elles ne trouvent plus personne qui les écoute. La vue confuse de quelque gloire qui les environne lorsqu’elles débitent leurs opinions leur soutient le courage dans les études même les plus stériles et les plus ennuyeuses. Mais si par hasard ou par la nécessité de leurs affaires, elles se trouvent éloignées de ce petit troupeau qui leur applaudissait, leur ardeur se refroidit aussitôt ; les études même les plus solides n’ont plus d’attrait pour elles : le dégoût, l’ennui, le chagrin les prend, elles quittent tout. La vanité triomphait de leur paresse naturelle, mais la paresse triomphe à son tour de l’amour de la vérité ; car la vanité résiste quelquefois à la paresse, mais la paresse est presque toujours victorieuse de l’amour de la vérité.</p><p style=\"text-align: right;\">MALEBRANCHE, <em>De la Recherche de la vérité</em>, Livre VI, chap. 3, 1675</p><div>(1) « établissement » : une position sociale</div>"
+                "source": "MALEBRANCHE, <em>De la Recherche de la vérité</em>, Livre VI, chap. 3, 1675",
+                "notes": "(1) « établissement » : une position sociale",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "Les passions dont il est utile de se servir pour s’exciter à la recherche de la vérité sont celles qui donnent la force et le courage de surmonter la peine que l’on trouve à se rendre attentif.",
+                            "Il y en a de bonnes et de mauvaises : de bonnes, comme le désir de trouver la vérité, d’acquérir assez de lumière pour se conduire, de se rendre utile au prochain, et quelques autres semblables ; de mauvaises ou dangereuses, comme le désir d’acquérir de la réputation, de se faire quelque établissement (1), de s’élever au-dessus de ses semblables, et quelques autres encore plus déréglées dont il n’est pas nécessaire de parler."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Dans le malheureux état où nous sommes, il arrive souvent que les passions les moins raisonnables nous portent plus vivement à la recherche de la vérité et nous consolent plus agréablement dans les peines que nous y trouvons que les passions les plus justes et les plus raisonnables.",
+                            "La vanité, par exemple, nous agite beaucoup plus que l’amour de la vérité, et l’on voit tous les jours que des personnes s’appliquent continuellement à l’étude lorsqu’elles trouvent des gens à qui elles puissent dire ce qu’elles ont appris, et qui l’abandonnent entièrement lorsqu’elles ne trouvent plus personne qui les écoute.",
+                            "La vue confuse de quelque gloire qui les environne lorsqu’elles débitent leurs opinions leur soutient le courage dans les études même les plus stériles et les plus ennuyeuses."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Mais si par hasard ou par la nécessité de leurs affaires, elles se trouvent éloignées de ce petit troupeau qui leur applaudissait, leur ardeur se refroidit aussitôt ; les études même les plus solides n’ont plus d’attrait pour elles : le dégoût, l’ennui, le chagrin les prend, elles quittent tout.",
+                            "La vanité triomphait de leur paresse naturelle, mais la paresse triomphe à son tour de l’amour de la vérité ; car la vanité résiste quelquefois à la paresse, mais la paresse est presque toujours victorieuse de l’amour de la vérité."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        1,
+                        0
+                    ]
+                ]
             },
             {
                 "author": "Lévi-Strauss",
                 "work": "Le Regard éloigné",
                 "theme": "L'œuvre créatrice",
                 "label": "Lévi-Strauss, Le Regard éloigné — L'œuvre créatrice",
-                "html": "<p>L’œuvre créatrice résulte d’un arbitrage et d’un compromis : entre l’intention première du créateur – mais, à ce stade, encore informulable – et les résistances qu’il doit vaincre pour l’exprimer. Ces résistances sont celles qu’opposent à l’artiste la technique, les outils, le matériau ; à l’écrivain, le vocabulaire, la grammaire, la syntaxe ; mais aussi, à tous les deux, l’opinion et les lois. Toute œuvre d’art est révolutionnaire, soit, mais elle ne peut l’être qu’en agissant sur ce qu’elle subvertit. Son caractère novateur (qui disparaîtrait s’il n’y avait rien devant elle) lui vient de ce qu’elle mord sur l’obstacle, mais non sans lui céder et se modeler tant soit peu sur lui. Le chef d’œuvre est donc fait, tout à la fois, de ce qu’il est et de ce qu’il nie, du terrain qu’il conquiert et de la résistance qu’il rencontre. Il résulte de forces antagonistes qu’il compose, mais à la poussée et à la contre-poussée desquelles il doit cette vibration et cette tension que nous admirons en lui.</p><p style=\"text-align: right;\">  LÉVI-STRAUSS, <em>Le Regard éloigné</em>, 1983</p>"
+                "source": "LÉVI-STRAUSS, <em>Le Regard éloigné</em>, 1983",
+                "notes": "",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "L’œuvre créatrice résulte d’un arbitrage et d’un compromis : entre l’intention première du créateur – mais, à ce stade, encore informulable – et les résistances qu’il doit vaincre pour l’exprimer.",
+                            "Ces résistances sont celles qu’opposent à l’artiste la technique, les outils, le matériau ; à l’écrivain, le vocabulaire, la grammaire, la syntaxe ; mais aussi, à tous les deux, l’opinion et les lois."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Toute œuvre d’art est révolutionnaire, soit, mais elle ne peut l’être qu’en agissant sur ce qu’elle subvertit.",
+                            "Son caractère novateur (qui disparaîtrait s’il n’y avait rien devant elle) lui vient de ce qu’elle mord sur l’obstacle, mais non sans lui céder et se modeler tant soit peu sur lui."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Le chef d’œuvre est donc fait, tout à la fois, de ce qu’il est et de ce qu’il nie, du terrain qu’il conquiert et de la résistance qu’il rencontre.",
+                            "Il résulte de forces antagonistes qu’il compose, mais à la poussée et à la contre-poussée desquelles il doit cette vibration et cette tension que nous admirons en lui."
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             },
             {
-                author: "Locke",
-                work: "Essai sur l’entendement humain",
-                theme: "La justice et le respect des contrats",
-                label: "Locke, Essai sur l’entendement humain — La justice et le respect des contrats",
-                html: "<p>La justice et le respect des contrats semblent faire l’accord du plus grand nombre ; c’est un principe qui, pense-t-on, pénètre jusque dans les repaires de brigands, et dans les bandes des plus grands malfaiteurs ; et ceux qui sont allés le plus loin dans l’abandon de leur humanité respectent la fidélité et la justice entre eux. Je reconnais que les hors-la-loi eux-mêmes les respectent entre eux ; mais ces règles ne sont pas respectées comme des lois de nature innées (1) : elles sont appliquées comme des règles utiles dans leur communauté ; et on ne peut concevoir que celui qui agit correctement avec ses complices mais pille et assassine en même temps le premier honnête homme venu, embrasse la justice comme un principe pratique (2). La justice et la vérité sont les liens élémentaires de toute société : même les hors-la-loi et les voleurs, qui ont par ailleurs rompu avec le monde, doivent donc garder entre eux la fidélité et les règles de l’équité, sans quoi ils ne pourraient rester ensemble. Mais qui soutiendrait que ceux qui vivent de fraude et de rapine (3) ont des principes innés de vérité et de justice, qu’ils acceptent et reconnaissent ?</p><p style=\"text-align: right;\">LOCKE, <em>Essai sur l’entendement humain</em>, 1690</p><div>(1) « lois de nature innées » : lois dont chaque être humain est doté à sa naissance<br>(2) « principe pratique » : principe qui guide l’action<br>(3) « rapine » : vol</div>"
+                "author": "Locke",
+                "work": "Essai sur l’entendement humain",
+                "theme": "La justice et le respect des contrats",
+                "label": "Locke, Essai sur l’entendement humain — La justice et le respect des contrats",
+                "source": "LOCKE, <em>Essai sur l’entendement humain</em>, 1690",
+                "notes": "(1) « lois de nature innées » : lois dont chaque être humain est doté à sa naissance<br>(2) « principe pratique » : principe qui guide l’action<br>(3) « rapine » : vol",
+                "structure": [
+                    {
+                        "subMoments": [
+                            "La justice et le respect des contrats semblent faire l’accord du plus grand nombre ; c’est un principe qui, pense-t-on, pénètre jusque dans les repaires de brigands, et dans les bandes des plus grands malfaiteurs ; et ceux qui sont allés le plus loin dans l’abandon de leur humanité respectent la fidélité et la justice entre eux."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "Je reconnais que les hors-la-loi eux-mêmes les respectent entre eux ; mais ces règles ne sont pas respectées comme des lois de nature innées (1) : elles sont appliquées comme des règles utiles dans leur communauté ;",
+                            "et on ne peut concevoir que celui qui agit correctement avec ses complices mais pille et assassine en même temps le premier honnête homme venu, embrasse la justice comme un principe pratique (2)."
+                        ]
+                    },
+                    {
+                        "subMoments": [
+                            "La justice et la vérité sont les liens élémentaires de toute société : même les hors-la-loi et les voleurs, qui ont par ailleurs rompu avec le monde, doivent donc garder entre eux la fidélité et les règles de l’équité, sans quoi ils ne pourraient rester ensemble.",
+                            "Mais qui soutiendrait que ceux qui vivent de fraude et de rapine (3) ont des principes innés de vérité et de justice, qu’ils acceptent et reconnaissent ?"
+                        ]
+                    }
+                ],
+                "paragraphStarts": [
+                    [
+                        0,
+                        0
+                    ]
+                ]
             }
         ];
 
@@ -2027,12 +2867,12 @@
             training: {
                 dissertation: { intro: null, dev: null },
                 explic: { intro: null, dev: null },
-                argumentation: { argumentation: null }
+                argumentation: { dissertation: null, fragment: null }
             },
             corrections: {
                 dissertation: { intro: null, dev: null },
                 explic: { intro: null, dev: null },
-                argumentation: { argumentation: null }
+                argumentation: { dissertation: null, fragment: null }
             },
             explicTexts: [],
             currentExplicTextIndex: null,
@@ -2041,7 +2881,8 @@
             isCustomExplication: false,
             isCustomArgumentation: false,
             activeThesis: null,
-            thesisOrientation: null
+            thesisOrientation: null,
+            argumentationSubMode: 'dissertation'
         };
 
         const content = {
@@ -2134,8 +2975,10 @@
         state.training.dissertation.dev = content.dev.trainingTemplate;
         state.training.explic.intro = content.explic.intro.trainingTemplate;
         state.training.explic.dev = content.explic.dev.trainingTemplate;
-        state.training.argumentation = { argumentation: content.argumentation.trainingTemplate };
-        state.corrections.argumentation = { argumentation: null };
+        state.training.argumentation.dissertation = content.argumentation.trainingTemplate;
+        state.training.argumentation.fragment = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
+        state.corrections.argumentation.dissertation = null;
+        state.corrections.argumentation.fragment = null;
 
         function obtenirSujetActif() {
             if (state.exerciseType === 'dissertation') {
@@ -2242,7 +3085,11 @@
                 } else if (state.exerciseType === 'explication') {
                     state.training.explic[state.mode] = textarea.value;
                 } else if (state.exerciseType === 'argumentation') {
-                    state.training.argumentation.argumentation = textarea.value;
+                    if (state.argumentationSubMode === 'fragment') {
+                        state.training.argumentation.fragment = textarea.value;
+                    } else {
+                        state.training.argumentation.dissertation = textarea.value;
+                    }
                 }
             }
         }
@@ -2268,7 +3115,7 @@
             if (t === 'argumentation') {
                 state.mode = 'argumentation';
                 if (mainNav) mainNav.style.display = 'none';
-                toggleArgumentationMode(false);
+                setArgSubMode(state.argumentationSubMode, false);
             } else {
                 if (state.mode === 'argumentation') {
                     state.mode = 'intro';
@@ -2378,8 +3225,13 @@
                 state.training.explic[state.mode] = content.explic[state.mode].trainingTemplate;
                 state.corrections.explic[state.mode] = null;
             } else if (state.exerciseType === 'argumentation') {
-                state.training.argumentation.argumentation = content.argumentation.trainingTemplate;
-                state.corrections.argumentation.argumentation = null;
+                if (state.argumentationSubMode === 'fragment') {
+                    state.training.argumentation.fragment = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
+                    state.corrections.argumentation.fragment = null;
+                } else {
+                    state.training.argumentation.dissertation = content.argumentation.trainingTemplate;
+                    state.corrections.argumentation.dissertation = null;
+                }
             }
             render();
         }
@@ -2418,7 +3270,11 @@
             } else if (state.exerciseType === 'explication') {
                 state.training.explic[state.mode] = textarea.value;
             } else if (state.exerciseType === 'argumentation') {
-                state.training.argumentation.argumentation = textarea.value;
+                if (state.argumentationSubMode === 'fragment') {
+                    state.training.argumentation.fragment = textarea.value;
+                } else {
+                    state.training.argumentation.dissertation = textarea.value;
+                }
             }
             updateCharCount(textarea);
         }
@@ -2453,8 +3309,13 @@
                 currentText = state.training.explic[state.mode] || '';
                 savedCorrectionObj = state.corrections.explic[state.mode];
             } else if (state.exerciseType === 'argumentation') {
-                currentText = state.training.argumentation.argumentation || '';
-                savedCorrectionObj = state.corrections.argumentation.argumentation;
+                if (state.argumentationSubMode === 'fragment') {
+                    currentText = state.training.argumentation.fragment || '';
+                    savedCorrectionObj = state.corrections.argumentation.fragment;
+                } else {
+                    currentText = state.training.argumentation.dissertation || '';
+                    savedCorrectionObj = state.corrections.argumentation.dissertation;
+                }
             }
 
             const sujetActif = obtenirSujetActif();
@@ -2490,9 +3351,41 @@
             // If explication de texte, show the text block first
             if (state.exerciseType === 'explication') {
                 if (state.currentExplicText) {
+                    let textHtml = "";
+                    if (state.currentExplicText.structure) {
+                        const starts = state.currentExplicText.paragraphStarts || [[0, 0]];
+                        const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
+                        let inParagraph = false;
+                        state.currentExplicText.structure.forEach((moment, mIdx) => {
+                            moment.subMoments.forEach((sub, sIdx) => {
+                                const isStart = isParagraphStart(mIdx, sIdx);
+                                if (isStart) {
+                                    if (inParagraph) {
+                                        textHtml += `</p>`;
+                                    }
+                                    textHtml += `<p style="margin-bottom: 15px;">`;
+                                    inParagraph = true;
+                                } else {
+                                    textHtml += " ";
+                                }
+                                textHtml += sub;
+                            });
+                        });
+                        if (inParagraph) {
+                            textHtml += `</p>`;
+                        }
+                        if (state.currentExplicText.source) {
+                            textHtml += `<p style="text-align: right; margin-top: 15px; color: #475569;">${state.currentExplicText.source}</p>`;
+                        }
+                        if (state.currentExplicText.notes) {
+                            textHtml += `<div style="margin-top: 15px; color: #475569;">${state.currentExplicText.notes}</div>`;
+                        }
+                    } else {
+                        textHtml = state.currentExplicText.html || "";
+                    }
                     workspaceHtml += `
                         <div class="texte-philo" style="margin-top:12px; margin-bottom: 15px; padding:15px; background:#fafafa; border:1px solid #ddd; border-radius:6px; line-height:1.8;">
-                            ${state.currentExplicText.html}
+                            ${textHtml}
                         </div>
                     `;
                 }
@@ -2572,7 +3465,39 @@
                     }
                     return;
                 }
-                selectedTextHtml = state.currentExplicText.html;
+                if (state.currentExplicText.structure) {
+                    const starts = state.currentExplicText.paragraphStarts || [[0, 0]];
+                    const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
+                    let textHtml = "";
+                    let inParagraph = false;
+                    state.currentExplicText.structure.forEach((moment, mIdx) => {
+                        moment.subMoments.forEach((sub, sIdx) => {
+                            const isStart = isParagraphStart(mIdx, sIdx);
+                            if (isStart) {
+                                if (inParagraph) {
+                                    textHtml += `</p>`;
+                                }
+                                textHtml += `<p style="margin-bottom: 15px;">`;
+                                inParagraph = true;
+                            } else {
+                                textHtml += " ";
+                            }
+                            textHtml += sub;
+                        });
+                    });
+                    if (inParagraph) {
+                        textHtml += `</p>`;
+                    }
+                    selectedTextHtml = textHtml;
+                    if (state.currentExplicText.source) {
+                        selectedTextHtml += `<p style="text-align: right; margin-top: 15px; color: #475569;">${state.currentExplicText.source}</p>`;
+                    }
+                    if (state.currentExplicText.notes) {
+                        selectedTextHtml += `<div style="margin-top: 15px; color: #475569;">${state.currentExplicText.notes}</div>`;
+                    }
+                } else {
+                    selectedTextHtml = state.currentExplicText.html || "";
+                }
                 selectedTextTitle = state.currentExplicText.label || state.currentExplicText.title;
             } else if (state.exerciseType === 'argumentation') {
                 if (!state.activeThesis) {
@@ -2611,7 +3536,11 @@
             } else if (state.exerciseType === 'explication') {
                 savedCorrectionObj = state.corrections.explic[state.mode];
             } else if (state.exerciseType === 'argumentation') {
-                savedCorrectionObj = state.corrections.argumentation.argumentation;
+                if (state.argumentationSubMode === 'fragment') {
+                    savedCorrectionObj = state.corrections.argumentation.fragment;
+                } else {
+                    savedCorrectionObj = state.corrections.argumentation.dissertation;
+                }
             }
 
             let pistesPrecedentes = {};
@@ -2648,6 +3577,7 @@
                 if (state.exerciseType === 'argumentation') {
                     body.thesisOrientation = thesisOrientation;
                     body.positionTexte = positionTexte;
+                    body.argumentationSubMode = state.argumentationSubMode;
                 }
 
                 const response = await fetch(CLOUD_FUNCTION_URL, {
@@ -2699,7 +3629,11 @@
                 } else if (state.exerciseType === 'explication') {
                     state.corrections.explic[state.mode] = newCorrectionObj;
                 } else if (state.exerciseType === 'argumentation') {
-                    state.corrections.argumentation.argumentation = newCorrectionObj;
+                    if (state.argumentationSubMode === 'fragment') {
+                        state.corrections.argumentation.fragment = newCorrectionObj;
+                    } else {
+                        state.corrections.argumentation.dissertation = newCorrectionObj;
+                    }
                 }
             } catch (error) {
                 alert("Erreur lors de la communication avec le correcteur : " + error.message);
@@ -2834,12 +3768,217 @@
         function updateDisplaySelectedThesis() {
             const display = document.getElementById('display-selected-thesis');
             if (state.activeThesis) {
-                const prefix = "<strong>Position à défendre :</strong> ";
+                const prefix = (state.exerciseType === 'argumentation' && state.argumentationSubMode === 'fragment')
+                    ? "<strong>Fragment à expliquer :</strong> "
+                    : "<strong>Position à défendre :</strong> ";
                 display.innerHTML = prefix + state.activeThesis;
                 display.style.display = 'block';
             } else {
                 display.innerHTML = '';
                 display.style.display = 'none';
+            }
+        }
+
+        function setArgSubMode(mode, preserveText = true) {
+            if (preserveText) {
+                preserveTrainingText();
+            }
+            state.argumentationSubMode = mode;
+
+            const textarea = document.getElementById("training-textarea");
+            const defaultDissertationTemplate = `[ARGUMENT]\n[RÉF/EX]`;
+            const defaultFragmentTemplate = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
+
+            if (mode === 'fragment') {
+                if (preserveText || !state.training.argumentation.fragment) {
+                    state.training.argumentation.fragment = defaultFragmentTemplate;
+                    if (textarea) {
+                        textarea.value = defaultFragmentTemplate;
+                    }
+                }
+            } else if (mode === 'dissertation') {
+                if (preserveText || !state.training.argumentation.dissertation) {
+                    state.training.argumentation.dissertation = defaultDissertationTemplate;
+                    if (textarea) {
+                        textarea.value = defaultDissertationTemplate;
+                    }
+                }
+            }
+
+            // Toggle active class on buttons
+            document.getElementById('btn-arg-submode-dis').classList.toggle('active', mode === 'dissertation');
+            document.getElementById('btn-arg-submode-frag').classList.toggle('active', mode === 'fragment');
+
+            // Show/hide blocks
+            document.getElementById('argumentation-dissertation-block').style.display = mode === 'dissertation' ? 'block' : 'none';
+            document.getElementById('argumentation-fragment-block').style.display = mode === 'fragment' ? 'block' : 'none';
+
+            if (mode === 'dissertation') {
+                // Restore dissertation argumentation mode
+                toggleArgumentationMode(state.isCustomArgumentation);
+            } else {
+                // Fragment sub-mode
+                populateExplicTextArgSelector();
+                const select = document.getElementById('select-explic-text-arg');
+                if (select) {
+                    if (!select.value && state.explicTexts.length > 0) {
+                        select.value = "0";
+                    }
+                    selectExplicTextArg(select.value);
+                } else {
+                    state.activeThesis = null;
+                    state.thesisOrientation = null;
+                }
+            }
+
+            // Update methodology help in content.argumentation
+            updateArgumentationMethodology();
+
+            updateDisplaySelectedThesis();
+            render();
+        }
+
+        function populateExplicTextArgSelector() {
+            const sel = document.getElementById('select-explic-text-arg');
+            if (!sel) return;
+            if (sel.children.length <= 1) {
+                sel.innerHTML = '<option value="">-- Sélectionnez un texte --</option>' +
+                    state.explicTexts.map((t, i) => `<option value="${i}">${t.label}</option>`).join('');
+            }
+        }
+
+        function selectExplicTextArg(val) {
+            const idx = parseInt(val, 10);
+            const container = document.getElementById('argumentation-fragment-text-display');
+            if (!container) return;
+
+            if (isNaN(idx) || idx < 0 || idx >= state.explicTexts.length) {
+                container.innerHTML = '<p style="color: #7f8c8d; font-style: italic; margin: 0;">Veuillez sélectionner un texte pour afficher les fragments cliquables.</p>';
+                state.activeThesis = null;
+                state.thesisOrientation = null;
+                updateDisplaySelectedThesis();
+                return;
+            }
+
+            const textData = state.explicTexts[idx];
+
+            if (!state.activeFragment || state.activeFragment.textIndex !== idx) {
+                state.activeFragment = { textIndex: idx, momentIndex: 0, subMomentIndex: 0 };
+            }
+
+            let html = "";
+            if (textData.structure) {
+                const starts = textData.paragraphStarts || [[0, 0]];
+                const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
+                let inParagraph = false;
+
+                textData.structure.forEach((moment, mIdx) => {
+                    moment.subMoments.forEach((sub, sIdx) => {
+                        const isStart = isParagraphStart(mIdx, sIdx);
+                        if (isStart) {
+                            if (inParagraph) {
+                                html += `</p>`;
+                            }
+                            html += `<p style="margin: 0 0 15px 0; text-align: justify; text-indent: 2em; line-height: 1.8;">`;
+                            inParagraph = true;
+                        } else {
+                            html += " ";
+                        }
+
+                        const isActive = (state.activeFragment.momentIndex === mIdx && state.activeFragment.subMomentIndex === sIdx);
+                        const spanStyle = isActive
+                            ? "font-weight: bold; background-color: #fef08a; color: inherit; cursor: pointer; transition: all 0.2s; display: inline; padding: 2px 4px; border-radius: 3px;"
+                            : "color: inherit; cursor: pointer; transition: all 0.2s; display: inline; padding: 2px 4px;";
+
+                        html += `<span class="clickable-fragment" onclick="clickFragment(${idx}, ${mIdx}, ${sIdx})" style="${spanStyle}">${sub}</span>`;
+                    });
+                });
+
+                if (inParagraph) {
+                    html += `</p>`;
+                }
+
+                if (textData.source) {
+                    html += `<p style="text-align: right; margin-top: 15px; color: #475569;">${textData.source}</p>`;
+                }
+                if (textData.notes) {
+                    html += `<div style="margin-top: 15px; color: #475569;">${textData.notes}</div>`;
+                }
+            } else {
+                html = textData.html || "";
+            }
+
+            container.innerHTML = html;
+
+            if (textData.structure && textData.structure[state.activeFragment.momentIndex]) {
+                state.activeThesis = textData.structure[state.activeFragment.momentIndex].subMoments[state.activeFragment.subMomentIndex];
+                state.thesisOrientation = 'fragment';
+            }
+
+            updateDisplaySelectedThesis();
+        }
+
+        function clickFragment(textIdx, mIdx, sIdx) {
+            state.activeFragment = { textIndex: textIdx, momentIndex: mIdx, subMomentIndex: sIdx };
+
+            // Force the fragment template into state and textarea
+            const defaultFragmentTemplate = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
+            state.training.argumentation.fragment = defaultFragmentTemplate;
+            const textarea = document.getElementById("training-textarea");
+            if (textarea) {
+                textarea.value = defaultFragmentTemplate;
+                updateCharCount(textarea);
+            }
+
+            selectExplicTextArg(textIdx);
+        }
+
+        function updateArgumentationMethodology() {
+            if (state.argumentationSubMode === 'fragment') {
+                content.argumentation.trainingTemplate = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
+                content.argumentation.fields = ["REFORMULATION", "ARGUMENT", "RÉF/EX", "TRANSITION"];
+                content.argumentation.methodo = `<h2>Méthodologie de l’explication de fragment</h2>
+            <div class="methodo-block"><h3>[REFORMULATION]</h3>
+            <p>Résumer en quelques phrases ce que l'auteur fait dans ce passage et ce qu'il y dit. Expliquer consiste à déplier et mettre en évidence ce qui demeure implicite. <strong>Attention&nbsp;: L'analyse philosophique ne s'intéresse pas aux figures de style (la forme) mais à la dimension argumentative (le fond).</strong></p>
+            </div>
+            <div class="methodo-block"><h3>[ARGUMENT]</h3>
+            <p>Montrer que l’auteur a raison avec un argument conceptuel abstrait, en intégrant obligatoirement la définition d’au moins un terme important du fragment. Si nécessaire, on peut proposer des hypothèses d'interprétation justifiées (et admettre l'incertitude interprétative si nécessaire). <strong>Postulat de cohérence&nbsp;: L’auteur ne peut pas se contredire, il faut partir du principe qu’il est cohérent tout le long du texte.</strong></p>
+            </div>
+            <div class="methodo-block"><h3>[RÉF/EX]</h3>
+            <p>Illustrer le propos de l’auteur avec une référence philosophique ou un exemple extérieur solide (historique, littéraire, scientifique) s'il n'en propose pas. L'exemple doit être universel (pas d'anecdote triviale ou purement personnelle) et le lien avec l'argument doit être explicitement démontré.</p>
+            </div>
+            <div class="methodo-block"><h3>[TRANSITION]</h3>
+            <p>Faire une phrase de transition (sous forme de question ou en mesurant ce qui fait encore défaut) s’appuyant éventuellement sur une objection rigoureuse pour montrer comment ce passage s’articule avec le fragment ou le moment suivant.</p>
+            </div>`;
+            } else {
+                content.argumentation.trainingTemplate = `[ARGUMENT]\n[RÉF/EX]`;
+                content.argumentation.fields = ["ARGUMENT", "RÉF/EX"];
+                content.argumentation.methodo = `<h2>Méthodologie de l’argumentation</h2>
+            <div class="methodo-block"><h3>Argument</h3>
+            <p>Rédiger un argument consiste donner une bonne raison d’adhérer à la position défendue. Dans l’idéal, l’argument doit donc apporter une preuve conceptuelle et abstraite qui démontre la vérité de la position défendue. <strong>Attention à ne pas raconter d’histoires ni donner d’exemples concrets.</strong></p>
+            
+            <p style="margin-top: 15px; font-weight: bold;">Méthode indirecte – Par étapes&nbsp;:</p>
+            <ul style="margin-top: 5px;">
+                <li><strong>Le recensement initial&nbsp;:</strong> listez au brouillon deux ou trois exemples marquants qui illustrent la thèse défendue.</li>
+                <li><strong>Le regroupement par affinité&nbsp;:</strong> rassemblez les exemples similaires afin de former des blocs cohérents d’illustrations.</li>
+                <li><strong>La formalisation abstraite&nbsp;:</strong> interrogez-vous&nbsp;: «&nbsp;Pourquoi ce groupe d’exemples permet-il de justifier la thèse&nbsp;?&nbsp;» La réponse théorique à cette question (le «&nbsp;parce que...&nbsp;» global) constituera votre argument général valide dans tous les cas.</li>
+            </ul>
+
+            <p style="margin-top: 15px; font-weight: bold;">Méthode directe – Au choix&nbsp;:</p>
+            <ul style="margin-top: 5px;">
+                <li><strong>L’emboîtement définitionnel&nbsp;:</strong> réduisez la thèse de l’articulation de définitions de concepts clés.</li>
+                <li><strong>Le rapport de causalité&nbsp;:</strong> justifiez la thèse par ses causes ou ses conséquences objectives, par sa finalité ou ses raisons.</li>
+                <li><strong>L’action réciproque&nbsp;:</strong> montrez comment les concepts de la thèse défendue interagissent ont des conséquences qui s’influencent mutuellement.</li>
+                <li><strong>Le raisonnement par l’absurde&nbsp;:</strong> démontrez que la position inverse de la vôtre est impossible à soutenir ou contradictoire.</li>
+                <li><strong>La diversification des perspectives&nbsp;:</strong> variez les angles d’approche pour viser une complétude analytique. <em>Note&nbsp;: chaque argument ne traite qu’une perspective déterminée à la fois&nbsp;; c’est la combinaison de plusieurs arguments traitant des angles distincts qui permet de construire une démonstration probante et nuancée.</em> S’appuyer sur des repères clés&nbsp;: (ex&nbsp;: <em>soi / les autres / la société</em>, <em>subjectif / objectif</em>, <em>passé / présent / futur</em>, <em>en théorie / en pratique</em>, <em>désir / devoir</em>, <em>abstrait / concret</em>, <em>légal / légitime</em>, <em>croire / savoir</em>, <em>l’intention / les conséquences</em>, <em>nature / culture</em>, <em>pouvoir&nbsp;: droit légal / capacité matérielle / possibilité logique</em>, <em>corps / esprit</em>, <em>conscient / inconscient</em>, <em>raison / passion</em>, <em>volonté / désir</em>, <em>absolu / relatif</em>, <em>contingent / nécessaire</em>, <em>essentiel / accidentel</em>, <em>obligation / contrainte</em>, <em>public / privé</em>, <em>universel / général / particulier / singulier</em>).</li>
+            </ul></div>
+
+            <div class="methodo-block"><h3>Référence / Exemple</h3>
+            <p>Donnez du relief à votre argument général à l’aide d’une référence philosophique (Auteur, Œuvre) ou d’un exemple particulier qui peut être historique, littéraire, scientifique, etc.</p>
+            <ul style="margin-top: 5px;">
+                <li><strong>Universalité et légitimité&nbsp;:</strong> l’exemple doit avoir une portée générale, parler à tout le monde et relever si possible d’un champ de la culture usuellement considéré comme légitime. Évitez les anecdotes personnelles ou triviales.</li>
+                <li><strong>Explicitation du lien&nbsp;:</strong> ne vous contentez pas de parachuter votre exemple. Expliquez en toutes lettres en quoi ce cas précis confirme la règle générale que vous avez démontrée dans votre argument.</li>
+            </ul></div>`;
             }
         }
     </script>
