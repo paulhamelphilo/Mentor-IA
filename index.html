@@ -349,6 +349,17 @@
                 max-width: 1000px;
             }
         }
+
+        .texte-philo p {
+            text-indent: 2em;
+            text-align: justify;
+            margin-top: 0;
+            margin-bottom: 0.6em;
+        }
+
+        .texte-philo p[style*="text-align: right"] {
+            text-indent: 0;
+        }
     </style>
 </head>
 
@@ -2432,7 +2443,7 @@
 
             const area = document.getElementById('content-area');
 
-            const maxLength = state.exerciseType === 'argumentation' ? 6000 : (state.mode === 'intro' ? 3000 : 12000);
+            const maxLength = state.exerciseType === 'argumentation' ? 3000 : (state.mode === 'intro' ? 3000 : 12000);
             let currentText = '';
             let savedCorrectionObj = null;
             if (state.exerciseType === 'dissertation') {
@@ -2480,7 +2491,7 @@
             if (state.exerciseType === 'explication') {
                 if (state.currentExplicText) {
                     workspaceHtml += `
-                        <div style="margin-top:12px; margin-bottom: 15px; padding:15px; background:#fafafa; border:1px solid #ddd; border-radius:6px; line-height:1.8;">
+                        <div class="texte-philo" style="margin-top:12px; margin-bottom: 15px; padding:15px; background:#fafafa; border:1px solid #ddd; border-radius:6px; line-height:1.8;">
                             ${state.currentExplicText.html}
                         </div>
                     `;
