@@ -423,7 +423,7 @@
                     </select>
 
                     <label style="margin-top:15px; display:block;"><strong>Sujet à traiter</strong></label>
-                    <select id="select-sujet" disabled>
+                    <select id="select-sujet" onchange="render()" disabled>
                         <option value="">-- Sélectionnez d’abord une notion --</option>
                     </select>
 
@@ -434,7 +434,8 @@
                 </div>
                 <div id="dissertation-custom" style="display:none;">
                     <label><strong>Saisir votre sujet personnalisé :</strong></label>
-                    <input type="text" id="input-custom-sujet" placeholder="Ex: Peut-on être libre sans l’État ?"
+                    <input type="text" id="input-custom-sujet" oninput="render()"
+                        placeholder="Ex: Peut-on être libre sans l’État ?"
                         style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
 
                     <div style="margin-top:12px; text-align:right;">
@@ -2125,6 +2126,65 @@
         state.training.argumentation = { argumentation: content.argumentation.trainingTemplate };
         state.corrections.argumentation = { argumentation: null };
 
+        function obtenirSujetActif() {
+            if (state.exerciseType === 'dissertation') {
+                if (state.isCustomDissertation) {
+                    const inputCustom = document.getElementById("input-custom-sujet");
+                    return inputCustom ? inputCustom.value.trim() : '';
+                } else {
+                    const selectSujet = document.getElementById("select-sujet");
+                    return selectSujet ? selectSujet.value : '';
+                }
+            } else if (state.exerciseType === 'explication') {
+                return state.currentExplicText ? (state.currentExplicText.label || state.currentExplicText.title || '') : '';
+            } else if (state.exerciseType === 'argumentation') {
+                return state.activeThesis || '';
+            }
+            return '';
+        }
+
+        function extrairePistesParBalise(html) {
+            const pistes = {};
+            if (!html) return pistes;
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const headers = doc.querySelectorAll('h3');
+
+            headers.forEach(header => {
+                const sectionName = header.textContent.replace(/[\[\]]/g, '').trim();
+
+                let currentElement = header.nextElementSibling;
+                let blockquote = null;
+                while (currentElement && currentElement.tagName !== 'H3') {
+                    if (currentElement.tagName === 'BLOCKQUOTE') {
+                        blockquote = currentElement;
+                        break;
+                    }
+                    const nestedBlockquote = currentElement.querySelector('blockquote');
+                    if (nestedBlockquote) {
+                        blockquote = nestedBlockquote;
+                        break;
+                    }
+                    currentElement = currentElement.nextElementSibling;
+                }
+
+                if (blockquote) {
+                    const text = blockquote.textContent.trim();
+                    const normalized = text.toLowerCase()
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .replace(/[^a-z]/g, "");
+                    if (normalized.includes("aucunepistedameliorationnecessaire")) {
+                        return;
+                    }
+                    pistes[sectionName] = text;
+                }
+            });
+
+            return pistes;
+        }
+
         window.onload = () => {
             // Initialize explication texts
             state.explicTexts = explicTextsData;
@@ -2160,6 +2220,7 @@
             } else {
                 selectSujet.disabled = true;
             }
+            render();
         }
 
         function preserveTrainingText() {
@@ -2373,16 +2434,22 @@
 
             const maxLength = state.exerciseType === 'argumentation' ? 6000 : (state.mode === 'intro' ? 3000 : 12000);
             let currentText = '';
-            let savedCorrection = null;
+            let savedCorrectionObj = null;
             if (state.exerciseType === 'dissertation') {
                 currentText = state.training.dissertation[state.mode] || '';
-                savedCorrection = state.corrections.dissertation[state.mode];
+                savedCorrectionObj = state.corrections.dissertation[state.mode];
             } else if (state.exerciseType === 'explication') {
                 currentText = state.training.explic[state.mode] || '';
-                savedCorrection = state.corrections.explic[state.mode];
+                savedCorrectionObj = state.corrections.explic[state.mode];
             } else if (state.exerciseType === 'argumentation') {
                 currentText = state.training.argumentation.argumentation || '';
-                savedCorrection = state.corrections.argumentation.argumentation;
+                savedCorrectionObj = state.corrections.argumentation.argumentation;
+            }
+
+            const sujetActif = obtenirSujetActif();
+            let savedCorrection = null;
+            if (savedCorrectionObj && savedCorrectionObj.sujet === sujetActif && sujetActif !== '') {
+                savedCorrection = savedCorrectionObj.html;
             }
             const currentLength = currentText.length;
             const charInfo = getCharCountInfo(currentLength, maxLength);
@@ -2518,11 +2585,25 @@
                 return;
             }
 
-            // Vérifier si l'utilisateur a écrit du contenu réel en dehors des balises [BALISE]
             const cleanTextForValidation = trainingText.replace(/\[[^\]]+\]/g, '').trim();
             if (cleanTextForValidation.length < 10) {
                 alert("Veuillez rédiger votre travail avant de demander la correction.");
                 return;
+            }
+
+            const sujetActif = obtenirSujetActif();
+            let savedCorrectionObj = null;
+            if (state.exerciseType === 'dissertation') {
+                savedCorrectionObj = state.corrections.dissertation[state.mode];
+            } else if (state.exerciseType === 'explication') {
+                savedCorrectionObj = state.corrections.explic[state.mode];
+            } else if (state.exerciseType === 'argumentation') {
+                savedCorrectionObj = state.corrections.argumentation.argumentation;
+            }
+
+            let pistesPrecedentes = {};
+            if (savedCorrectionObj && savedCorrectionObj.sujet === sujetActif && sujetActif !== '') {
+                pistesPrecedentes = extrairePistesParBalise(savedCorrectionObj.html);
             }
 
             // ==========================================
@@ -2540,7 +2621,13 @@
             document.getElementById("correction-box").style.display = "none";
 
             try {
-                const body = { sujet, type: state.exerciseType, mode: state.mode, texte: trainingText };
+                const body = {
+                    sujet,
+                    type: state.exerciseType,
+                    mode: state.mode,
+                    texte: trainingText,
+                    pistesPrecedentes
+                };
                 if (state.exerciseType === 'explication') {
                     body.selectedTextTitle = selectedTextTitle;
                     body.selectedTextHtml = selectedTextHtml;
@@ -2590,12 +2677,16 @@
 
                 // Sauvegarder la correction finale dans le state de l'application
                 const correctionHtmlFinale = marked.parse(texteCumule);
+                const newCorrectionObj = {
+                    sujet: sujetActif,
+                    html: correctionHtmlFinale
+                };
                 if (state.exerciseType === 'dissertation') {
-                    state.corrections.dissertation[state.mode] = correctionHtmlFinale;
+                    state.corrections.dissertation[state.mode] = newCorrectionObj;
                 } else if (state.exerciseType === 'explication') {
-                    state.corrections.explic[state.mode] = correctionHtmlFinale;
+                    state.corrections.explic[state.mode] = newCorrectionObj;
                 } else if (state.exerciseType === 'argumentation') {
-                    state.corrections.argumentation.argumentation = correctionHtmlFinale;
+                    state.corrections.argumentation.argumentation = newCorrectionObj;
                 }
             } catch (error) {
                 alert("Erreur lors de la communication avec le correcteur : " + error.message);
@@ -2638,6 +2729,7 @@
             } else {
                 selectSujet.disabled = true;
             }
+            render();
         }
 
         function updateArgThesisButtons() {
@@ -2667,6 +2759,7 @@
             state.activeThesis = null;
             state.thesisOrientation = null;
             updateDisplaySelectedThesis();
+            render();
         }
 
         function selectArgPosition(orientation) {
@@ -2683,6 +2776,7 @@
             document.getElementById('btn-arg-antithesis').classList.toggle('active', orientation === 'antithesis');
 
             updateDisplaySelectedThesis();
+            render();
         }
 
         function updateCustomArgPosition() {
@@ -2695,6 +2789,7 @@
                 state.thesisOrientation = null;
             }
             updateDisplaySelectedThesis();
+            render();
         }
 
         function toggleArgumentationMode(isCustom) {
@@ -2720,6 +2815,7 @@
                     updateDisplaySelectedThesis();
                 }
             }
+            render();
         }
 
         function updateDisplaySelectedThesis() {
