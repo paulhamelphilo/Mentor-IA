@@ -360,6 +360,20 @@
         .texte-philo p[style*="text-align: right"] {
             text-indent: 0;
         }
+
+        #main-nav-separator {
+            width: 2px;
+            height: 30px;
+            background-color: #bdc3c7;
+            align-self: center;
+            margin: 0 5px;
+        }
+
+        @media (max-width: 768px) {
+            #main-nav-separator {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -369,13 +383,9 @@
         <h1>Mentor IA philo</h1>
 
         <div class="global-selector">
-            <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Mode</strong></label>
+            <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Exercice</strong></label>
             <div class="exercise-type-nav"
                 style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: center; width: 100%;">
-                    <button id="btn-ex-type-arg" class="btn"
-                        onclick="setExerciseType('argumentation')">Argumentation</button>
-                </div>
                 <div style="display: flex; justify-content: center; gap: 10px; width: 100%; flex-wrap: wrap;">
                     <button id="btn-ex-type-dis" class="btn active"
                         onclick="setExerciseType('dissertation')">Dissertation</button>
@@ -384,75 +394,7 @@
                 </div>
             </div>
 
-            <div id="selector-argumentation" style="display:none;">
-                <!-- Commutateur de sous-mode -->
-                <div class="arg-submode-nav" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <button type="button" id="btn-arg-submode-dis" class="btn active" style="flex: 1;"
-                        onclick="setArgSubMode('dissertation')">Argumenter une thèse de dissertation</button>
-                    <button type="button" id="btn-arg-submode-frag" class="btn" style="flex: 1;"
-                        onclick="setArgSubMode('fragment')">Expliquer un fragment de texte</button>
-                </div>
-
-                <!-- Bloc Dissertation Thèse -->
-                <div id="argumentation-dissertation-block">
-                    <div id="argumentation-predefined">
-                        <label><strong>Notion</strong></label>
-                        <select id="select-notion-arg" onchange="updateSujetsArg()">
-                            <option value="">-- Sélectionnez une notion --</option>
-                        </select>
-
-                        <label style="margin-top:15px; display:block;"><strong>Sujet</strong></label>
-                        <select id="select-sujet-arg" onchange="updateArgThesisButtons()" disabled>
-                            <option value="">-- Sélectionnez d’abord une notion --</option>
-                        </select>
-
-                        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
-                            <button type="button" id="btn-arg-thesis" class="btn"
-                                style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
-                                onclick="selectArgPosition('thesis')"></button>
-                            <button type="button" id="btn-arg-antithesis" class="btn"
-                                style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
-                                onclick="selectArgPosition('antithesis')"></button>
-                        </div>
-
-                        <div style="margin-top:12px; text-align:right;">
-                            <button type="button" class="btn btn-secondary btn-sm"
-                                onclick="toggleArgumentationMode(true)">✍
-                                Saisir une thèse personnalisée à argumenter</button>
-                        </div>
-                    </div>
-                    <div id="argumentation-custom" style="display:none;">
-                        <label><strong>Saisir votre thèse personnalisée :</strong></label>
-                        <input type="text" id="input-custom-thesis" placeholder="Ex: L’art est utile."
-                            oninput="updateCustomArgPosition()"
-                            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
-
-                        <div style="margin-top:12px; text-align:right;">
-                            <button type="button" class="btn btn-secondary btn-sm"
-                                onclick="toggleArgumentationMode(false)">📋 Choisir dans la liste</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bloc Fragment de texte -->
-                <div id="argumentation-fragment-block" style="display:none;">
-                    <label><strong>Texte philosophique</strong></label>
-                    <select id="select-explic-text-arg" onchange="selectExplicTextArg(this.value)">
-                        <option value="">-- Sélectionnez un texte --</option>
-                    </select>
-
-                    <div id="argumentation-fragment-text-display"
-                        style="margin-top: 15px; padding: 15px; background: #fafafa; border: 1px solid #ddd; border-radius: 6px; line-height: 1.8;">
-                        <p style="color: #7f8c8d; font-style: italic; margin: 0;">Veuillez sélectionner un texte pour
-                            afficher les fragments cliquables.</p>
-                    </div>
-                </div>
-
-                <div id="display-selected-thesis"
-                    style="margin-top: 15px; padding: 12px; background-color: #e8f4f8; border-left: 5px solid var(--accent-color); border-radius: 4px; font-weight: bold; color: var(--primary-color); display: none;">
-                </div>
-            </div>
-
+            <!-- Dissertation - Sélecteur standard (Introduction / Développement) -->
             <div id="selector-dissertation">
                 <div id="dissertation-predefined">
                     <label><strong>Notion</strong></label>
@@ -483,6 +425,47 @@
                 </div>
             </div>
 
+            <!-- Dissertation - Sélecteur d'argumentation de thèse -->
+            <div id="selector-dissertation-argumentation" style="display:none;">
+                <div id="argumentation-predefined">
+                    <label><strong>Notion</strong></label>
+                    <select id="select-notion-arg" onchange="updateSujetsArg()">
+                        <option value="">-- Sélectionnez une notion --</option>
+                    </select>
+
+                    <label style="margin-top:15px; display:block;"><strong>Sujet</strong></label>
+                    <select id="select-sujet-arg" onchange="updateArgThesisButtons()" disabled>
+                        <option value="">-- Sélectionnez d’abord une notion --</option>
+                    </select>
+
+                    <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" id="btn-arg-thesis" class="btn"
+                            style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
+                            onclick="selectArgPosition('thesis')"></button>
+                        <button type="button" id="btn-arg-antithesis" class="btn"
+                            style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
+                            onclick="selectArgPosition('antithesis')"></button>
+                    </div>
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleArgumentationMode(true)">✍
+                            Saisir une thèse personnalisée à argumenter</button>
+                    </div>
+                </div>
+                <div id="argumentation-custom" style="display:none;">
+                    <label><strong>Saisir votre thèse personnalisée :</strong></label>
+                    <input type="text" id="input-custom-thesis" placeholder="Ex: L’art est utile."
+                        oninput="updateCustomArgPosition()"
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="toggleArgumentationMode(false)">📋 Choisir dans la liste</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explication de texte - Sélecteur standard (Introduction / Développement) -->
             <div id="selector-explication" style="display:none;">
                 <div id="explication-predefined">
                     <label><strong>Sujet</strong></label>
@@ -521,11 +504,63 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Explication de texte - Sélecteur d'argumentation (Fragment) -->
+            <div id="selector-explication-argumentation" style="display:none;">
+                <div id="explication-arg-predefined">
+                    <label><strong>Texte philosophique</strong></label>
+                    <select id="select-explic-text-arg" onchange="selectExplicTextArg(this.value)">
+                        <option value="">-- Sélectionnez un texte --</option>
+                    </select>
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="toggleExplicationArgMode(true)">✍
+                            Saisir un fragment personnalisé</button>
+                    </div>
+                </div>
+                <div id="explication-arg-custom" style="display:none;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <label><strong>Auteur</strong></label>
+                            <input type="text" id="input-custom-arg-author" placeholder="Ex: Descartes"
+                                oninput="updateCustomExplicationArg()"
+                                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label><strong>Œuvre</strong></label>
+                            <input type="text" id="input-custom-arg-work" placeholder="Ex: Discours de la méthode"
+                                oninput="updateCustomExplicationArg()"
+                                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px;">
+                        </div>
+                    </div>
+                    <label><strong>Fragment à expliquer</strong></label>
+                    <textarea id="textarea-custom-arg-fragment" rows="4"
+                        placeholder="Saisissez ou collez le fragment ici..." oninput="updateCustomExplicationArg()"
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px; resize: vertical; font-family: inherit;"></textarea>
+
+                    <div style="margin-top:12px; text-align:right;">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="toggleExplicationArgMode(false)">📋
+                            Choisir dans la liste</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Affichage de la thèse sélectionnée (partagé) -->
+            <div id="display-selected-thesis"
+                style="margin-top: 15px; padding: 12px; background-color: #e8f4f8; border-left: 5px solid var(--accent-color); border-radius: 4px; font-weight: bold; color: var(--primary-color); display: none;">
+            </div>
         </div>
 
         <div class="main-nav">
             <button id="btn-mode-intro" class="btn active" onclick="setMode('intro')">Introduction</button>
             <button id="btn-mode-dev" class="btn" onclick="setMode('dev')">Développement</button>
+            <div id="main-nav-separator"></div>
+            <button id="btn-mode-arg-dis" class="btn" onclick="setMode('argumentation')"
+                style="max-width: 220px; white-space: nowrap;">Argumenter une thèse</button>
+            <button id="btn-mode-arg-exp" class="btn" onclick="setMode('argumentation')"
+                style="max-width: 280px; white-space: nowrap;">Expliquer un fragment de texte</button>
         </div>
 
 
@@ -2879,10 +2914,10 @@
             currentExplicText: null,
             isCustomDissertation: false,
             isCustomExplication: false,
+            isCustomExplicationArg: false,
             isCustomArgumentation: false,
             activeThesis: null,
-            thesisOrientation: null,
-            argumentationSubMode: 'dissertation'
+            thesisOrientation: null
         };
 
         const content = {
@@ -2982,17 +3017,23 @@
 
         function obtenirSujetActif() {
             if (state.exerciseType === 'dissertation') {
-                if (state.isCustomDissertation) {
-                    const inputCustom = document.getElementById("input-custom-sujet");
-                    return inputCustom ? inputCustom.value.trim() : '';
+                if (state.mode === 'argumentation') {
+                    return state.activeThesis || '';
                 } else {
-                    const selectSujet = document.getElementById("select-sujet");
-                    return selectSujet ? selectSujet.value : '';
+                    if (state.isCustomDissertation) {
+                        const inputCustom = document.getElementById("input-custom-sujet");
+                        return inputCustom ? inputCustom.value.trim() : '';
+                    } else {
+                        const selectSujet = document.getElementById("select-sujet");
+                        return selectSujet ? selectSujet.value : '';
+                    }
                 }
             } else if (state.exerciseType === 'explication') {
-                return state.currentExplicText ? (state.currentExplicText.label || state.currentExplicText.title || '') : '';
-            } else if (state.exerciseType === 'argumentation') {
-                return state.activeThesis || '';
+                if (state.mode === 'argumentation') {
+                    return state.activeThesis || '';
+                } else {
+                    return state.currentExplicText ? (state.currentExplicText.label || state.currentExplicText.title || '') : '';
+                }
             }
             return '';
         }
@@ -3081,14 +3122,180 @@
             const textarea = document.getElementById("training-textarea");
             if (textarea) {
                 if (state.exerciseType === 'dissertation') {
-                    state.training.dissertation[state.mode] = textarea.value;
+                    if (state.mode === 'argumentation') {
+                        state.training.argumentation.dissertation = textarea.value;
+                    } else {
+                        state.training.dissertation[state.mode] = textarea.value;
+                    }
                 } else if (state.exerciseType === 'explication') {
-                    state.training.explic[state.mode] = textarea.value;
-                } else if (state.exerciseType === 'argumentation') {
-                    if (state.argumentationSubMode === 'fragment') {
+                    if (state.mode === 'argumentation') {
                         state.training.argumentation.fragment = textarea.value;
                     } else {
-                        state.training.argumentation.dissertation = textarea.value;
+                        state.training.explic[state.mode] = textarea.value;
+                    }
+                }
+            }
+        }
+
+        function syncSelections(oldMode, newMode) {
+            if (state.exerciseType === 'dissertation') {
+                if ((oldMode === 'intro' || oldMode === 'dev') && newMode === 'argumentation') {
+                    // Standard -> Argumentation
+                    state.isCustomArgumentation = state.isCustomDissertation;
+
+                    const inputCustomSujet = document.getElementById("input-custom-sujet");
+                    const inputCustomThesis = document.getElementById("input-custom-thesis");
+                    if (inputCustomSujet && inputCustomThesis) {
+                        inputCustomThesis.value = inputCustomSujet.value;
+                    }
+
+                    if (!state.isCustomDissertation) {
+                        const selectNotion = document.getElementById("select-notion");
+                        const selectSujet = document.getElementById("select-sujet");
+                        const selectNotionArg = document.getElementById("select-notion-arg");
+                        const selectSujetArg = document.getElementById("select-sujet-arg");
+
+                        if (selectNotion && selectNotionArg) {
+                            const notion = selectNotion.value;
+                            selectNotionArg.value = notion;
+                            updateSujetsArg();
+
+                            if (selectSujet && selectSujetArg && notion) {
+                                const question = selectSujet.value;
+                                if (sujetsPhilo[notion]) {
+                                    const idx = sujetsPhilo[notion].findIndex(s => s.question === question);
+                                    if (idx !== -1) {
+                                        selectSujetArg.value = idx;
+                                        updateArgThesisButtons();
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        updateCustomArgPosition();
+                    }
+                } else if (oldMode === 'argumentation' && (newMode === 'intro' || newMode === 'dev')) {
+                    // Argumentation -> Standard
+                    state.isCustomDissertation = state.isCustomArgumentation;
+
+                    const pre = document.getElementById('dissertation-predefined');
+                    const cust = document.getElementById('dissertation-custom');
+                    if (pre && cust) {
+                        pre.style.display = state.isCustomDissertation ? 'none' : 'block';
+                        cust.style.display = state.isCustomDissertation ? 'block' : 'none';
+                    }
+
+                    const inputCustomSujet = document.getElementById("input-custom-sujet");
+                    const inputCustomThesis = document.getElementById("input-custom-thesis");
+                    if (inputCustomSujet && inputCustomThesis) {
+                        inputCustomSujet.value = inputCustomThesis.value;
+                    }
+
+                    if (!state.isCustomArgumentation) {
+                        const selectNotion = document.getElementById("select-notion");
+                        const selectSujet = document.getElementById("select-sujet");
+                        const selectNotionArg = document.getElementById("select-notion-arg");
+                        const selectSujetArg = document.getElementById("select-sujet-arg");
+
+                        if (selectNotion && selectNotionArg) {
+                            const notion = selectNotionArg.value;
+                            selectNotion.value = notion;
+                            updateSujets();
+
+                            if (selectSujet && selectSujetArg && notion) {
+                                const idx = parseInt(selectSujetArg.value, 10);
+                                if (!isNaN(idx) && sujetsPhilo[notion] && sujetsPhilo[notion][idx]) {
+                                    selectSujet.value = sujetsPhilo[notion][idx].question;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (state.exerciseType === 'explication') {
+                if ((oldMode === 'intro' || oldMode === 'dev') && newMode === 'argumentation') {
+                    // Standard -> Argumentation
+                    state.isCustomExplicationArg = state.isCustomExplication;
+
+                    const inputCustomAuthor = document.getElementById("input-custom-author");
+                    const inputCustomWork = document.getElementById("input-custom-work");
+                    const textareaCustomText = document.getElementById("textarea-custom-text");
+
+                    const inputCustomArgAuthor = document.getElementById("input-custom-arg-author");
+                    const inputCustomArgWork = document.getElementById("input-custom-arg-work");
+                    const textareaCustomArgFragment = document.getElementById("textarea-custom-arg-fragment");
+
+                    if (inputCustomAuthor && inputCustomArgAuthor) {
+                        inputCustomArgAuthor.value = inputCustomAuthor.value;
+                    }
+                    if (inputCustomWork && inputCustomArgWork) {
+                        inputCustomArgWork.value = inputCustomWork.value;
+                    }
+                    if (textareaCustomText && textareaCustomArgFragment) {
+                        textareaCustomArgFragment.value = textareaCustomText.value;
+                    }
+
+                    const preArg = document.getElementById('explication-arg-predefined');
+                    const custArg = document.getElementById('explication-arg-custom');
+                    if (preArg && custArg) {
+                        preArg.style.display = state.isCustomExplicationArg ? 'none' : 'block';
+                        custArg.style.display = state.isCustomExplicationArg ? 'block' : 'none';
+                    }
+
+                    if (!state.isCustomExplicationArg) {
+                        if (state.currentExplicTextIndex !== null) {
+                            const idx = state.currentExplicTextIndex;
+                            if (!state.activeFragment || state.activeFragment.textIndex !== idx) {
+                                state.activeFragment = { textIndex: idx, momentIndex: 0, subMomentIndex: 0 };
+                            }
+                            const textData = state.explicTexts[idx];
+                            if (textData && textData.structure && textData.structure[state.activeFragment.momentIndex]) {
+                                state.activeThesis = textData.structure[state.activeFragment.momentIndex].subMoments[state.activeFragment.subMomentIndex];
+                                state.thesisOrientation = 'fragment';
+                            } else {
+                                state.activeThesis = null;
+                                state.thesisOrientation = null;
+                            }
+                        }
+                    } else {
+                        updateCustomExplicationArg();
+                    }
+                } else if (oldMode === 'argumentation' && (newMode === 'intro' || newMode === 'dev')) {
+                    // Argumentation -> Standard
+                    state.isCustomExplication = state.isCustomExplicationArg;
+
+                    const preExp = document.getElementById('explication-predefined');
+                    const custExp = document.getElementById('explication-custom');
+                    if (preExp && custExp) {
+                        preExp.style.display = state.isCustomExplication ? 'none' : 'block';
+                        custExp.style.display = state.isCustomExplication ? 'block' : 'none';
+                    }
+
+                    const inputCustomAuthor = document.getElementById("input-custom-author");
+                    const inputCustomWork = document.getElementById("input-custom-work");
+                    const textareaCustomText = document.getElementById("textarea-custom-text");
+
+                    const inputCustomArgAuthor = document.getElementById("input-custom-arg-author");
+                    const inputCustomArgWork = document.getElementById("input-custom-arg-work");
+                    const textareaCustomArgFragment = document.getElementById("textarea-custom-arg-fragment");
+
+                    if (inputCustomAuthor && inputCustomArgAuthor) {
+                        inputCustomAuthor.value = inputCustomArgAuthor.value;
+                    }
+                    if (inputCustomWork && inputCustomArgWork) {
+                        inputCustomWork.value = inputCustomArgWork.value;
+                    }
+                    if (textareaCustomText && textareaCustomArgFragment) {
+                        textareaCustomText.value = textareaCustomArgFragment.value;
+                    }
+
+                    if (!state.isCustomExplicationArg) {
+                        if (state.activeFragment && state.activeFragment.textIndex !== null) {
+                            const idx = state.activeFragment.textIndex;
+                            state.currentExplicTextIndex = idx;
+                            state.currentExplicText = state.explicTexts[idx];
+                        }
+                    } else {
+                        updateCustomExplication();
                     }
                 }
             }
@@ -3096,32 +3303,25 @@
 
         function setMode(m) {
             preserveTrainingText();
+            const oldMode = state.mode;
+            syncSelections(oldMode, m);
             state.mode = m;
+            if (m === 'argumentation') {
+                initArgumentationSubMode();
+            }
             render();
         }
 
         function setExerciseType(t) {
             preserveTrainingText();
             state.exerciseType = t;
+
+            // Active classes on exercise selector buttons
             document.getElementById('btn-ex-type-dis').classList.toggle('active', t === 'dissertation');
             document.getElementById('btn-ex-type-exp').classList.toggle('active', t === 'explication');
-            document.getElementById('btn-ex-type-arg').classList.toggle('active', t === 'argumentation');
-            // toggle selectors
-            document.getElementById('selector-dissertation').style.display = t === 'dissertation' ? 'block' : 'none';
-            document.getElementById('selector-explication').style.display = t === 'explication' ? 'block' : 'none';
-            document.getElementById('selector-argumentation').style.display = t === 'argumentation' ? 'block' : 'none';
 
-            const mainNav = document.querySelector('.main-nav');
-            if (t === 'argumentation') {
-                state.mode = 'argumentation';
-                if (mainNav) mainNav.style.display = 'none';
-                setArgSubMode(state.argumentationSubMode, false);
-            } else {
-                if (state.mode === 'argumentation') {
-                    state.mode = 'intro';
-                }
-                if (mainNav) mainNav.style.display = 'flex';
-            }
+            // Reset sub-mode to intro when switching exercise type
+            state.mode = 'intro';
             render();
         }
 
@@ -3211,6 +3411,47 @@
             render();
         }
 
+        function toggleExplicationArgMode(isCustom) {
+            state.isCustomExplicationArg = isCustom;
+            const pre = document.getElementById('explication-arg-predefined');
+            const cust = document.getElementById('explication-arg-custom');
+            if (pre) pre.style.display = isCustom ? 'none' : 'block';
+            if (cust) cust.style.display = isCustom ? 'block' : 'none';
+            if (!isCustom) {
+                const authorInput = document.getElementById('input-custom-arg-author');
+                const workInput = document.getElementById('input-custom-arg-work');
+                const fragmentTextarea = document.getElementById('textarea-custom-arg-fragment');
+                if (authorInput) authorInput.value = '';
+                if (workInput) workInput.value = '';
+                if (fragmentTextarea) fragmentTextarea.value = '';
+                state.activeFragment = null;
+                state.activeThesis = null;
+                state.thesisOrientation = null;
+                const select = document.getElementById('select-explic-text-arg');
+                if (select) {
+                    selectExplicTextArg(select.value);
+                }
+            } else {
+                updateCustomExplicationArg();
+            }
+            render();
+        }
+
+        function updateCustomExplicationArg() {
+            const author = document.getElementById("input-custom-arg-author") ? document.getElementById("input-custom-arg-author").value.trim() : "";
+            const work = document.getElementById("input-custom-arg-work") ? document.getElementById("input-custom-arg-work").value.trim() : "";
+            const fragment = document.getElementById("textarea-custom-arg-fragment") ? document.getElementById("textarea-custom-arg-fragment").value.trim() : "";
+
+            if (!fragment) {
+                state.activeThesis = null;
+                state.thesisOrientation = null;
+            } else {
+                state.activeThesis = fragment;
+                state.thesisOrientation = 'fragment';
+            }
+            render();
+        }
+
         function toggleHelp() {
             preserveTrainingText();
             state.showHelp = !state.showHelp;
@@ -3219,18 +3460,20 @@
 
         function resetTraining() {
             if (state.exerciseType === 'dissertation') {
-                state.training.dissertation[state.mode] = content[state.mode].trainingTemplate;
-                state.corrections.dissertation[state.mode] = null;
+                if (state.mode === 'argumentation') {
+                    state.training.argumentation.dissertation = `[ARGUMENT]\n[RÉF/EX]`;
+                    state.corrections.argumentation.dissertation = null;
+                } else {
+                    state.training.dissertation[state.mode] = content[state.mode].trainingTemplate;
+                    state.corrections.dissertation[state.mode] = null;
+                }
             } else if (state.exerciseType === 'explication') {
-                state.training.explic[state.mode] = content.explic[state.mode].trainingTemplate;
-                state.corrections.explic[state.mode] = null;
-            } else if (state.exerciseType === 'argumentation') {
-                if (state.argumentationSubMode === 'fragment') {
+                if (state.mode === 'argumentation') {
                     state.training.argumentation.fragment = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
                     state.corrections.argumentation.fragment = null;
                 } else {
-                    state.training.argumentation.dissertation = content.argumentation.trainingTemplate;
-                    state.corrections.argumentation.dissertation = null;
+                    state.training.explic[state.mode] = content.explic[state.mode].trainingTemplate;
+                    state.corrections.explic[state.mode] = null;
                 }
             }
             render();
@@ -3266,26 +3509,55 @@
 
         function preserveAndCount(textarea) {
             if (state.exerciseType === 'dissertation') {
-                state.training.dissertation[state.mode] = textarea.value;
+                if (state.mode === 'argumentation') {
+                    state.training.argumentation.dissertation = textarea.value;
+                } else {
+                    state.training.dissertation[state.mode] = textarea.value;
+                }
             } else if (state.exerciseType === 'explication') {
-                state.training.explic[state.mode] = textarea.value;
-            } else if (state.exerciseType === 'argumentation') {
-                if (state.argumentationSubMode === 'fragment') {
+                if (state.mode === 'argumentation') {
                     state.training.argumentation.fragment = textarea.value;
                 } else {
-                    state.training.argumentation.dissertation = textarea.value;
+                    state.training.explic[state.mode] = textarea.value;
                 }
             }
             updateCharCount(textarea);
         }
 
         function render() {
-            // exercise type buttons
-            document.getElementById('btn-ex-type-dis').classList.toggle('active', state.exerciseType === 'dissertation');
-            document.getElementById('btn-ex-type-exp').classList.toggle('active', state.exerciseType === 'explication');
-            document.getElementById('btn-ex-type-arg').classList.toggle('active', state.exerciseType === 'argumentation');
+            // Check active navigation buttons
+            document.getElementById('btn-mode-intro').classList.toggle('active', state.mode === 'intro');
+            document.getElementById('btn-mode-dev').classList.toggle('active', state.mode === 'dev');
 
-            document.querySelectorAll('.main-nav .btn').forEach(b => b.classList.toggle('active', b.id === (state.mode === 'intro' ? 'btn-mode-intro' : 'btn-mode-dev')));
+            const btnArgDis = document.getElementById('btn-mode-arg-dis');
+            const btnArgExp = document.getElementById('btn-mode-arg-exp');
+
+            const isDissert = state.exerciseType === 'dissertation';
+
+            if (btnArgDis) {
+                btnArgDis.style.display = isDissert ? 'block' : 'none';
+                btnArgDis.classList.toggle('active', state.mode === 'argumentation');
+            }
+            if (btnArgExp) {
+                btnArgExp.style.display = isDissert ? 'none' : 'block';
+                btnArgExp.classList.toggle('active', state.mode === 'argumentation');
+            }
+
+            // Toggle selector sections
+            document.getElementById('selector-dissertation').style.display = (isDissert && state.mode !== 'argumentation') ? 'block' : 'none';
+            document.getElementById('selector-dissertation-argumentation').style.display = (isDissert && state.mode === 'argumentation') ? 'block' : 'none';
+
+            document.getElementById('selector-explication').style.display = (!isDissert && state.mode !== 'argumentation') ? 'block' : 'none';
+            document.getElementById('selector-explication-argumentation').style.display = (!isDissert && state.mode === 'argumentation') ? 'block' : 'none';
+
+            // Sync explanation argumentation dropdown selection
+            if (state.exerciseType === 'explication' && state.mode === 'argumentation') {
+                populateExplicTextArgSelector();
+                const select = document.getElementById('select-explic-text-arg');
+                if (select && state.activeFragment) {
+                    select.value = state.activeFragment.textIndex !== null ? state.activeFragment.textIndex : '';
+                }
+            }
 
             // Toggle wide container based on help state
             const container = document.querySelector('.container');
@@ -3293,28 +3565,34 @@
                 container.classList.toggle('wide', state.showHelp);
             }
 
-            if (state.exerciseType === 'explication') {
+            if (state.exerciseType === 'explication' && state.mode !== 'argumentation') {
                 populateExplicTextSelector();
             }
 
+            // Sync the selected thesis display for dissertation or other modes
+            updateDisplaySelectedThesis();
+
             const area = document.getElementById('content-area');
 
-            const maxLength = state.exerciseType === 'argumentation' ? 3000 : (state.mode === 'intro' ? 3000 : 12000);
+            const maxLength = state.mode === 'argumentation' ? 3000 : (state.mode === 'intro' ? 3000 : 12000);
             let currentText = '';
             let savedCorrectionObj = null;
+
             if (state.exerciseType === 'dissertation') {
-                currentText = state.training.dissertation[state.mode] || '';
-                savedCorrectionObj = state.corrections.dissertation[state.mode];
+                if (state.mode === 'argumentation') {
+                    currentText = state.training.argumentation.dissertation || '';
+                    savedCorrectionObj = state.corrections.argumentation.dissertation;
+                } else {
+                    currentText = state.training.dissertation[state.mode] || '';
+                    savedCorrectionObj = state.corrections.dissertation[state.mode];
+                }
             } else if (state.exerciseType === 'explication') {
-                currentText = state.training.explic[state.mode] || '';
-                savedCorrectionObj = state.corrections.explic[state.mode];
-            } else if (state.exerciseType === 'argumentation') {
-                if (state.argumentationSubMode === 'fragment') {
+                if (state.mode === 'argumentation') {
                     currentText = state.training.argumentation.fragment || '';
                     savedCorrectionObj = state.corrections.argumentation.fragment;
                 } else {
-                    currentText = state.training.argumentation.dissertation || '';
-                    savedCorrectionObj = state.corrections.argumentation.dissertation;
+                    currentText = state.training.explic[state.mode] || '';
+                    savedCorrectionObj = state.corrections.explic[state.mode];
                 }
             }
 
@@ -3328,15 +3606,21 @@
 
             let exerciseTitle = '';
             if (state.exerciseType === 'dissertation') {
-                exerciseTitle = state.mode === 'intro'
-                    ? "Entraînement à l’introduction de la dissertation"
-                    : "Entraînement au développement de la dissertation";
+                if (state.mode === 'intro') {
+                    exerciseTitle = "Entraînement à l’introduction de la dissertation";
+                } else if (state.mode === 'dev') {
+                    exerciseTitle = "Entraînement au développement de la dissertation";
+                } else if (state.mode === 'argumentation') {
+                    exerciseTitle = "Entraînement à l’argumentation de la dissertation";
+                }
             } else if (state.exerciseType === 'explication') {
-                exerciseTitle = state.mode === 'intro'
-                    ? "Entraînement à l’introduction de l’explication de texte"
-                    : "Entraînement au développement de l’explication de texte";
-            } else if (state.exerciseType === 'argumentation') {
-                exerciseTitle = "Entraînement à l’argumentation";
+                if (state.mode === 'intro') {
+                    exerciseTitle = "Entraînement à l’introduction de l’explication de texte";
+                } else if (state.mode === 'dev') {
+                    exerciseTitle = "Entraînement au développement de l’explication de texte";
+                } else if (state.mode === 'argumentation') {
+                    exerciseTitle = "Entraînement à l’explication d’un fragment de texte";
+                }
             }
 
             let workspaceHtml = `
@@ -3348,46 +3632,132 @@
                 </div>
             `;
 
-            // If explication de texte, show the text block first
+            // If explication de texte, show the text block first (either standard or interactive fragment)
             if (state.exerciseType === 'explication') {
-                if (state.currentExplicText) {
-                    let textHtml = "";
-                    if (state.currentExplicText.structure) {
-                        const starts = state.currentExplicText.paragraphStarts || [[0, 0]];
-                        const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
-                        let inParagraph = false;
-                        state.currentExplicText.structure.forEach((moment, mIdx) => {
-                            moment.subMoments.forEach((sub, sIdx) => {
-                                const isStart = isParagraphStart(mIdx, sIdx);
-                                if (isStart) {
-                                    if (inParagraph) {
-                                        textHtml += `</p>`;
+                let textHtml = "";
+                let hasText = false;
+
+                if (state.mode !== 'argumentation') {
+                    if (state.currentExplicText) {
+                        hasText = true;
+                        if (state.currentExplicText.structure) {
+                            const starts = state.currentExplicText.paragraphStarts || [[0, 0]];
+                            const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
+                            let inParagraph = false;
+                            state.currentExplicText.structure.forEach((moment, mIdx) => {
+                                moment.subMoments.forEach((sub, sIdx) => {
+                                    const isStart = isParagraphStart(mIdx, sIdx);
+                                    if (isStart) {
+                                        if (inParagraph) {
+                                            textHtml += `</p>`;
+                                        }
+                                        textHtml += `<p style="margin-bottom: 15px;">`;
+                                        inParagraph = true;
+                                    } else {
+                                        textHtml += " ";
                                     }
-                                    textHtml += `<p style="margin-bottom: 15px;">`;
-                                    inParagraph = true;
-                                } else {
-                                    textHtml += " ";
-                                }
-                                textHtml += sub;
+                                    textHtml += sub;
+                                });
                             });
-                        });
-                        if (inParagraph) {
-                            textHtml += `</p>`;
+                            if (inParagraph) {
+                                textHtml += `</p>`;
+                            }
+                            if (state.currentExplicText.source) {
+                                textHtml += `<p style="text-align: right; margin-top: 15px; color: #475569;">${state.currentExplicText.source}</p>`;
+                            }
+                            if (state.currentExplicText.notes) {
+                                textHtml += `<div style="margin-top: 15px; color: #475569;">${state.currentExplicText.notes}</div>`;
+                            }
+                        } else {
+                            textHtml = state.currentExplicText.html || "";
                         }
-                        if (state.currentExplicText.source) {
-                            textHtml += `<p style="text-align: right; margin-top: 15px; color: #475569;">${state.currentExplicText.source}</p>`;
-                        }
-                        if (state.currentExplicText.notes) {
-                            textHtml += `<div style="margin-top: 15px; color: #475569;">${state.currentExplicText.notes}</div>`;
+                    }
+                } else {
+                    // Expliquer un fragment de texte mode (interactive text)
+                    if (state.isCustomExplicationArg) {
+                        const author = document.getElementById("input-custom-arg-author") ? document.getElementById("input-custom-arg-author").value.trim() : "";
+                        const work = document.getElementById("input-custom-arg-work") ? document.getElementById("input-custom-arg-work").value.trim() : "";
+                        const fragment = document.getElementById("textarea-custom-arg-fragment") ? document.getElementById("textarea-custom-arg-fragment").value.trim() : "";
+
+                        if (fragment) {
+                            hasText = true;
+                            let htmlContent = "";
+                            if (author || work) {
+                                htmlContent += `<h3>${author || ''}${author && work ? ', ' : ''}<em>${work || ''}</em></h3>`;
+                            }
+                            htmlContent += `<p style="margin: 0 0 15px 0; text-align: justify; line-height: 1.8;">${fragment.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+                            textHtml = htmlContent;
+                        } else {
+                            hasText = true;
+                            textHtml = '<p style="color: #7f8c8d; font-style: italic; margin: 0;">Veuillez saisir un fragment personnalisé dans le sélecteur ci-dessus.</p>';
                         }
                     } else {
-                        textHtml = state.currentExplicText.html || "";
+                        const idx = state.activeFragment ? state.activeFragment.textIndex : null;
+                        if (idx !== null && idx >= 0 && idx < state.explicTexts.length) {
+                            hasText = true;
+                            const textData = state.explicTexts[idx];
+                            if (textData.structure) {
+                                const starts = textData.paragraphStarts || [[0, 0]];
+                                const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
+                                let inParagraph = false;
+
+                                textData.structure.forEach((moment, mIdx) => {
+                                    moment.subMoments.forEach((sub, sIdx) => {
+                                        const isStart = isParagraphStart(mIdx, sIdx);
+                                        if (isStart) {
+                                            if (inParagraph) {
+                                                textHtml += `</p>`;
+                                            }
+                                            textHtml += `<p style="margin: 0 0 15px 0; text-align: justify; text-indent: 2em; line-height: 1.8;">`;
+                                            inParagraph = true;
+                                        } else {
+                                            textHtml += " ";
+                                        }
+
+                                        const isActive = (state.activeFragment.momentIndex === mIdx && state.activeFragment.subMomentIndex === sIdx);
+                                        const spanStyle = isActive
+                                            ? "font-weight: bold; background-color: #fef08a; color: inherit; cursor: pointer; transition: all 0.2s; display: inline; padding: 2px 4px; border-radius: 3px;"
+                                            : "color: inherit; cursor: pointer; transition: all 0.2s; display: inline; padding: 2px 4px;";
+
+                                        textHtml += `<span class="clickable-fragment" onclick="clickFragment(${idx}, ${mIdx}, ${sIdx})" style="${spanStyle}">${sub}</span>`;
+                                    });
+                                });
+
+                                if (inParagraph) {
+                                    textHtml += `</p>`;
+                                }
+
+                                if (textData.source) {
+                                    textHtml += `<p style="text-align: right; margin-top: 15px; color: #475569;">${textData.source}</p>`;
+                                }
+                                if (textData.notes) {
+                                    textHtml += `<div style="margin-top: 15px; color: #475569;">${textData.notes}</div>`;
+                                }
+                            } else {
+                                textHtml = textData.html || "";
+                            }
+                        } else {
+                            hasText = true;
+                            textHtml = '<p style="color: #7f8c8d; font-style: italic; margin: 0;">Veuillez sélectionner un texte pour afficher les fragments cliquables.</p>';
+                        }
                     }
+                }
+
+                if (hasText) {
                     workspaceHtml += `
                         <div class="texte-philo" style="margin-top:12px; margin-bottom: 15px; padding:15px; background:#fafafa; border:1px solid #ddd; border-radius:6px; line-height:1.8;">
                             ${textHtml}
                         </div>
                     `;
+
+                    // Display the selected fragment directly below the text block
+                    if (state.mode === 'argumentation' && state.activeThesis) {
+                        workspaceHtml += `
+                            <div style="margin-top: 15px; margin-bottom: 15px; padding: 12px; background-color: #e8f4f8; border-left: 5px solid var(--accent-color); border-radius: 4px; font-weight: bold; color: var(--primary-color);">
+                                <strong>Fragment à expliquer :</strong> ${state.activeThesis}
+                            </div>
+                        `;
+                    }
                 }
             }
 
@@ -3415,12 +3785,12 @@
             // If help is active, render the help column
             if (state.showHelp) {
                 let helpContent = '';
-                if (state.exerciseType === 'dissertation') {
+                if (state.mode === 'argumentation') {
+                    helpContent = content.argumentation.methodo;
+                } else if (state.exerciseType === 'dissertation') {
                     helpContent = content[state.mode].methodo;
                 } else if (state.exerciseType === 'explication') {
                     helpContent = content.explic[state.mode].methodo;
-                } else if (state.exerciseType === 'argumentation') {
-                    helpContent = content.argumentation.methodo;
                 }
                 workspaceHtml += `
                     <div class="help-column">
@@ -3442,78 +3812,94 @@
             let positionTexte = null;
 
             if (state.exerciseType === 'dissertation') {
-                if (state.isCustomDissertation) {
-                    sujet = document.getElementById("input-custom-sujet").value.trim();
-                    if (!sujet) {
-                        alert("Veuillez saisir votre sujet personnalisé avant de demander la correction.");
+                if (state.mode === 'argumentation') {
+                    if (!state.activeThesis) {
+                        alert("Veuillez choisir ou saisir une thèse à défendre avant de demander la correction.");
                         return;
                     }
+                    thesisOrientation = state.thesisOrientation;
+                    positionTexte = state.activeThesis;
+                    if (!state.isCustomArgumentation) {
+                        const notion = document.getElementById("select-notion-arg").value;
+                        const idx = parseInt(document.getElementById("select-sujet-arg").value, 10);
+                        if (notion && !isNaN(idx)) {
+                            sujet = sujetsPhilo[notion][idx].question;
+                        }
+                    } else {
+                        sujet = "Thèse personnalisée";
+                    }
                 } else {
-                    sujet = document.getElementById("select-sujet").value;
-                    if (!sujet) {
-                        alert("Veuillez sélectionner un sujet avant de demander la correction.");
-                        return;
+                    if (state.isCustomDissertation) {
+                        sujet = document.getElementById("input-custom-sujet").value.trim();
+                        if (!sujet) {
+                            alert("Veuillez saisir votre sujet personnalisé avant de demander la correction.");
+                            return;
+                        }
+                    } else {
+                        sujet = document.getElementById("select-sujet").value;
+                        if (!sujet) {
+                            alert("Veuillez sélectionner un sujet avant de demander la correction.");
+                            return;
+                        }
                     }
                 }
             } else if (state.exerciseType === 'explication') {
-                // Explication de texte
-                if (!state.currentExplicText) {
-                    if (state.isCustomExplication) {
-                        alert("Veuillez saisir le texte à expliquer avant de demander la correction.");
-                    } else {
-                        alert("Veuillez sélectionner un texte en haut de la page avant de demander la correction.");
+                if (state.mode === 'argumentation') {
+                    if (!state.activeThesis) {
+                        if (state.isCustomExplicationArg) {
+                            alert("Veuillez saisir le fragment à expliquer avant de demander la correction.");
+                        } else {
+                            alert("Veuillez choisir un fragment à expliquer avant de demander la correction.");
+                        }
+                        return;
                     }
-                    return;
-                }
-                if (state.currentExplicText.structure) {
-                    const starts = state.currentExplicText.paragraphStarts || [[0, 0]];
-                    const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
-                    let textHtml = "";
-                    let inParagraph = false;
-                    state.currentExplicText.structure.forEach((moment, mIdx) => {
-                        moment.subMoments.forEach((sub, sIdx) => {
-                            const isStart = isParagraphStart(mIdx, sIdx);
-                            if (isStart) {
-                                if (inParagraph) {
-                                    textHtml += `</p>`;
+                    thesisOrientation = 'fragment';
+                    positionTexte = state.activeThesis;
+                    sujet = "Fragment de texte";
+                } else {
+                    // Explication de texte standard
+                    if (!state.currentExplicText) {
+                        if (state.isCustomExplication) {
+                            alert("Veuillez saisir le texte à expliquer avant de demander la correction.");
+                        } else {
+                            alert("Veuillez sélectionner un texte en haut de la page avant de demander la correction.");
+                        }
+                        return;
+                    }
+                    if (state.currentExplicText.structure) {
+                        const starts = state.currentExplicText.paragraphStarts || [[0, 0]];
+                        const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
+                        let textHtml = "";
+                        let inParagraph = false;
+                        state.currentExplicText.structure.forEach((moment, mIdx) => {
+                            moment.subMoments.forEach((sub, sIdx) => {
+                                const isStart = isParagraphStart(mIdx, sIdx);
+                                if (isStart) {
+                                    if (inParagraph) {
+                                        textHtml += `</p>`;
+                                    }
+                                    textHtml += `<p style="margin-bottom: 15px;">`;
+                                    inParagraph = true;
+                                } else {
+                                    textHtml += " ";
                                 }
-                                textHtml += `<p style="margin-bottom: 15px;">`;
-                                inParagraph = true;
-                            } else {
-                                textHtml += " ";
-                            }
-                            textHtml += sub;
+                                textHtml += sub;
+                            });
                         });
-                    });
-                    if (inParagraph) {
-                        textHtml += `</p>`;
+                        if (inParagraph) {
+                            textHtml += `</p>`;
+                        }
+                        selectedTextHtml = textHtml;
+                        if (state.currentExplicText.source) {
+                            selectedTextHtml += `<p style="text-align: right; margin-top: 15px; color: #475569;">${state.currentExplicText.source}</p>`;
+                        }
+                        if (state.currentExplicText.notes) {
+                            selectedTextHtml += `<div style="margin-top: 15px; color: #475569;">${state.currentExplicText.notes}</div>`;
+                        }
+                    } else {
+                        selectedTextHtml = state.currentExplicText.html || "";
                     }
-                    selectedTextHtml = textHtml;
-                    if (state.currentExplicText.source) {
-                        selectedTextHtml += `<p style="text-align: right; margin-top: 15px; color: #475569;">${state.currentExplicText.source}</p>`;
-                    }
-                    if (state.currentExplicText.notes) {
-                        selectedTextHtml += `<div style="margin-top: 15px; color: #475569;">${state.currentExplicText.notes}</div>`;
-                    }
-                } else {
-                    selectedTextHtml = state.currentExplicText.html || "";
-                }
-                selectedTextTitle = state.currentExplicText.label || state.currentExplicText.title;
-            } else if (state.exerciseType === 'argumentation') {
-                if (!state.activeThesis) {
-                    alert("Veuillez choisir ou saisir une thèse à défendre avant de demander la correction.");
-                    return;
-                }
-                thesisOrientation = state.thesisOrientation;
-                positionTexte = state.activeThesis;
-                if (!state.isCustomArgumentation) {
-                    const notion = document.getElementById("select-notion-arg").value;
-                    const idx = parseInt(document.getElementById("select-sujet-arg").value, 10);
-                    if (notion && !isNaN(idx)) {
-                        sujet = sujetsPhilo[notion][idx].question;
-                    }
-                } else {
-                    sujet = "Thèse personnalisée";
+                    selectedTextTitle = state.currentExplicText.label || state.currentExplicText.title;
                 }
             }
 
@@ -3532,14 +3918,16 @@
             const sujetActif = obtenirSujetActif();
             let savedCorrectionObj = null;
             if (state.exerciseType === 'dissertation') {
-                savedCorrectionObj = state.corrections.dissertation[state.mode];
+                if (state.mode === 'argumentation') {
+                    savedCorrectionObj = state.corrections.argumentation.dissertation;
+                } else {
+                    savedCorrectionObj = state.corrections.dissertation[state.mode];
+                }
             } else if (state.exerciseType === 'explication') {
-                savedCorrectionObj = state.corrections.explic[state.mode];
-            } else if (state.exerciseType === 'argumentation') {
-                if (state.argumentationSubMode === 'fragment') {
+                if (state.mode === 'argumentation') {
                     savedCorrectionObj = state.corrections.argumentation.fragment;
                 } else {
-                    savedCorrectionObj = state.corrections.argumentation.dissertation;
+                    savedCorrectionObj = state.corrections.explic[state.mode];
                 }
             }
 
@@ -3548,14 +3936,12 @@
                 pistesPrecedentes = extrairePistesParBalise(savedCorrectionObj.html);
             }
 
-            // ==========================================
-            // 🛠️ ÉTAPE 1 : RETOUR VISUEL ET SÉCURISATION DU BOUTON
-            // ==========================================
+            // Visuel de chargement
             const btnSubmit = document.querySelector(".btn-submit");
             if (btnSubmit) {
-                btnSubmit.disabled = true;          // Bloque les clics frénétiques
-                btnSubmit.innerText = "⏳ Analyse en cours..."; // Indique que l'IA travaille
-                btnSubmit.style.opacity = "0.6";    // Grise légèrement le bouton
+                btnSubmit.disabled = true;
+                btnSubmit.innerText = "⏳ Analyse en cours...";
+                btnSubmit.style.opacity = "0.6";
                 btnSubmit.style.cursor = "not-allowed";
             }
 
@@ -3563,39 +3949,38 @@
             document.getElementById("correction-box").style.display = "none";
 
             try {
+                // Détermine les bons paramètres en fonction du mode d'argumentation ou standard
                 const body = {
                     sujet,
-                    type: state.exerciseType,
+                    type: state.mode === 'argumentation' ? 'argumentation' : state.exerciseType,
                     mode: state.mode,
                     texte: trainingText,
                     pistesPrecedentes
                 };
-                if (state.exerciseType === 'explication') {
+                if (state.exerciseType === 'explication' && state.mode !== 'argumentation') {
                     body.selectedTextTitle = selectedTextTitle;
                     body.selectedTextHtml = selectedTextHtml;
                 }
-                if (state.exerciseType === 'argumentation') {
+                if (state.mode === 'argumentation') {
                     body.thesisOrientation = thesisOrientation;
                     body.positionTexte = positionTexte;
-                    body.argumentationSubMode = state.argumentationSubMode;
+                    body.argumentationSubMode = state.exerciseType === 'explication' ? 'fragment' : 'dissertation';
                 }
 
                 const response = await fetch(CLOUD_FUNCTION_URL, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Accept-Encoding": "identity" // 🚀 Force l'envoi immédiat mot par mot sans attendre
+                        "Accept-Encoding": "identity"
                     },
                     body: JSON.stringify(body)
                 });
 
                 if (!response.ok) throw new Error("Le serveur a rencontré un problème.");
 
-                // Configuration pour lire le flux progressif
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder("utf-8");
 
-                // Vider et afficher la boîte de correction dès le début
                 document.getElementById("correction-text").innerHTML = "";
                 document.getElementById("correction-box").style.display = "block";
                 document.getElementById("correction-box").scrollIntoView({
@@ -3605,48 +3990,41 @@
 
                 let texteCumule = "";
 
-                // Boucle de lecture du flux en temps réel
                 while (true) {
                     const { done, value } = await reader.read();
-                    if (done) break; // Fin du flux
+                    if (done) break;
 
-                    // Convertir le morceau de binaire en texte et l'ajouter
                     const chunk = decoder.decode(value, { stream: true });
                     texteCumule += chunk;
-
-                    // Mettre à jour l'affichage Markdown à la volée grâce à marked
                     document.getElementById("correction-text").innerHTML = marked.parse(texteCumule);
                 }
 
-                // Sauvegarder la correction finale dans le state de l'application
                 const correctionHtmlFinale = marked.parse(texteCumule);
                 const newCorrectionObj = {
                     sujet: sujetActif,
                     html: correctionHtmlFinale
                 };
                 if (state.exerciseType === 'dissertation') {
-                    state.corrections.dissertation[state.mode] = newCorrectionObj;
+                    if (state.mode === 'argumentation') {
+                        state.corrections.argumentation.dissertation = newCorrectionObj;
+                    } else {
+                        state.corrections.dissertation[state.mode] = newCorrectionObj;
+                    }
                 } else if (state.exerciseType === 'explication') {
-                    state.corrections.explic[state.mode] = newCorrectionObj;
-                } else if (state.exerciseType === 'argumentation') {
-                    if (state.argumentationSubMode === 'fragment') {
+                    if (state.mode === 'argumentation') {
                         state.corrections.argumentation.fragment = newCorrectionObj;
                     } else {
-                        state.corrections.argumentation.dissertation = newCorrectionObj;
+                        state.corrections.explic[state.mode] = newCorrectionObj;
                     }
                 }
             } catch (error) {
                 alert("Erreur lors de la communication avec le correcteur : " + error.message);
             } finally {
                 document.getElementById("loading-msg").style.display = "none";
-
-                // ==========================================
-                // 🛠️ ÉTAPE 2 : RÉACTIVATION OBLIGATOIRE DU BOUTON (MÊME SI BUG)
-                // ==========================================
                 if (btnSubmit) {
-                    btnSubmit.disabled = false;         // Le bouton redevient cliquable
-                    btnSubmit.innerText = "Correction IA"; // Reprend son texte d'origine
-                    btnSubmit.style.opacity = "1";       // Reprend son opacité normale
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerText = "Correction IA";
+                    btnSubmit.style.opacity = "1";
                     btnSubmit.style.cursor = "pointer";
                 }
             }
@@ -3752,11 +4130,18 @@
                 document.getElementById('input-custom-thesis').value = '';
                 const btnThesis = document.getElementById('btn-arg-thesis');
                 const btnAntithesis = document.getElementById('btn-arg-antithesis');
-                if (btnThesis.classList.contains('active')) {
+
+                if (state.thesisOrientation === 'thesis') {
+                    btnThesis.classList.add('active');
+                    btnAntithesis.classList.remove('active');
                     selectArgPosition('thesis');
-                } else if (btnAntithesis.classList.contains('active')) {
+                } else if (state.thesisOrientation === 'antithesis') {
+                    btnAntithesis.classList.add('active');
+                    btnThesis.classList.remove('active');
                     selectArgPosition('antithesis');
                 } else {
+                    btnThesis.classList.remove('active');
+                    btnAntithesis.classList.remove('active');
                     state.activeThesis = null;
                     state.thesisOrientation = null;
                     updateDisplaySelectedThesis();
@@ -3767,11 +4152,9 @@
 
         function updateDisplaySelectedThesis() {
             const display = document.getElementById('display-selected-thesis');
-            if (state.activeThesis) {
-                const prefix = (state.exerciseType === 'argumentation' && state.argumentationSubMode === 'fragment')
-                    ? "<strong>Fragment à expliquer :</strong> "
-                    : "<strong>Position à défendre :</strong> ";
-                display.innerHTML = prefix + state.activeThesis;
+            if (!display) return;
+            if (state.activeThesis && state.exerciseType === 'dissertation' && state.mode === 'argumentation') {
+                display.innerHTML = "<strong>Position à défendre :</strong> " + state.activeThesis;
                 display.style.display = 'block';
             } else {
                 display.innerHTML = '';
@@ -3779,63 +4162,48 @@
             }
         }
 
-        function setArgSubMode(mode, preserveText = true) {
-            if (preserveText) {
-                preserveTrainingText();
-            }
-            state.argumentationSubMode = mode;
-
+        function initArgumentationSubMode() {
             const textarea = document.getElementById("training-textarea");
             const defaultDissertationTemplate = `[ARGUMENT]\n[RÉF/EX]`;
             const defaultFragmentTemplate = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
 
-            if (mode === 'fragment') {
-                if (preserveText || !state.training.argumentation.fragment) {
+            if (state.exerciseType === 'explication') {
+                if (!state.training.argumentation.fragment) {
                     state.training.argumentation.fragment = defaultFragmentTemplate;
-                    if (textarea) {
-                        textarea.value = defaultFragmentTemplate;
-                    }
                 }
-            } else if (mode === 'dissertation') {
-                if (preserveText || !state.training.argumentation.dissertation) {
-                    state.training.argumentation.dissertation = defaultDissertationTemplate;
-                    if (textarea) {
-                        textarea.value = defaultDissertationTemplate;
-                    }
+                if (textarea) {
+                    textarea.value = state.training.argumentation.fragment;
                 }
-            }
-
-            // Toggle active class on buttons
-            document.getElementById('btn-arg-submode-dis').classList.toggle('active', mode === 'dissertation');
-            document.getElementById('btn-arg-submode-frag').classList.toggle('active', mode === 'fragment');
-
-            // Show/hide blocks
-            document.getElementById('argumentation-dissertation-block').style.display = mode === 'dissertation' ? 'block' : 'none';
-            document.getElementById('argumentation-fragment-block').style.display = mode === 'fragment' ? 'block' : 'none';
-
-            if (mode === 'dissertation') {
-                // Restore dissertation argumentation mode
-                toggleArgumentationMode(state.isCustomArgumentation);
-            } else {
-                // Fragment sub-mode
                 populateExplicTextArgSelector();
                 const select = document.getElementById('select-explic-text-arg');
                 if (select) {
-                    if (!select.value && state.explicTexts.length > 0) {
+                    if (state.activeFragment && state.activeFragment.textIndex !== null) {
+                        select.value = state.activeFragment.textIndex.toString();
+                    } else if (!select.value && state.explicTexts.length > 0) {
                         select.value = "0";
                     }
-                    selectExplicTextArg(select.value);
+                    if (!state.isCustomExplicationArg) {
+                        selectExplicTextArg(select.value);
+                    }
                 } else {
-                    state.activeThesis = null;
-                    state.thesisOrientation = null;
+                    if (!state.isCustomExplicationArg) {
+                        state.activeThesis = null;
+                        state.thesisOrientation = null;
+                    }
                 }
+                toggleExplicationArgMode(state.isCustomExplicationArg);
+            } else if (state.exerciseType === 'dissertation') {
+                if (!state.training.argumentation.dissertation) {
+                    state.training.argumentation.dissertation = defaultDissertationTemplate;
+                }
+                if (textarea) {
+                    textarea.value = state.training.argumentation.dissertation;
+                }
+                toggleArgumentationMode(state.isCustomArgumentation);
             }
 
-            // Update methodology help in content.argumentation
             updateArgumentationMethodology();
-
             updateDisplaySelectedThesis();
-            render();
         }
 
         function populateExplicTextArgSelector() {
@@ -3849,14 +4217,11 @@
 
         function selectExplicTextArg(val) {
             const idx = parseInt(val, 10);
-            const container = document.getElementById('argumentation-fragment-text-display');
-            if (!container) return;
-
             if (isNaN(idx) || idx < 0 || idx >= state.explicTexts.length) {
-                container.innerHTML = '<p style="color: #7f8c8d; font-style: italic; margin: 0;">Veuillez sélectionner un texte pour afficher les fragments cliquables.</p>';
+                state.activeFragment = null;
                 state.activeThesis = null;
                 state.thesisOrientation = null;
-                updateDisplaySelectedThesis();
+                render();
                 return;
             }
 
@@ -3866,62 +4231,23 @@
                 state.activeFragment = { textIndex: idx, momentIndex: 0, subMomentIndex: 0 };
             }
 
-            let html = "";
-            if (textData.structure) {
-                const starts = textData.paragraphStarts || [[0, 0]];
-                const isParagraphStart = (m, s) => starts.some(coord => coord[0] === m && coord[1] === s);
-                let inParagraph = false;
-
-                textData.structure.forEach((moment, mIdx) => {
-                    moment.subMoments.forEach((sub, sIdx) => {
-                        const isStart = isParagraphStart(mIdx, sIdx);
-                        if (isStart) {
-                            if (inParagraph) {
-                                html += `</p>`;
-                            }
-                            html += `<p style="margin: 0 0 15px 0; text-align: justify; text-indent: 2em; line-height: 1.8;">`;
-                            inParagraph = true;
-                        } else {
-                            html += " ";
-                        }
-
-                        const isActive = (state.activeFragment.momentIndex === mIdx && state.activeFragment.subMomentIndex === sIdx);
-                        const spanStyle = isActive
-                            ? "font-weight: bold; background-color: #fef08a; color: inherit; cursor: pointer; transition: all 0.2s; display: inline; padding: 2px 4px; border-radius: 3px;"
-                            : "color: inherit; cursor: pointer; transition: all 0.2s; display: inline; padding: 2px 4px;";
-
-                        html += `<span class="clickable-fragment" onclick="clickFragment(${idx}, ${mIdx}, ${sIdx})" style="${spanStyle}">${sub}</span>`;
-                    });
-                });
-
-                if (inParagraph) {
-                    html += `</p>`;
-                }
-
-                if (textData.source) {
-                    html += `<p style="text-align: right; margin-top: 15px; color: #475569;">${textData.source}</p>`;
-                }
-                if (textData.notes) {
-                    html += `<div style="margin-top: 15px; color: #475569;">${textData.notes}</div>`;
-                }
-            } else {
-                html = textData.html || "";
-            }
-
-            container.innerHTML = html;
-
             if (textData.structure && textData.structure[state.activeFragment.momentIndex]) {
                 state.activeThesis = textData.structure[state.activeFragment.momentIndex].subMoments[state.activeFragment.subMomentIndex];
                 state.thesisOrientation = 'fragment';
+            } else {
+                state.activeThesis = null;
+                state.thesisOrientation = null;
             }
 
-            updateDisplaySelectedThesis();
+            state.currentExplicTextIndex = idx;
+            state.currentExplicText = textData;
+
+            render();
         }
 
         function clickFragment(textIdx, mIdx, sIdx) {
             state.activeFragment = { textIndex: textIdx, momentIndex: mIdx, subMomentIndex: sIdx };
 
-            // Force the fragment template into state and textarea
             const defaultFragmentTemplate = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
             state.training.argumentation.fragment = defaultFragmentTemplate;
             const textarea = document.getElementById("training-textarea");
@@ -3934,7 +4260,7 @@
         }
 
         function updateArgumentationMethodology() {
-            if (state.argumentationSubMode === 'fragment') {
+            if (state.exerciseType === 'explication') {
                 content.argumentation.trainingTemplate = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
                 content.argumentation.fields = ["REFORMULATION", "ARGUMENT", "RÉF/EX", "TRANSITION"];
                 content.argumentation.methodo = `<h2>Méthodologie de l’explication de fragment</h2>
@@ -3967,7 +4293,7 @@
             <p style="margin-top: 15px; font-weight: bold;">Méthode directe – Au choix&nbsp;:</p>
             <ul style="margin-top: 5px;">
                 <li><strong>L’emboîtement définitionnel&nbsp;:</strong> réduisez la thèse de l’articulation de définitions de concepts clés.</li>
-                <li><strong>Le rapport de causalité&nbsp;:</strong> justifiez la thèse par ses causes ou ses conséquences objectives, par sa finalité ou ses raisons.</li>
+                <li><strong>Le rapport de causalité&nbsp;:</strong> justifiez la thèse by ses causes ou ses conséquences objectives, par sa finalité ou ses raisons.</li>
                 <li><strong>L’action réciproque&nbsp;:</strong> montrez comment les concepts de la thèse défendue interagissent ont des conséquences qui s’influencent mutuellement.</li>
                 <li><strong>Le raisonnement par l’absurde&nbsp;:</strong> démontrez que la position inverse de la vôtre est impossible à soutenir ou contradictoire.</li>
                 <li><strong>La diversification des perspectives&nbsp;:</strong> variez les angles d’approche pour viser une complétude analytique. <em>Note&nbsp;: chaque argument ne traite qu’une perspective déterminée à la fois&nbsp;; c’est la combinaison de plusieurs arguments traitant des angles distincts qui permet de construire une démonstration probante et nuancée.</em> S’appuyer sur des repères clés&nbsp;: (ex&nbsp;: <em>soi / les autres / la société</em>, <em>subjectif / objectif</em>, <em>passé / présent / futur</em>, <em>en théorie / en pratique</em>, <em>désir / devoir</em>, <em>abstrait / concret</em>, <em>légal / légitime</em>, <em>croire / savoir</em>, <em>l’intention / les conséquences</em>, <em>nature / culture</em>, <em>pouvoir&nbsp;: droit légal / capacité matérielle / possibilité logique</em>, <em>corps / esprit</em>, <em>conscient / inconscient</em>, <em>raison / passion</em>, <em>volonté / désir</em>, <em>absolu / relatif</em>, <em>contingent / nécessaire</em>, <em>essentiel / accidentel</em>, <em>obligation / contrainte</em>, <em>public / privé</em>, <em>universel / général / particulier / singulier</em>).</li>
