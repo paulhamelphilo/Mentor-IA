@@ -3099,6 +3099,16 @@
                 selectArg.appendChild(opt);
             });
 
+            // === CORRECTION DU BUG DE NAVIGATION HISTORIQUE ===
+            // Si le navigateur a mémorisé une notion sélectionnée, on force la mise à jour des listes
+            if (select && select.value) {
+                updateSujets();
+            }
+            if (selectArg && selectArg.value) {
+                updateSujetsArg();
+            }
+            // ==================================================
+
             render();
         };
 
