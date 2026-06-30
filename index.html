@@ -3099,18 +3099,26 @@
                 selectArg.appendChild(opt);
             });
 
-            // === CORRECTION DU BUG DE NAVIGATION HISTORIQUE ===
-            // Si le navigateur a mémorisé une notion sélectionnée, on force la mise à jour des listes
-            if (select && select.value) {
-                updateSujets();
-            }
-            if (selectArg && selectArg.value) {
-                updateSujetsArg();
-            }
-            // ==================================================
-
             render();
         };
+
+        // === CORRECTIF ULTIME POUR MOBILE (ONGLETS & HISTORIQUE) ===
+        window.addEventListener('pageshow', (event) => {
+            const select = document.getElementById("select-notion");
+            const selectArg = document.getElementById("select-notion-arg");
+
+            // On laisse un micro-délai (0ms) pour s'assurer que le navigateur a fini d'injecter les valeurs
+            setTimeout(() => {
+                if (select && select.value) {
+                    updateSujets();
+                }
+                if (selectArg && selectArg.value) {
+                    updateSujetsArg();
+                }
+                render();
+            }, 0);
+        });
+        // ===========================================================
 
         function updateSujets() {
             const notion = document.getElementById("select-notion").value;
