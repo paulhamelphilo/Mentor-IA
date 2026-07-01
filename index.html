@@ -2761,7 +2761,7 @@
                     "antithesis": "On ne gagne rien à travailler."
                 },
                 {
-                    "question": "Travailler est-ce seulement Comic ?",
+                    "question": "Travailler est-ce seulement produire ?",
                     "thesis": "Travailler, c’est seulement produire.",
                     "antithesis": "Travailler, ce n’est pas seulement produire."
                 },
@@ -3792,7 +3792,7 @@
                             <button class="btn btn-submit" onclick="envoyerCorrection()">Correction IA</button>
                             <button class="btn btn-secondary" onclick="resetTraining()">Remise à zéro</button>
                         </div>
-                        <div id="loading-msg" class="loading">Le correcteur IA analyse votre travail selon la méthodologie de votre professeur, veuillez patienter (environ 5 à 10 secondes)...</div>
+                        <div id="loading-msg" class="loading">Le correcteur IA analyse votre travail conformément à la méthodologie, veuillez patienter (environ 5 à 10 secondes)...</div>
                         <div id="correction-box" style="${savedCorrection ? 'display: block;' : 'display: none;'}">
                             <h2>Analyse personnalisée</h2>
                             <div id="correction-text">${savedCorrection || ''}</div>
@@ -4008,12 +4008,17 @@
 
                 let texteCumule = "";
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
 
-                    const chunk = decoder.decode(value, { stream: true });
-                    texteCumule += chunk;
+                        const chunk = decoder.decode(value, { stream: true });
+                        texteCumule += chunk;
+                        document.getElementById("correction-text").innerHTML = marked.parse(texteCumule);
+                    }
+                } catch (streamError) {
+                    texteCumule += "\n\n[Erreur de connexion : le flux a été interrompu par le réseau. Veuillez réessayer si la correction est incomplète.]";
                     document.getElementById("correction-text").innerHTML = marked.parse(texteCumule);
                 }
 
