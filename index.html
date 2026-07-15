@@ -59,6 +59,14 @@
             padding-bottom: 15px;
         }
 
+        /* Option A — teinte bleu-violet pour distinguer Mentor IA */
+        .logo-emoji-mentor {
+            display: inline-block;
+            filter: hue-rotate(200deg) saturate(2.5) brightness(1.1);
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
         .global-selector {
             background: #eef2f3;
             padding: 20px;
@@ -380,7 +388,7 @@
 <body>
 
     <div class="container">
-        <h1>Mentor IA philo</h1>
+        <h1><span class="logo-emoji-mentor">🦉</span> Mentor IA philo</h1>
 
         <div class="global-selector">
             <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Exercice</strong></label>
@@ -4067,7 +4075,7 @@
 
             if (notion) {
                 selectSujet.disabled = false;
-                selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet d’étude --</option>';
+                selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet --</option>';
                 sujetsPhilo[notion].forEach((s, idx) => {
                     const opt = document.createElement("option");
                     opt.value = idx;
