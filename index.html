@@ -438,7 +438,7 @@
                         <option value="">-- Sélectionnez d’abord une notion --</option>
                     </select>
 
-                    <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <div id="arg-buttons-container" style="margin-top:15px; display:none; gap:10px; flex-wrap:wrap;">
                         <button type="button" id="btn-arg-thesis" class="btn"
                             style="flex:1; display:none; white-space: normal; height: auto; text-align: center; padding: 10px;"
                             onclick="selectArgPosition('thesis')"></button>
@@ -4061,6 +4061,8 @@
             // Hide buttons and clear selection state since the notion changed
             document.getElementById('btn-arg-thesis').style.display = 'none';
             document.getElementById('btn-arg-antithesis').style.display = 'none';
+            const container = document.getElementById('arg-buttons-container');
+            if (container) container.style.display = 'none';
             state.activeThesis = null;
             state.thesisOrientation = null;
             updateDisplaySelectedThesis();
@@ -4086,6 +4088,7 @@
 
             const btnThesis = document.getElementById('btn-arg-thesis');
             const btnAntithesis = document.getElementById('btn-arg-antithesis');
+            const container = document.getElementById('arg-buttons-container');
 
             if (notion && !isNaN(idx)) {
                 const subject = sujetsPhilo[notion][idx];
@@ -4095,6 +4098,7 @@
 
                 btnThesis.style.display = 'block';
                 btnAntithesis.style.display = 'block';
+                if (container) container.style.display = 'flex';
 
                 // Clear active button styles
                 btnThesis.classList.remove('active');
@@ -4102,6 +4106,7 @@
             } else {
                 btnThesis.style.display = 'none';
                 btnAntithesis.style.display = 'none';
+                if (container) container.style.display = 'none';
             }
             // Clear current selection since subject changed
             state.activeThesis = null;
