@@ -59,12 +59,19 @@
             padding-bottom: 15px;
         }
 
-        /* Option A — teinte bleu-violet pour distinguer Mentor IA */
+        /* Option A — chouette SVG bleu-violet pour Mentor IA */
         .logo-emoji-mentor {
-            display: inline-block;
-            filter: hue-rotate(200deg) saturate(2.5) brightness(1.1);
-            margin-right: 8px;
+            display: inline-flex;
+            align-items: center;
             vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .logo-emoji-mentor svg {
+            width: 1.2em;
+            height: 1.2em;
+            transition: filter 0.3s ease;
+            filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.7));
         }
 
         .global-selector {
@@ -388,7 +395,58 @@
 <body>
 
     <div class="container">
-        <h1><span class="logo-emoji-mentor">🦉</span> Mentor IA philo</h1>
+        <h1>
+            <span class="logo-emoji-mentor">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+                  <defs>
+                    <filter id="glow-blue">
+                      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                  </defs>
+                  <!-- Corps -->
+                  <ellipse cx="50" cy="62" rx="28" ry="32" fill="#3730a3" filter="url(#glow-blue)"/>
+                  <!-- Ventre -->
+                  <ellipse cx="50" cy="70" rx="16" ry="20" fill="#818cf8" opacity="0.9"/>
+                  <!-- Stries ventre -->
+                  <line x1="44" y1="62" x2="44" y2="84" stroke="#6366f1" stroke-width="1.2" opacity="0.5"/>
+                  <line x1="50" y1="60" x2="50" y2="86" stroke="#6366f1" stroke-width="1.2" opacity="0.5"/>
+                  <line x1="56" y1="62" x2="56" y2="84" stroke="#6366f1" stroke-width="1.2" opacity="0.5"/>
+                  <!-- Circuit nodes sur ventre -->
+                  <circle cx="50" cy="68" r="2.5" fill="#c7d2fe" opacity="0.8"/>
+                  <circle cx="44" cy="74" r="1.8" fill="#c7d2fe" opacity="0.7"/>
+                  <circle cx="56" cy="74" r="1.8" fill="#c7d2fe" opacity="0.7"/>
+                  <line x1="44" y1="74" x2="50" y2="68" stroke="#c7d2fe" stroke-width="0.8" opacity="0.6"/>
+                  <line x1="56" y1="74" x2="50" y2="68" stroke="#c7d2fe" stroke-width="0.8" opacity="0.6"/>
+                  <!-- Tete -->
+                  <ellipse cx="50" cy="36" rx="22" ry="20" fill="#312e81" filter="url(#glow-blue)"/>
+                  <!-- Aigrettes -->
+                  <polygon points="36,20 32,8 40,18" fill="#312e81"/>
+                  <polygon points="64,20 68,8 60,18" fill="#312e81"/>
+                  <!-- Yeux -->
+                  <circle cx="40" cy="35" r="8" fill="#e0e7ff" filter="url(#glow-blue)"/>
+                  <circle cx="60" cy="35" r="8" fill="#e0e7ff" filter="url(#glow-blue)"/>
+                  <circle cx="40" cy="35" r="5" fill="#6366f1"/>
+                  <circle cx="60" cy="35" r="5" fill="#6366f1"/>
+                  <circle cx="41" cy="34" r="2" fill="#1e1b4b"/>
+                  <circle cx="61" cy="34" r="2" fill="#1e1b4b"/>
+                  <!-- Reflets yeux -->
+                  <circle cx="43" cy="32" r="1" fill="#ffffff" opacity="0.9"/>
+                  <circle cx="63" cy="32" r="1" fill="#ffffff" opacity="0.9"/>
+                  <!-- Bec -->
+                  <polygon points="50,42 45,48 55,48" fill="#818cf8"/>
+                  <!-- Ailes -->
+                  <ellipse cx="25" cy="68" rx="10" ry="18" fill="#312e81" transform="rotate(-10,25,68)"/>
+                  <ellipse cx="75" cy="68" rx="10" ry="18" fill="#312e81" transform="rotate(10,75,68)"/>
+                  <!-- Pattes -->
+                  <line x1="43" y1="92" x2="38" y2="100" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="43" y1="92" x2="43" y2="100" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="57" y1="92" x2="57" y2="100" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="57" y1="92" x2="62" y2="100" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+            Mentor IA philo
+        </h1>
 
         <div class="global-selector">
             <label style="display:block; font-weight:bold; margin-bottom:8px"><strong>Exercice</strong></label>
