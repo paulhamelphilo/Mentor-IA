@@ -375,37 +375,62 @@
             border-radius: 8px;
         }
 
-        /* Carte d'évaluation par section (Indice Unique) */
-        .section-eval-card {
+        /* Conteneur de section complète (Carte d'évaluation globale) */
+        .section-feedback-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-left: 4px solid #3498db;
-            border-radius: 6px;
-            padding: 10px 16px;
-            margin: 12px 0 16px 0;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            border-left: 5px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .section-feedback-card.card-tier-1 {
+            border-left-color: #22c55e;
+        }
+        .section-feedback-card.card-tier-2 {
+            border-left-color: #0ea5e9;
+        }
+        .section-feedback-card.card-tier-3 {
+            border-left-color: #f59e0b;
+        }
+        .section-feedback-card.card-tier-4 {
+            border-left-color: #f97316;
+        }
+        .section-feedback-card.card-tier-5 {
+            border-left-color: #ef4444;
+        }
+
+        /* En-tête intégré de la carte */
+        .section-card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
+            gap: 16px;
             flex-wrap: wrap;
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .section-eval-left {
+        .section-card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .section-card-bar-wrap {
             display: flex;
             align-items: center;
             gap: 12px;
             flex: 1;
-            min-width: 200px;
-        }
-
-        .section-eval-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
+            min-width: 180px;
         }
 
         .section-eval-bar-container {
@@ -451,11 +476,63 @@
             white-space: nowrap;
         }
 
+        /* Corps de la carte de section */
+        .section-feedback-card h4 {
+            color: var(--primary-color);
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-feedback-card p {
+            color: #1e293b;
+            line-height: 1.65;
+            margin: 0 0 12px 0;
+            font-size: 15px;
+        }
+
+        /* Pistes d'amélioration thématisées */
+        .section-feedback-card blockquote {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #0ea5e9;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 10px 0 6px 0;
+            color: #1e293b;
+            font-style: normal;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .section-feedback-card.card-tier-1 blockquote {
+            border-left-color: #22c55e;
+        }
+        .section-feedback-card.card-tier-2 blockquote {
+            border-left-color: #0ea5e9;
+        }
+        .section-feedback-card.card-tier-3 blockquote {
+            border-left-color: #f59e0b;
+        }
+        .section-feedback-card.card-tier-4 blockquote {
+            border-left-color: #f97316;
+        }
+        .section-feedback-card.card-tier-5 blockquote {
+            border-left-color: #ef4444;
+        }
+
         @media (max-width: 600px) {
-            .section-eval-card {
+            .section-feedback-card {
+                padding: 16px;
+            }
+            .section-card-header {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 8px;
+                gap: 10px;
             }
             .section-score-pill {
                 align-self: flex-end;
@@ -3291,8 +3368,31 @@
 
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const headers = doc.querySelectorAll('h3');
 
+            // Recherche prioritaire par cartes de section
+            const cards = doc.querySelectorAll('.section-feedback-card');
+            if (cards.length > 0) {
+                cards.forEach(card => {
+                    const titleEl = card.querySelector('.section-card-title, h3');
+                    const blockquote = card.querySelector('blockquote');
+                    if (titleEl && blockquote) {
+                        const sectionName = titleEl.textContent.replace(/[\[\]]/g, '').trim();
+                        const text = blockquote.textContent.trim();
+                        const normalized = text.toLowerCase()
+                            .normalize("NFD")
+                            .replace(/[\u0300-\u036f]/g, "")
+                            .replace(/[^a-z]/g, "");
+                        if (normalized.includes("aucunepistedameliorationsignificative")) {
+                            return;
+                        }
+                        pistes[sectionName] = text;
+                    }
+                });
+                return pistes;
+            }
+
+            // Recherche de repli par balises h3 standard
+            const headers = doc.querySelectorAll('h3');
             headers.forEach(header => {
                 const sectionName = header.textContent.replace(/[\[\]]/g, '').trim();
 
@@ -3328,11 +3428,11 @@
         }
 
         function getScoreColorClass(score) {
-            if (score >= 90) return { bg: 'score-tier-1', bar: 'bar-tier-1' }; // Vert (90-100)
-            if (score >= 75) return { bg: 'score-tier-2', bar: 'bar-tier-2' }; // Bleu (75-89)
-            if (score >= 60) return { bg: 'score-tier-3', bar: 'bar-tier-3' }; // Ambre / Jaune (60-74)
-            if (score >= 50) return { bg: 'score-tier-4', bar: 'bar-tier-4' }; // Orange (50-59)
-            return { bg: 'score-tier-5', bar: 'bar-tier-5' };                   // Rouge (< 50)
+            if (score >= 90) return { bg: 'score-tier-1', bar: 'bar-tier-1', card: 'card-tier-1', tier: 1 }; // Vert (90-100)
+            if (score >= 75) return { bg: 'score-tier-2', bar: 'bar-tier-2', card: 'card-tier-2', tier: 2 }; // Bleu (75-89)
+            if (score >= 60) return { bg: 'score-tier-3', bar: 'bar-tier-3', card: 'card-tier-3', tier: 3 }; // Ambre / Jaune (60-74)
+            if (score >= 50) return { bg: 'score-tier-4', bar: 'bar-tier-4', card: 'card-tier-4', tier: 4 }; // Orange (50-59)
+            return { bg: 'score-tier-5', bar: 'bar-tier-5', card: 'card-tier-5', tier: 5 };                   // Rouge (< 50)
         }
 
         function extraireTexteParSection(rawText) {
@@ -3361,20 +3461,21 @@
 
             const parser = new DOMParser();
             const doc = parser.parseFromString(rawHtml, 'text/html');
-            const headers = doc.querySelectorAll('h3');
+            const headers = Array.from(doc.querySelectorAll('h3'));
             const sections = [];
 
             headers.forEach((header, idx) => {
                 const sectionName = header.textContent.replace(/[\[\]]/g, '').trim();
                 const sectionAnchorId = 'sec-eval-' + idx;
-                header.id = sectionAnchorId;
+
+                // Collecter tous les nœuds frères appartenant à cette section jusqu'au prochain h3 ou h2
+                const sectionNodes = [];
                 let current = header.nextElementSibling;
                 let scoreElement = null;
                 let extractedScore = null;
-                const elementsToRemove = [];
 
-                // Parcourir les éléments jusqu'au prochain titre de section
                 while (current && current.tagName !== 'H3' && current.tagName !== 'H2') {
+                    const next = current.nextElementSibling;
                     const text = current.textContent;
 
                     // Repérer l'indice de conformité
@@ -3383,24 +3484,16 @@
                     if (scoreMatch && extractedScore === null) {
                         extractedScore = parseInt(scoreMatch[1], 10);
                         scoreElement = current;
+                    } else if (current.tagName === 'HR') {
+                        // Supprimer les séparateurs hr horizontaux superflus
+                        if (current.parentNode) current.parentNode.removeChild(current);
+                    } else if (current.tagName === 'P' && /^[*\s]*(?:[eé]valuation|indice\s+de\s+conformit[eé])\b/i.test(text.trim())) {
+                        if (current.parentNode) current.parentNode.removeChild(current);
+                    } else {
+                        sectionNodes.push(current);
                     }
 
-                    // Si on rencontre un paragraphe d'introduction "Indice de conformité :" ou "Évaluation :" avant la liste
-                    if (current.tagName === 'P' && /^[*\s]*(?:[eé]valuation|indice\s+de\s+conformit[eé])\b/i.test(text.trim())) {
-                        elementsToRemove.push(current);
-                    }
-
-                    if (scoreElement) {
-                        if (current.tagName === 'UL' || current.tagName === 'OL' || current.tagName === 'P') {
-                            break;
-                        }
-                    }
-
-                    // Si on atteint déjà l'analyse (H4), on s'arrête
-                    if (current.tagName === 'H4') {
-                        break;
-                    }
-                    current = current.nextElementSibling;
+                    current = next;
                 }
 
                 // Si un score a été détecté pour cette section
@@ -3439,28 +3532,38 @@
 
                     const scoreColors = getScoreColorClass(finalScore);
 
+                    // Créer la carte de section complète englobante
                     const cardDiv = doc.createElement('div');
-                    cardDiv.className = 'section-eval-card';
-                    cardDiv.innerHTML = `
-                        <div class="section-eval-left">
-                            <span class="section-eval-title">Indice de conformité</span>
+                    cardDiv.className = `section-feedback-card ${scoreColors.card}`;
+                    cardDiv.id = sectionAnchorId;
+
+                    // En-tête intégré moderne de la carte
+                    const cardHeader = doc.createElement('div');
+                    cardHeader.className = 'section-card-header';
+                    cardHeader.innerHTML = `
+                        <h3 class="section-card-title">[${sectionName}]</h3>
+                        <div class="section-card-bar-wrap">
                             <div class="section-eval-bar-container">
                                 <div class="section-eval-bar-fill ${scoreColors.bar}" style="width: ${finalScore}%;"></div>
                             </div>
                         </div>
                         <span class="section-score-pill ${scoreColors.bg}">${finalScore} / 100</span>
                     `;
+                    cardDiv.appendChild(cardHeader);
 
-                    // Nettoyer les éléments parasites d'introduction
-                    elementsToRemove.forEach(el => {
-                        if (el && el.parentNode) el.parentNode.removeChild(el);
+                    // Déplacer les nœuds de contenu (Analyse, Pistes, etc.) à l'intérieur de la carte
+                    sectionNodes.forEach(node => {
+                        cardDiv.appendChild(node);
                     });
 
-                    // Remplacer l'élément de liste de score par la carte visuelle épurée
+                    // Supprimer l'élément brut de score s'il existe
                     if (scoreElement && scoreElement.parentNode) {
-                        scoreElement.parentNode.replaceChild(cardDiv, scoreElement);
-                    } else if (header.parentNode) {
-                        header.parentNode.insertBefore(cardDiv, header.nextElementSibling);
+                        scoreElement.parentNode.removeChild(scoreElement);
+                    }
+
+                    // Remplacer le h3 d'origine par la carte complète
+                    if (header.parentNode) {
+                        header.parentNode.replaceChild(cardDiv, header);
                     }
                 }
             });
