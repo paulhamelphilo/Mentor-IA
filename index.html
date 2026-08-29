@@ -220,6 +220,227 @@
             color: #27ae60;
         }
 
+        /* Styles Indice de Conformité & Tableau de bord */
+        .global-eval-dashboard {
+            background: #ffffff;
+            border: 1px solid #c8e6c9;
+            border-left: 5px solid #27ae60;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .dashboard-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-score-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .global-score-badge {
+            font-size: 20px;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .score-excellent {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .score-good {
+            background-color: #fff8e1;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .score-low {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .score-delta-badge {
+            font-size: 13px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .delta-positive {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .delta-negative {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .delta-neutral {
+            background-color: #eceff1;
+            color: #546e7a;
+            border: 1px solid #cfd8dc;
+        }
+
+        .dashboard-sections-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eef2f3;
+        }
+
+        .section-chip {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            color: #334155;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-chip-score {
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+
+        /* Carte d'évaluation par section */
+        .section-eval-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #3498db;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 12px 0 16px 0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .section-eval-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .section-eval-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-score-pill {
+            font-size: 13px;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+
+        .criteria-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .criteria-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .criteria-label {
+            width: 215px;
+            flex-shrink: 0;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .criteria-bar-container {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            min-width: 80px;
+        }
+
+        .criteria-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .bar-excellent {
+            background-color: #2ecc71;
+        }
+
+        .bar-good {
+            background-color: #f39c12;
+        }
+
+        .bar-low {
+            background-color: #e74c3c;
+        }
+
+        .criteria-val {
+            width: 52px;
+            text-align: right;
+            font-weight: 700;
+            color: #334155;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 600px) {
+            .criteria-row {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .criteria-label {
+                width: 100%;
+            }
+            .criteria-bar-container {
+                flex: 1;
+            }
+        }
+
         .loading {
             text-align: center;
             font-style: italic;
@@ -3085,6 +3306,179 @@
             return pistes;
         }
 
+        function getScoreColorClass(score) {
+            if (score >= 80) return { bg: 'score-excellent', bar: 'bar-excellent' };
+            if (score >= 50) return { bg: 'score-good', bar: 'bar-good' };
+            return { bg: 'score-low', bar: 'bar-low' };
+        }
+
+        function transformerRenduCorrection(rawHtml, previousCorrectionObj) {
+            if (!rawHtml) return { html: '', sections: [], globalScore: null };
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rawHtml, 'text/html');
+            const headers = doc.querySelectorAll('h3');
+            const sections = [];
+
+            headers.forEach(header => {
+                const sectionName = header.textContent.replace(/[\[\]]/g, '').trim();
+                let current = header.nextElementSibling;
+                let scoreElement = null;
+                let methodeScore = null;
+                let rigueurScore = null;
+                let clarteScore = null;
+                const elementsToRemove = [];
+
+                // Parcourir les éléments jusqu'au prochain titre de section
+                while (current && current.tagName !== 'H3' && current.tagName !== 'H2') {
+                    const text = current.textContent;
+
+                    // Repérer les 3 piliers
+                    const mMatch = text.match(/m[eé]thodologie\s*[:*]+\s*(\d+)\s*\/\s*100/i);
+                    const rMatch = text.match(/rigueur(?:\s+conceptuelle(?:\s*(?:&|et))?\s*logique)?\s*[:*]+\s*(\d+)\s*\/\s*100/i);
+                    const cMatch = text.match(/clart[eé](?:\s*(?:&|et))?\s*pr[eé]cision(?:\s*formelle)?\s*[:*]+\s*(\d+)\s*\/\s*100/i);
+
+                    if (mMatch && methodeScore === null) methodeScore = parseInt(mMatch[1], 10);
+                    if (rMatch && rigueurScore === null) rigueurScore = parseInt(rMatch[1], 10);
+                    if (cMatch && clarteScore === null) clarteScore = parseInt(cMatch[1], 10);
+
+                    // Si on rencontre un paragraphe d'introduction "Évaluation :" avant la liste
+                    if (current.tagName === 'P' && /^[*\s]*[eé]valuation\b/i.test(text.trim())) {
+                        elementsToRemove.push(current);
+                    }
+
+                    if (mMatch || rMatch || cMatch) {
+                        scoreElement = current;
+                        if (current.tagName === 'UL' || current.tagName === 'OL') {
+                            break;
+                        }
+                    }
+
+                    // Si on atteint déjà l'analyse (H4), on s'arrête
+                    if (current.tagName === 'H4') {
+                        break;
+                    }
+                    current = current.nextElementSibling;
+                }
+
+                // Si au moins un score a été détecté pour cette section
+                if (methodeScore !== null || rigueurScore !== null || clarteScore !== null) {
+                    const validScores = [methodeScore, rigueurScore, clarteScore].filter(s => s !== null);
+                    const sectionAvg = validScores.length ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length) : 0;
+                    const mVal = methodeScore !== null ? methodeScore : sectionAvg;
+                    const rVal = rigueurScore !== null ? rigueurScore : sectionAvg;
+                    const cVal = clarteScore !== null ? clarteScore : sectionAvg;
+
+                    sections.push({
+                        name: sectionName,
+                        avg: sectionAvg,
+                        methode: mVal,
+                        rigueur: rVal,
+                        clarte: cVal
+                    });
+
+                    const avgColors = getScoreColorClass(sectionAvg);
+                    const mColors = getScoreColorClass(mVal);
+                    const rColors = getScoreColorClass(rVal);
+                    const cColors = getScoreColorClass(cVal);
+
+                    const cardDiv = doc.createElement('div');
+                    cardDiv.className = 'section-eval-card';
+                    cardDiv.innerHTML = `
+                        <div class="section-eval-header">
+                            <span class="section-eval-title">Indice de conformité</span>
+                            <span class="section-score-pill ${avgColors.bg}">${sectionAvg} / 100</span>
+                        </div>
+                        <div class="criteria-bars">
+                            <div class="criteria-row">
+                                <span class="criteria-label">Conformité méthodologique</span>
+                                <div class="criteria-bar-container">
+                                    <div class="criteria-bar-fill ${mColors.bar}" style="width: ${mVal}%;"></div>
+                                </div>
+                                <span class="criteria-val">${mVal}/100</span>
+                            </div>
+                            <div class="criteria-row">
+                                <span class="criteria-label">Rigueur conceptuelle &amp; logique</span>
+                                <div class="criteria-bar-container">
+                                    <div class="criteria-bar-fill ${rColors.bar}" style="width: ${rVal}%;"></div>
+                                </div>
+                                <span class="criteria-val">${rVal}/100</span>
+                            </div>
+                            <div class="criteria-row">
+                                <span class="criteria-label">Clarté &amp; précision formelle</span>
+                                <div class="criteria-bar-container">
+                                    <div class="criteria-bar-fill ${cColors.bar}" style="width: ${cVal}%;"></div>
+                                </div>
+                                <span class="criteria-val">${cVal}/100</span>
+                            </div>
+                        </div>
+                    `;
+
+                    // Nettoyer les éléments parasites d'introduction
+                    elementsToRemove.forEach(el => {
+                        if (el && el.parentNode) el.parentNode.removeChild(el);
+                    });
+
+                    // Remplacer l'élément de liste de score par la carte visuelle stylisée
+                    if (scoreElement && scoreElement.parentNode) {
+                        scoreElement.parentNode.replaceChild(cardDiv, scoreElement);
+                    } else if (header.parentNode) {
+                        header.parentNode.insertBefore(cardDiv, header.nextElementSibling);
+                    }
+                }
+            });
+
+            // Construction du tableau de bord global en tête si des sections sont évaluées
+            let globalScore = null;
+            if (sections.length > 0) {
+                globalScore = Math.round(sections.reduce((acc, s) => acc + s.avg, 0) / sections.length);
+                const globalColors = getScoreColorClass(globalScore);
+
+                let deltaHtml = '';
+                if (previousCorrectionObj && typeof previousCorrectionObj.globalScore === 'number') {
+                    const diff = globalScore - previousCorrectionObj.globalScore;
+                    if (diff > 0) {
+                        deltaHtml = `<span class="score-delta-badge delta-positive">▲ +${diff} pts (précédent : ${previousCorrectionObj.globalScore}/100)</span>`;
+                    } else if (diff < 0) {
+                        deltaHtml = `<span class="score-delta-badge delta-negative">▼ ${diff} pts (précédent : ${previousCorrectionObj.globalScore}/100)</span>`;
+                    } else {
+                        deltaHtml = `<span class="score-delta-badge delta-neutral">■ 0 pt (identique : ${previousCorrectionObj.globalScore}/100)</span>`;
+                    }
+                }
+
+                const chipsHtml = sections.map(s => {
+                    const c = getScoreColorClass(s.avg);
+                    return `<span class="section-chip">${s.name} <span class="section-chip-score ${c.bg}">${s.avg}/100</span></span>`;
+                }).join('');
+
+                const dashboardDiv = doc.createElement('div');
+                dashboardDiv.className = 'global-eval-dashboard';
+                dashboardDiv.innerHTML = `
+                    <div class="dashboard-header">
+                        <div class="dashboard-title">
+                            <span>Tableau de bord de conformité</span>
+                        </div>
+                        <div class="dashboard-score-wrap">
+                            ${deltaHtml}
+                            <span class="global-score-badge ${globalColors.bg}">${globalScore} / 100</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-sections-summary">
+                        <span style="font-size: 12px; font-weight: 700; color: #475569; align-self: center; margin-right: 4px;">Sections :</span>
+                        ${chipsHtml}
+                    </div>
+                `;
+
+                doc.body.insertBefore(dashboardDiv, doc.body.firstChild);
+            }
+
+            return {
+                html: doc.body.innerHTML,
+                sections,
+                globalScore
+            };
+        }
+
         window.onload = () => {
             // Initialize explication texts
             state.explicTexts = explicTextsData;
@@ -4020,17 +4414,27 @@
 
                         const chunk = decoder.decode(value, { stream: true });
                         texteCumule += chunk;
-                        document.getElementById("correction-text").innerHTML = marked.parse(texteCumule);
+                        const intermediateHtml = marked.parse(texteCumule);
+                        const intermediateTransformed = transformerRenduCorrection(intermediateHtml, savedCorrectionObj);
+                        document.getElementById("correction-text").innerHTML = intermediateTransformed.html;
                     }
                 } catch (streamError) {
                     texteCumule += "\n\n[Erreur de connexion : le flux a été interrompu par le réseau. Veuillez réessayer si la correction est incomplète.]";
-                    document.getElementById("correction-text").innerHTML = marked.parse(texteCumule);
+                    const errHtml = marked.parse(texteCumule);
+                    const errTransformed = transformerRenduCorrection(errHtml, savedCorrectionObj);
+                    document.getElementById("correction-text").innerHTML = errTransformed.html;
                 }
 
                 const correctionHtmlFinale = marked.parse(texteCumule);
+                const transformedFinal = transformerRenduCorrection(correctionHtmlFinale, savedCorrectionObj);
+                document.getElementById("correction-text").innerHTML = transformedFinal.html;
+
                 const newCorrectionObj = {
                     sujet: sujetActif,
-                    html: correctionHtmlFinale
+                    html: transformedFinal.html,
+                    rawMarkdown: texteCumule,
+                    scores: transformedFinal.sections,
+                    globalScore: transformedFinal.globalScore
                 };
                 if (state.exerciseType === 'dissertation') {
                     if (state.mode === 'argumentation') {
