@@ -3876,7 +3876,7 @@
             }
             if (s.startsWith('RÉF') || s.startsWith('REF') || s.startsWith('EXEMPLE')) {
                 const num = s.match(/\d+/);
-                return num ? 'R' + num[0] : 'Réf';
+                return num ? 'R' + num[0] : 'Réf.';
             }
             if (s.includes('SOUS-MOMENT') || s.includes('MOMENT')) {
                 const num = s.match(/\d+/);
@@ -3884,9 +3884,9 @@
             }
             if (s === 'THÈSE' || s === 'THESE') return 'T';
             if (s === 'THÈME' || s === 'THEME') return 'Th';
-            if (s === 'AMORCE') return 'Am';
+            if (s === 'AMORCE') return 'A';
             if (s === 'SUJET') return 'S';
-            if (s.startsWith('ÉVIDENCE') || s.startsWith('EVIDENCE')) return 'Év';
+            if (s.startsWith('ÉVIDENCE') || s.startsWith('EVIDENCE')) return 'EDC';
             if (s.startsWith('CONTRADICTION')) return 'CL';
             if (s.startsWith('PROBLÉMATIQUE') || s.startsWith('PROBLEMATIQUE') || s === 'PROBLÈME' || s === 'PROBLEME') return 'Pb';
             if (s.startsWith('ANNONCE') || s.includes('PLAN')) return 'AP';
@@ -3895,7 +3895,7 @@
             if (s.startsWith('CONCLUSION')) return 'C';
             if (s.startsWith('OBJECTION')) return 'Obj';
             if (s.startsWith('TRANSITION')) return 'Tr';
-            if (s.startsWith('REFORMULATION')) return 'Ref';
+            if (s.startsWith('REFORMULATION')) return 'Refo.';
             return s.charAt(0);
         }
 
