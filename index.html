@@ -569,6 +569,203 @@
             font-size: 13px;
         }
 
+        /* Barre de navigation rapide flottante (Desktop & Mobile) */
+        .floating-quicknav {
+            position: fixed;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid #cbd5e1;
+            border-radius: 28px;
+            padding: 8px 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            max-height: 85vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .floating-quicknav::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .floating-quicknav::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        .quicknav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+            text-decoration: none;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .quicknav-btn:hover {
+            background: var(--primary-color);
+            color: #ffffff;
+            border-color: var(--primary-color);
+            transform: scale(1.12);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+        }
+
+        .quicknav-btn:active {
+            transform: scale(0.96);
+        }
+
+        .quicknav-divider {
+            width: 22px;
+            height: 1px;
+            background: #cbd5e1;
+            margin: 2px 0;
+            flex-shrink: 0;
+        }
+
+        .quicknav-section-pill {
+            min-width: 36px;
+            height: 32px;
+            padding: 0 5px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-sizing: border-box;
+            position: relative;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .quicknav-section-pill:hover {
+            transform: scale(1.15);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+            z-index: 10;
+        }
+
+        .quicknav-section-pill:active {
+            transform: scale(0.96);
+        }
+
+        /* Styles de couleurs des pastilles flottantes selon palier */
+        .pill-tier-1 {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+        .pill-tier-2 {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #7dd3fc;
+        }
+        .pill-tier-3 {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fcd34d;
+        }
+        .pill-tier-4 {
+            background-color: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+        }
+        .pill-tier-5 {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+
+        /* Info-bulles élégantes à gauche (Desktop) */
+        .quicknav-btn[data-tooltip]::before,
+        .quicknav-section-pill[data-tooltip]::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: 125%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            padding: 5px 9px;
+            border-radius: 6px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+            z-index: 1200;
+        }
+
+        .quicknav-btn:hover[data-tooltip]::before,
+        .quicknav-section-pill:hover[data-tooltip]::before {
+            opacity: 1;
+            transform: translateY(-50%) translateX(-4px);
+        }
+
+        /* Mode Mobile (<= 768px) : Dock horizontal fixé en bas */
+        @media (max-width: 768px) {
+            .floating-quicknav {
+                right: auto;
+                left: 50%;
+                top: auto;
+                bottom: 12px;
+                transform: translateX(-50%);
+                flex-direction: row;
+                max-width: calc(100vw - 24px);
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 6px 10px;
+                border-radius: 24px;
+                gap: 6px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .quicknav-divider {
+                width: 1px;
+                height: 22px;
+                margin: 0 2px;
+            }
+
+            /* Info-bulles au-dessus sur Mobile */
+            .quicknav-btn[data-tooltip]::before,
+            .quicknav-section-pill[data-tooltip]::before {
+                right: auto;
+                left: 50%;
+                top: auto;
+                bottom: 125%;
+                transform: translateX(-50%);
+            }
+
+            .quicknav-btn:hover[data-tooltip]::before,
+            .quicknav-section-pill:hover[data-tooltip]::before {
+                opacity: 1;
+                transform: translateX(-50%) translateY(-4px);
+            }
+        }
+
         .footer-credit {
             position: fixed;
             right: 10px;
@@ -3445,11 +3642,11 @@
         }
 
         function getScoreColorClass(score) {
-            if (score >= 90) return { bg: 'score-tier-1', bar: 'bar-tier-1', card: 'card-tier-1', tier: 1 }; // Vert (90-100)
-            if (score >= 75) return { bg: 'score-tier-2', bar: 'bar-tier-2', card: 'card-tier-2', tier: 2 }; // Bleu (75-89)
-            if (score >= 60) return { bg: 'score-tier-3', bar: 'bar-tier-3', card: 'card-tier-3', tier: 3 }; // Ambre / Jaune (60-74)
-            if (score >= 50) return { bg: 'score-tier-4', bar: 'bar-tier-4', card: 'card-tier-4', tier: 4 }; // Orange (50-59)
-            return { bg: 'score-tier-5', bar: 'bar-tier-5', card: 'card-tier-5', tier: 5 };                   // Rouge (< 50)
+            if (score >= 90) return { bg: 'score-tier-1', bar: 'bar-tier-1', card: 'card-tier-1', pill: 'pill-tier-1', tier: 1 }; // Vert (90-100)
+            if (score >= 75) return { bg: 'score-tier-2', bar: 'bar-tier-2', card: 'card-tier-2', pill: 'pill-tier-2', tier: 2 }; // Bleu (75-89)
+            if (score >= 60) return { bg: 'score-tier-3', bar: 'bar-tier-3', card: 'card-tier-3', pill: 'pill-tier-3', tier: 3 }; // Ambre / Jaune (60-74)
+            if (score >= 50) return { bg: 'score-tier-4', bar: 'bar-tier-4', card: 'card-tier-4', pill: 'pill-tier-4', tier: 4 }; // Orange (50-59)
+            return { bg: 'score-tier-5', bar: 'bar-tier-5', card: 'card-tier-5', pill: 'pill-tier-5', tier: 5 };                   // Rouge (< 50)
         }
 
         function extraireTexteParSection(rawText) {
@@ -3635,9 +3832,81 @@
             };
         }
 
-        // Navigation fluide instantanée via les badges de section (actif en continu, même pendant le streaming)
+        // Génération d'abréviations courtes et intelligentes pour les pastilles de sections
+        function getShortSectionCode(sectionName) {
+            if (!sectionName || typeof sectionName !== 'string') return '';
+            const s = sectionName.toUpperCase().trim();
+            if (s.startsWith('ARGUMENT')) {
+                const num = s.match(/\d+/);
+                return num ? 'A' + num[0] : 'Arg';
+            }
+            if (s.startsWith('RÉF') || s.startsWith('REF') || s.startsWith('EXEMPLE')) {
+                const num = s.match(/\d+/);
+                return num ? 'R' + num[0] : 'Réf';
+            }
+            if (s.includes('SOUS-MOMENT') || s.includes('MOMENT')) {
+                const num = s.match(/\d+/);
+                return num ? 'SM' + num[0] : 'SM';
+            }
+            if (s === 'THÈSE' || s === 'THESE') return 'T';
+            if (s === 'THÈME' || s === 'THEME') return 'Th';
+            if (s === 'AMORCE') return 'Am';
+            if (s === 'SUJET') return 'S';
+            if (s.startsWith('ÉVIDENCE') || s.startsWith('EVIDENCE')) return 'Év';
+            if (s.startsWith('CONTRADICTION')) return 'CL';
+            if (s.startsWith('PROBLÉMATIQUE') || s.startsWith('PROBLEMATIQUE') || s === 'PROBLÈME' || s === 'PROBLEME') return 'Pb';
+            if (s.startsWith('ANNONCE') || s.includes('PLAN')) return 'Pl';
+            if (s.startsWith('LIGNE')) return 'LD';
+            if (s.startsWith('ENJEU')) return 'Enj';
+            if (s.startsWith('CONCLUSION')) return 'C';
+            if (s.startsWith('OBJECTION')) return 'Obj';
+            if (s.startsWith('TRANSITION')) return 'Tr';
+            if (s.startsWith('REFORMULATION')) return 'Ref';
+            return s.charAt(0);
+        }
+
+        function scrollToElement(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Mise à jour dynamique de la barre de navigation rapide flottante (Desktop & Mobile)
+        function updateFloatingQuickNav(sectionsList) {
+            let nav = document.getElementById('floating-quicknav');
+            if (!nav) {
+                nav = document.createElement('div');
+                nav.id = 'floating-quicknav';
+                nav.className = 'floating-quicknav';
+                document.body.appendChild(nav);
+            }
+
+            const isExplication = state.exerciseType === 'explication';
+            let html = '';
+
+            if (isExplication) {
+                html += `<button type="button" class="quicknav-btn" data-tooltip="Revenir au texte de l'auteur" onclick="scrollToElement('texte-philo-container')">📖</button>`;
+            }
+
+            html += `<button type="button" class="quicknav-btn" data-tooltip="Revenir à la zone de rédaction" onclick="scrollToElement('training-section-container')">✍️</button>`;
+
+            if (Array.isArray(sectionsList) && sectionsList.length > 0) {
+                html += `<div class="quicknav-divider"></div>`;
+                sectionsList.forEach(s => {
+                    if (!s || typeof s.score !== 'number') return;
+                    const shortCode = getShortSectionCode(s.name);
+                    const colors = getScoreColorClass(s.score);
+                    html += `<a href="#${s.anchorId}" class="quicknav-section-pill ${colors.pill}" data-tooltip="${s.name} — ${s.score}/100" data-target="${s.anchorId}">${shortCode}</a>`;
+                });
+            }
+
+            nav.innerHTML = html;
+        }
+
+        // Navigation fluide instantanée via les badges et pastilles de section (actif en continu, même pendant le streaming)
         document.addEventListener('click', function (e) {
-            const chip = e.target.closest('.section-chip');
+            const chip = e.target.closest('.section-chip, .quicknav-section-pill');
             if (chip) {
                 e.preventDefault();
                 const targetId = chip.getAttribute('data-target') || chip.getAttribute('href')?.replace('#', '');
@@ -4333,7 +4602,7 @@
 
                 if (hasText) {
                     workspaceHtml += `
-                        <div class="texte-philo" style="margin-top:12px; margin-bottom: 15px; padding:15px; background:#fafafa; border:1px solid #ddd; border-radius:6px; line-height:1.8;">
+                        <div id="texte-philo-container" class="texte-philo" style="margin-top:12px; margin-bottom: 15px; padding:15px; background:#fafafa; border:1px solid #ddd; border-radius:6px; line-height:1.8;">
                             ${textHtml}
                         </div>
                     `;
@@ -4353,7 +4622,7 @@
             workspaceHtml += `
                 <div class="workspace-layout">
                     <div class="editor-column">
-                        <div class="form-group">
+                        <div id="training-section-container" class="form-group">
                             <label>Rédigez chaque section après la [balise] correspondante. Ne pas enlever les balises</label>
                             <textarea id="training-textarea" rows="18" maxlength="${maxLength}" oninput="preserveAndCount(this)">${currentText}</textarea>
                             <div id="char-count" style="text-align: right; font-size: 13px; color: ${charInfo.color}; font-weight: ${charInfo.fontWeight}; margin-top: 5px;">${charInfo.label}</div>
@@ -4390,6 +4659,10 @@
             workspaceHtml += `</div>`; // Close workspace-layout
 
             area.innerHTML = workspaceHtml;
+
+            // Synchroniser la barre flottante de navigation rapide
+            const savedScores = (savedCorrectionObj && Array.isArray(savedCorrectionObj.scores)) ? savedCorrectionObj.scores : [];
+            updateFloatingQuickNav(savedScores);
         }
 
         async function envoyerCorrection() {
@@ -4589,17 +4862,20 @@
                         const intermediateHtml = marked.parse(texteCumule);
                         const intermediateTransformed = transformerRenduCorrection(intermediateHtml, savedCorrectionObj, currentDraftBySection);
                         document.getElementById("correction-text").innerHTML = intermediateTransformed.html;
+                        updateFloatingQuickNav(intermediateTransformed.sections);
                     }
                 } catch (streamError) {
                     texteCumule += "\n\n[Erreur de connexion : le flux a été interrompu par le réseau. Veuillez réessayer si la correction est incomplète.]";
                     const errHtml = marked.parse(texteCumule);
                     const errTransformed = transformerRenduCorrection(errHtml, savedCorrectionObj, currentDraftBySection);
                     document.getElementById("correction-text").innerHTML = errTransformed.html;
+                    updateFloatingQuickNav(errTransformed.sections);
                 }
 
                 const correctionHtmlFinale = marked.parse(texteCumule);
                 const transformedFinal = transformerRenduCorrection(correctionHtmlFinale, savedCorrectionObj, currentDraftBySection);
                 document.getElementById("correction-text").innerHTML = transformedFinal.html;
+                updateFloatingQuickNav(transformedFinal.sections);
 
                 const newCorrectionObj = {
                     sujet: sujetActif,
