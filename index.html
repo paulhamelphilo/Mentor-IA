@@ -641,6 +641,36 @@
             flex-shrink: 0;
         }
 
+        .quicknav-global-pill {
+            min-width: 36px;
+            height: 32px;
+            padding: 0 4px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-sizing: border-box;
+            position: relative;
+            flex-shrink: 0;
+            user-select: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .quicknav-global-pill:hover {
+            transform: scale(1.18);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
+            z-index: 10;
+        }
+
+        .quicknav-global-pill:active {
+            transform: scale(0.96);
+        }
+
         .quicknav-section-pill {
             min-width: 36px;
             height: 32px;
@@ -699,6 +729,7 @@
 
         /* Info-bulles élégantes à gauche (Desktop) */
         .quicknav-btn[data-tooltip]::before,
+        .quicknav-global-pill[data-tooltip]::before,
         .quicknav-section-pill[data-tooltip]::before {
             content: attr(data-tooltip);
             position: absolute;
@@ -720,6 +751,7 @@
         }
 
         .quicknav-btn:hover[data-tooltip]::before,
+        .quicknav-global-pill:hover[data-tooltip]::before,
         .quicknav-section-pill:hover[data-tooltip]::before {
             opacity: 1;
             transform: translateY(-50%) translateX(-4px);
@@ -751,6 +783,7 @@
 
             /* Info-bulles au-dessus sur Mobile */
             .quicknav-btn[data-tooltip]::before,
+            .quicknav-global-pill[data-tooltip]::before,
             .quicknav-section-pill[data-tooltip]::before {
                 right: auto;
                 left: 50%;
@@ -760,6 +793,7 @@
             }
 
             .quicknav-btn:hover[data-tooltip]::before,
+            .quicknav-global-pill:hover[data-tooltip]::before,
             .quicknav-section-pill:hover[data-tooltip]::before {
                 opacity: 1;
                 transform: translateX(-50%) translateY(-4px);
@@ -3873,7 +3907,7 @@
         }
 
         // Mise à jour dynamique de la barre de navigation rapide flottante (Desktop & Mobile)
-        function updateFloatingQuickNav(sectionsList) {
+        function updateFloatingQuickNav(sectionsList, globalScore) {
             let nav = document.getElementById('floating-quicknav');
             if (!nav) {
                 nav = document.createElement('div');
@@ -3886,18 +3920,31 @@
             let html = '';
 
             if (isExplication) {
-                html += `<button type="button" class="quicknav-btn" data-tooltip="Revenir au texte de l'auteur" onclick="scrollToElement('texte-philo-container')">📖</button>`;
+                html += `<button type="button" class="quicknav-btn" data-tooltip="Revenir au texte de l'auteur" onclick="scrollToElement('texte-philo-container'); return false;">📖</button>`;
             }
 
-            html += `<button type="button" class="quicknav-btn" data-tooltip="Revenir à la zone de rédaction" onclick="scrollToElement('training-section-container')">✍️</button>`;
+            html += `<button type="button" class="quicknav-btn" data-tooltip="Revenir à la zone de rédaction" onclick="scrollToElement('training-section-container'); return false;">✍️</button>`;
 
-            if (Array.isArray(sectionsList) && sectionsList.length > 0) {
+            const validSections = Array.isArray(sectionsList) ? sectionsList.filter(s => s && typeof s.score === 'number') : [];
+
+            // Calculer ou récupérer le score global de conformité
+            let finalGlobalScore = (typeof globalScore === 'number') ? globalScore : null;
+            if (finalGlobalScore === null && validSections.length > 0) {
+                finalGlobalScore = Math.round(validSections.reduce((acc, s) => acc + s.score, 0) / validSections.length);
+            }
+
+            // Pastille d'indice général de conformité (placée juste sous le bouton Saisie)
+            if (typeof finalGlobalScore === 'number') {
+                const globalColors = getScoreColorClass(finalGlobalScore);
+                html += `<a href="#correction-box" class="quicknav-global-pill ${globalColors.pill}" data-tooltip="Indice général de conformité : ${finalGlobalScore}/100" data-target="correction-box" onclick="scrollToElement('correction-box'); return false;">${finalGlobalScore}</a>`;
+            }
+
+            if (validSections.length > 0) {
                 html += `<div class="quicknav-divider"></div>`;
-                sectionsList.forEach(s => {
-                    if (!s || typeof s.score !== 'number') return;
+                validSections.forEach(s => {
                     const shortCode = getShortSectionCode(s.name);
                     const colors = getScoreColorClass(s.score);
-                    html += `<a href="#${s.anchorId}" class="quicknav-section-pill ${colors.pill}" data-tooltip="${s.name} — ${s.score}/100" data-target="${s.anchorId}">${shortCode}</a>`;
+                    html += `<a href="#${s.anchorId}" class="quicknav-section-pill ${colors.pill}" data-tooltip="${s.name} — ${s.score}/100" data-target="${s.anchorId}" onclick="scrollToElement('${s.anchorId}'); return false;">${shortCode}</a>`;
                 });
             }
 
@@ -3906,7 +3953,7 @@
 
         // Navigation fluide instantanée via les badges et pastilles de section (actif en continu, même pendant le streaming)
         document.addEventListener('click', function (e) {
-            const chip = e.target.closest('.section-chip, .quicknav-section-pill');
+            const chip = e.target.closest('.section-chip, .quicknav-section-pill, .quicknav-global-pill');
             if (chip) {
                 e.preventDefault();
                 const targetId = chip.getAttribute('data-target') || chip.getAttribute('href')?.replace('#', '');
@@ -4662,7 +4709,8 @@
 
             // Synchroniser la barre flottante de navigation rapide
             const savedScores = (savedCorrectionObj && Array.isArray(savedCorrectionObj.scores)) ? savedCorrectionObj.scores : [];
-            updateFloatingQuickNav(savedScores);
+            const savedGlobalScore = (savedCorrectionObj && typeof savedCorrectionObj.globalScore === 'number') ? savedCorrectionObj.globalScore : null;
+            updateFloatingQuickNav(savedScores, savedGlobalScore);
         }
 
         async function envoyerCorrection() {
@@ -4862,20 +4910,20 @@
                         const intermediateHtml = marked.parse(texteCumule);
                         const intermediateTransformed = transformerRenduCorrection(intermediateHtml, savedCorrectionObj, currentDraftBySection);
                         document.getElementById("correction-text").innerHTML = intermediateTransformed.html;
-                        updateFloatingQuickNav(intermediateTransformed.sections);
+                        updateFloatingQuickNav(intermediateTransformed.sections, intermediateTransformed.globalScore);
                     }
                 } catch (streamError) {
                     texteCumule += "\n\n[Erreur de connexion : le flux a été interrompu par le réseau. Veuillez réessayer si la correction est incomplète.]";
                     const errHtml = marked.parse(texteCumule);
                     const errTransformed = transformerRenduCorrection(errHtml, savedCorrectionObj, currentDraftBySection);
                     document.getElementById("correction-text").innerHTML = errTransformed.html;
-                    updateFloatingQuickNav(errTransformed.sections);
+                    updateFloatingQuickNav(errTransformed.sections, errTransformed.globalScore);
                 }
 
                 const correctionHtmlFinale = marked.parse(texteCumule);
                 const transformedFinal = transformerRenduCorrection(correctionHtmlFinale, savedCorrectionObj, currentDraftBySection);
                 document.getElementById("correction-text").innerHTML = transformedFinal.html;
-                updateFloatingQuickNav(transformedFinal.sections);
+                updateFloatingQuickNav(transformedFinal.sections, transformedFinal.globalScore);
 
                 const newCorrectionObj = {
                     sujet: sujetActif,
