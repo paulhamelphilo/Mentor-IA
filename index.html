@@ -336,13 +336,28 @@
         .section-chip {
             font-size: 12px;
             font-weight: 600;
-            padding: 3px 10px;
+            padding: 4px 10px;
             border-radius: 12px;
             background: #f1f5f9;
             color: #334155;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-chip:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            color: var(--primary-color);
+        }
+
+        .section-chip:active {
+            transform: translateY(0);
         }
 
         .section-chip-score {
@@ -3340,8 +3355,10 @@
             const headers = doc.querySelectorAll('h3');
             const sections = [];
 
-            headers.forEach(header => {
+            headers.forEach((header, idx) => {
                 const sectionName = header.textContent.replace(/[\[\]]/g, '').trim();
+                const sectionAnchorId = 'sec-eval-' + idx;
+                header.id = sectionAnchorId;
                 let current = header.nextElementSibling;
                 let scoreElement = null;
                 let extractedScore = null;
@@ -3407,7 +3424,8 @@
                     sections.push({
                         name: sectionName,
                         score: finalScore,
-                        avg: finalScore
+                        avg: finalScore,
+                        anchorId: sectionAnchorId
                     });
 
                     const scoreColors = getScoreColorClass(finalScore);
@@ -3458,7 +3476,7 @@
 
                 const chipsHtml = sections.map(s => {
                     const c = getScoreColorClass(s.score);
-                    return `<span class="section-chip">${s.name} <span class="section-chip-score ${c.bg}">${s.score}/100</span></span>`;
+                    return `<a href="#${s.anchorId}" class="section-chip" onclick="document.getElementById('${s.anchorId}')?.scrollIntoView({behavior: 'smooth', block: 'start'}); return false;">${s.name} <span class="section-chip-score ${c.bg}">${s.score}/100</span></a>`;
                 }).join('');
 
                 const dashboardDiv = doc.createElement('div');
@@ -3466,7 +3484,7 @@
                 dashboardDiv.innerHTML = `
                     <div class="dashboard-header">
                         <div class="dashboard-title">
-                            <span>Tableau de bord de conformité</span>
+                            <span>Indice général de conformité</span>
                         </div>
                         <div class="dashboard-score-wrap">
                             ${deltaHtml}
@@ -3474,7 +3492,6 @@
                         </div>
                     </div>
                     <div class="dashboard-sections-summary">
-                        <span style="font-size: 12px; font-weight: 700; color: #475569; align-self: center; margin-right: 4px;">Sections :</span>
                         ${chipsHtml}
                     </div>
                 `;
