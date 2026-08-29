@@ -209,22 +209,31 @@
         #correction-box {
             display: none;
             margin-top: 30px;
-            padding: 20px;
-            border-radius: 6px;
-            border-left: 5px solid #2ecc71;
-            background-color: #ebfbe4;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid var(--accent-color);
+            background-color: #f8fafc;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         }
 
         #correction-box h2 {
             margin-top: 0;
-            color: #27ae60;
+            color: var(--primary-color);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         /* Styles Indice de Conformité & Tableau de bord */
         .global-eval-dashboard {
             background: #ffffff;
-            border: 1px solid #c8e6c9;
-            border-left: 5px solid #27ae60;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid var(--accent-color);
             border-radius: 8px;
             padding: 16px 20px;
             margin-bottom: 25px;
@@ -3476,7 +3485,7 @@
 
                 const chipsHtml = sections.map(s => {
                     const c = getScoreColorClass(s.score);
-                    return `<a href="#${s.anchorId}" class="section-chip" onclick="document.getElementById('${s.anchorId}')?.scrollIntoView({behavior: 'smooth', block: 'start'}); return false;">${s.name} <span class="section-chip-score ${c.bg}">${s.score}/100</span></a>`;
+                    return `<a href="#${s.anchorId}" class="section-chip" data-target="${s.anchorId}">${s.name} <span class="section-chip-score ${c.bg}">${s.score}/100</span></a>`;
                 }).join('');
 
                 const dashboardDiv = doc.createElement('div');
@@ -3505,6 +3514,21 @@
                 globalScore
             };
         }
+
+        // Navigation fluide instantanée via les badges de section (actif en continu, même pendant le streaming)
+        document.addEventListener('click', function (e) {
+            const chip = e.target.closest('.section-chip');
+            if (chip) {
+                e.preventDefault();
+                const targetId = chip.getAttribute('data-target') || chip.getAttribute('href')?.replace('#', '');
+                if (targetId) {
+                    const targetEl = document.getElementById(targetId);
+                    if (targetEl) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }
+        });
 
         window.onload = () => {
             // Initialize explication texts
