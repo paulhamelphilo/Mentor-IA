@@ -3312,7 +3312,28 @@
             return { bg: 'score-low', bar: 'bar-low' };
         }
 
-        function transformerRenduCorrection(rawHtml, previousCorrectionObj) {
+        function extraireTexteParSection(rawText) {
+            const sections = {};
+            if (!rawText || typeof rawText !== 'string') return sections;
+            const regex = /\[([A-ZÀ-ÿ0-9\s'/–—]+)\]/gi;
+            let match;
+            const matches = [];
+            while ((match = regex.exec(rawText)) !== null) {
+                const cleanTag = match[1].trim().toUpperCase().replace(/\s+/g, ' ');
+                matches.push({ tag: cleanTag, index: match.index, length: match[0].length });
+            }
+            for (let i = 0; i < matches.length; i++) {
+                const current = matches[i];
+                const next = matches[i + 1];
+                const start = current.index + current.length;
+                const end = next ? next.index : rawText.length;
+                const sectionContent = rawText.substring(start, end).trim();
+                sections[current.tag] = sectionContent;
+            }
+            return sections;
+        }
+
+        function transformerRenduCorrection(rawHtml, previousCorrectionObj, currentDraftBySection) {
             if (!rawHtml) return { html: '', sections: [], globalScore: null };
 
             const parser = new DOMParser();
@@ -3363,11 +3384,34 @@
 
                 // Si au moins un score a été détecté pour cette section
                 if (methodeScore !== null || rigueurScore !== null || clarteScore !== null) {
-                    const validScores = [methodeScore, rigueurScore, clarteScore].filter(s => s !== null);
-                    const sectionAvg = validScores.length ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length) : 0;
-                    const mVal = methodeScore !== null ? methodeScore : sectionAvg;
-                    const rVal = rigueurScore !== null ? rigueurScore : sectionAvg;
-                    const cVal = clarteScore !== null ? clarteScore : sectionAvg;
+                    const validScores = [methodeScore, rigueurScore, clarteScore].filter(s => s !== null && !isNaN(s));
+                    let sectionAvg = validScores.length ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length) : 0;
+                    let mVal = methodeScore !== null ? methodeScore : sectionAvg;
+                    let rVal = rigueurScore !== null ? rigueurScore : sectionAvg;
+                    let cVal = clarteScore !== null ? clarteScore : sectionAvg;
+
+                    // Robustesse : vérification d'invariance de saisie pour verrouiller la note
+                    const normSection = sectionName.toUpperCase().replace(/\s+/g, ' ');
+                    const currentContent = (currentDraftBySection && typeof currentDraftBySection === 'object') ? currentDraftBySection[normSection] : null;
+                    const prevContent = (previousCorrectionObj && previousCorrectionObj.draftBySection) ? previousCorrectionObj.draftBySection[normSection] : null;
+
+                    const isUnchanged = (
+                        typeof currentContent === 'string' &&
+                        typeof prevContent === 'string' &&
+                        currentContent.length >= 3 &&
+                        currentContent.trim() === prevContent.trim()
+                    );
+
+                    const prevScore = (isUnchanged && previousCorrectionObj && Array.isArray(previousCorrectionObj.scores))
+                        ? previousCorrectionObj.scores.find(s => s && s.name && s.name.toUpperCase().replace(/\s+/g, ' ') === normSection)
+                        : null;
+
+                    if (prevScore && typeof prevScore.avg === 'number') {
+                        mVal = typeof prevScore.methode === 'number' ? prevScore.methode : mVal;
+                        rVal = typeof prevScore.rigueur === 'number' ? prevScore.rigueur : rVal;
+                        cVal = typeof prevScore.clarte === 'number' ? prevScore.clarte : cVal;
+                        sectionAvg = prevScore.avg;
+                    }
 
                     sections.push({
                         name: sectionName,
@@ -4406,6 +4450,7 @@
                 });
 
                 let texteCumule = "";
+                const currentDraftBySection = extraireTexteParSection(trainingText);
 
                 try {
                     while (true) {
@@ -4415,18 +4460,18 @@
                         const chunk = decoder.decode(value, { stream: true });
                         texteCumule += chunk;
                         const intermediateHtml = marked.parse(texteCumule);
-                        const intermediateTransformed = transformerRenduCorrection(intermediateHtml, savedCorrectionObj);
+                        const intermediateTransformed = transformerRenduCorrection(intermediateHtml, savedCorrectionObj, currentDraftBySection);
                         document.getElementById("correction-text").innerHTML = intermediateTransformed.html;
                     }
                 } catch (streamError) {
                     texteCumule += "\n\n[Erreur de connexion : le flux a été interrompu par le réseau. Veuillez réessayer si la correction est incomplète.]";
                     const errHtml = marked.parse(texteCumule);
-                    const errTransformed = transformerRenduCorrection(errHtml, savedCorrectionObj);
+                    const errTransformed = transformerRenduCorrection(errHtml, savedCorrectionObj, currentDraftBySection);
                     document.getElementById("correction-text").innerHTML = errTransformed.html;
                 }
 
                 const correctionHtmlFinale = marked.parse(texteCumule);
-                const transformedFinal = transformerRenduCorrection(correctionHtmlFinale, savedCorrectionObj);
+                const transformedFinal = transformerRenduCorrection(correctionHtmlFinale, savedCorrectionObj, currentDraftBySection);
                 document.getElementById("correction-text").innerHTML = transformedFinal.html;
 
                 const newCorrectionObj = {
@@ -4434,7 +4479,8 @@
                     html: transformedFinal.html,
                     rawMarkdown: texteCumule,
                     scores: transformedFinal.sections,
-                    globalScore: transformedFinal.globalScore
+                    globalScore: transformedFinal.globalScore,
+                    draftBySection: currentDraftBySection
                 };
                 if (state.exerciseType === 'dissertation') {
                     if (state.mode === 'argumentation') {
