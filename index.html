@@ -3606,12 +3606,23 @@
             return '';
         }
 
-        function extrairePistesParBalise(html) {
+        function extrairePistesParBalise(html, scores) {
             const pistes = {};
             if (!html) return pistes;
 
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
+
+            // Indexer les scores connus par nom normalisé
+            const scoreMap = {};
+            if (Array.isArray(scores)) {
+                scores.forEach(s => {
+                    if (s && s.name) {
+                        const norm = s.name.trim().toUpperCase().replace(/\s+/g, ' ');
+                        scoreMap[norm] = typeof s.score === 'number' ? s.score : s.avg;
+                    }
+                });
+            }
 
             // Recherche prioritaire par cartes de section
             const cards = doc.querySelectorAll('.section-feedback-card');
@@ -3619,17 +3630,22 @@
                 cards.forEach(card => {
                     const titleEl = card.querySelector('.section-card-title, h3');
                     const blockquote = card.querySelector('blockquote');
-                    if (titleEl && blockquote) {
+                    if (titleEl) {
                         const sectionName = titleEl.textContent.replace(/[\[\]]/g, '').trim();
-                        const text = blockquote.textContent.trim();
-                        const normalized = text.toLowerCase()
-                            .normalize("NFD")
-                            .replace(/[\u0300-\u036f]/g, "")
-                            .replace(/[^a-z]/g, "");
-                        if (normalized.includes("aucunepistedameliorationsignificative")) {
-                            return;
+                        const normName = sectionName.toUpperCase().replace(/\s+/g, ' ');
+                        
+                        let note = scoreMap[normName];
+                        if (typeof note !== 'number') {
+                            const scorePill = card.querySelector('.section-score-pill');
+                            const match = scorePill ? scorePill.textContent.match(/(\d+)\s*\/\s*100/) : null;
+                            if (match) note = parseInt(match[1], 10);
                         }
-                        pistes[sectionName] = text;
+
+                        const text = blockquote ? blockquote.textContent.trim() : "";
+                        pistes[sectionName] = {
+                            note: typeof note === 'number' && !isNaN(note) ? note : null,
+                            conseil: text
+                        };
                     }
                 });
                 return pistes;
@@ -3639,33 +3655,32 @@
             const headers = doc.querySelectorAll('h3');
             headers.forEach(header => {
                 const sectionName = header.textContent.replace(/[\[\]]/g, '').trim();
+                const normName = sectionName.toUpperCase().replace(/\s+/g, ' ');
+                let note = scoreMap[normName];
 
                 let currentElement = header.nextElementSibling;
                 let blockquote = null;
                 while (currentElement && currentElement.tagName !== 'H3') {
+                    if (!note) {
+                        const match = currentElement.textContent.match(/(?:conformit[eé]|indice(?:\s+de\s+conformit[eé])?|m[eé]thodologie|note)[*\s]*[:*]+\s*(\d+)\s*\/\s*100/i);
+                        if (match) note = parseInt(match[1], 10);
+                    }
                     if (currentElement.tagName === 'BLOCKQUOTE') {
                         blockquote = currentElement;
-                        break;
-                    }
-                    const nestedBlockquote = currentElement.querySelector('blockquote');
-                    if (nestedBlockquote) {
-                        blockquote = nestedBlockquote;
-                        break;
+                    } else {
+                        const nestedBlockquote = currentElement.querySelector('blockquote');
+                        if (nestedBlockquote) {
+                            blockquote = nestedBlockquote;
+                        }
                     }
                     currentElement = currentElement.nextElementSibling;
                 }
 
-                if (blockquote) {
-                    const text = blockquote.textContent.trim();
-                    const normalized = text.toLowerCase()
-                        .normalize("NFD")
-                        .replace(/[\u0300-\u036f]/g, "")
-                        .replace(/[^a-z]/g, "");
-                    if (normalized.includes("aucunepistedameliorationsignificative")) {
-                        return;
-                    }
-                    pistes[sectionName] = text;
-                }
+                const text = blockquote ? blockquote.textContent.trim() : "";
+                pistes[sectionName] = {
+                    note: typeof note === 'number' && !isNaN(note) ? note : null,
+                    conseil: text
+                };
             });
 
             return pistes;
@@ -4838,7 +4853,7 @@
 
             let pistesPrecedentes = {};
             if (savedCorrectionObj && savedCorrectionObj.sujet === sujetActif && sujetActif !== '') {
-                pistesPrecedentes = extrairePistesParBalise(savedCorrectionObj.html);
+                pistesPrecedentes = extrairePistesParBalise(savedCorrectionObj.html, savedCorrectionObj.scores);
             }
 
             // Visuel de chargement
