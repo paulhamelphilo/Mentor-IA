@@ -3556,9 +3556,9 @@
 
             <p style="margin-top: 15px; font-weight: bold;">Méthode directe – Au choix&nbsp;:</p>
             <ul style="margin-top: 5px;">
-                <li><strong>L’emboîtement définitionnel&nbsp;:</strong> réduisez la thèse de l’articulation de définitions de concepts clés.</li>
+                <li><strong>L’emboîtement définitionnel&nbsp;:</strong> déduisez la thèse de l’articulation de définitions de concepts clés.</li>
                 <li><strong>Le rapport de causalité&nbsp;:</strong> justifiez la thèse par ses causes ou ses conséquences objectives, par sa finalité ou ses raisons.</li>
-                <li><strong>L’action réciproque&nbsp;:</strong> montrez comment les concepts de la thèse défendue interagissent ont des conséquences qui s’influencent mutuellement.</li>
+                <li><strong>L’action réciproque&nbsp;:</strong> montrez comment les concepts de la thèse défendue interagissent ou s’influencent mutuellement.</li>
                 <li><strong>Le raisonnement par l’absurde&nbsp;:</strong> démontrez que la position inverse de la vôtre est impossible à soutenir ou contradictoire.</li>
                 <li><strong>La diversification des perspectives&nbsp;:</strong> variez les angles d’approche pour viser une complétude analytique. <em>Note&nbsp;: chaque argument ne traite qu’une perspective déterminée à la fois&nbsp;; c’est la combinaison de plusieurs arguments traitant des angles distincts qui permet de construire une démonstration probante et nuancée.</em> S’appuyer sur des repères clés&nbsp;: (ex&nbsp;: <em>soi / les autres / la société</em>, <em>subjectif / objectif</em>, <em>passé / présent / futur</em>, <em>en théorie / en pratique</em>, <em>désir / devoir</em>, <em>abstrait / concret</em>, <em>légal / légitime</em>, <em>croire / savoir</em>, <em>l’intention / les conséquences</em>, <em>nature / culture</em>, <em>pouvoir&nbsp;: droit légal / capacité matérielle / possibilité logique</em>, <em>corps / esprit</em>, <em>conscient / inconscient</em>, <em>raison / passion</em>, <em>volonté / désir</em>, <em>absolu / relatif</em>, <em>contingent / nécessaire</em>, <em>essentiel / accidentel</em>, <em>obligation / contrainte</em>, <em>public / privé</em>, <em>universel / général / particulier / singulier</em>).</li>
             </ul></div>
@@ -3618,7 +3618,7 @@
             if (Array.isArray(scores)) {
                 scores.forEach(s => {
                     if (s && s.name) {
-                        const norm = s.name.trim().toUpperCase().replace(/\s+/g, ' ');
+                        const norm = s.name.trim().toUpperCase().replace(/[’'`]/g, "'").replace(/\s+/g, ' ');
                         scoreMap[norm] = typeof s.score === 'number' ? s.score : s.avg;
                     }
                 });
@@ -3632,7 +3632,7 @@
                     const blockquote = card.querySelector('blockquote');
                     if (titleEl) {
                         const sectionName = titleEl.textContent.replace(/[\[\]]/g, '').trim();
-                        const normName = sectionName.toUpperCase().replace(/\s+/g, ' ');
+                        const normName = sectionName.toUpperCase().replace(/[’'`]/g, "'").replace(/\s+/g, ' ');
                         
                         let note = scoreMap[normName];
                         if (typeof note !== 'number') {
@@ -3701,7 +3701,7 @@
             let match;
             const matches = [];
             while ((match = regex.exec(rawText)) !== null) {
-                const cleanTag = match[1].trim().toUpperCase().replace(/\s+/g, ' ');
+                const cleanTag = match[1].trim().toUpperCase().replace(/[’'`]/g, "'").replace(/\s+/g, ' ');
                 matches.push({ tag: cleanTag, index: match.index, length: match[0].length });
             }
             for (let i = 0; i < matches.length; i++) {
@@ -3760,7 +3760,7 @@
                     let finalScore = extractedScore;
 
                     // Robustesse : vérification d'invariance de saisie pour verrouiller la note
-                    const normSection = sectionName.toUpperCase().replace(/\s+/g, ' ');
+                    const normSection = sectionName.toUpperCase().replace(/[’'`]/g, "'").replace(/\s+/g, ' ');
                     const currentContent = (currentDraftBySection && typeof currentDraftBySection === 'object') ? currentDraftBySection[normSection] : null;
                     const prevContent = (previousCorrectionObj && previousCorrectionObj.draftBySection) ? previousCorrectionObj.draftBySection[normSection] : null;
 
@@ -3772,7 +3772,7 @@
                     );
 
                     const prevScoreObj = (isUnchanged && previousCorrectionObj && Array.isArray(previousCorrectionObj.scores))
-                        ? previousCorrectionObj.scores.find(s => s && s.name && s.name.toUpperCase().replace(/\s+/g, ' ') === normSection)
+                        ? previousCorrectionObj.scores.find(s => s && s.name && s.name.toUpperCase().replace(/[’'`]/g, "'").replace(/\s+/g, ' ') === normSection)
                         : null;
 
                     if (prevScoreObj) {
@@ -5237,9 +5237,9 @@
 
             <p style="margin-top: 15px; font-weight: bold;">Méthode directe – Au choix&nbsp;:</p>
             <ul style="margin-top: 5px;">
-                <li><strong>L’emboîtement définitionnel&nbsp;:</strong> réduisez la thèse de l’articulation de définitions de concepts clés.</li>
-                <li><strong>Le rapport de causalité&nbsp;:</strong> justifiez la thèse by ses causes ou ses conséquences objectives, par sa finalité ou ses raisons.</li>
-                <li><strong>L’action réciproque&nbsp;:</strong> montrez comment les concepts de la thèse défendue interagissent ont des conséquences qui s’influencent mutuellement.</li>
+                <li><strong>L’emboîtement définitionnel&nbsp;:</strong> déduisez la thèse de l’articulation de définitions de concepts clés.</li>
+                <li><strong>Le rapport de causalité&nbsp;:</strong> justifiez la thèse par ses causes ou ses conséquences objectives, par sa finalité ou ses raisons.</li>
+                <li><strong>L’action réciproque&nbsp;:</strong> montrez comment les concepts de la thèse défendue interagissent ou s’influencent mutuellement.</li>
                 <li><strong>Le raisonnement par l’absurde&nbsp;:</strong> démontrez que la position inverse de la vôtre est impossible à soutenir ou contradictoire.</li>
                 <li><strong>La diversification des perspectives&nbsp;:</strong> variez les angles d’approche pour viser une complétude analytique. <em>Note&nbsp;: chaque argument ne traite qu’une perspective déterminée à la fois&nbsp;; c’est la combinaison de plusieurs arguments traitant des angles distincts qui permet de construire une démonstration probante et nuancée.</em> S’appuyer sur des repères clés&nbsp;: (ex&nbsp;: <em>soi / les autres / la société</em>, <em>subjectif / objectif</em>, <em>passé / présent / futur</em>, <em>en théorie / en pratique</em>, <em>désir / devoir</em>, <em>abstrait / concret</em>, <em>légal / légitime</em>, <em>croire / savoir</em>, <em>l’intention / les conséquences</em>, <em>nature / culture</em>, <em>pouvoir&nbsp;: droit légal / capacité matérielle / possibilité logique</em>, <em>corps / esprit</em>, <em>conscient / inconscient</em>, <em>raison / passion</em>, <em>volonté / désir</em>, <em>absolu / relatif</em>, <em>contingent / nécessaire</em>, <em>essentiel / accidentel</em>, <em>obligation / contrainte</em>, <em>public / privé</em>, <em>universel / général / particulier / singulier</em>).</li>
             </ul></div>
