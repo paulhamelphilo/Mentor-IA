@@ -3876,7 +3876,7 @@
             }
             if (s.startsWith('RÉF') || s.startsWith('REF') || s.startsWith('EXEMPLE')) {
                 const num = s.match(/\d+/);
-                return num ? 'R' + num[0] : 'Réf.';
+                return num ? 'R' + num[0] : 'R';
             }
             if (s.includes('SOUS-MOMENT') || s.includes('MOMENT')) {
                 const num = s.match(/\d+/);
@@ -3895,7 +3895,7 @@
             if (s.startsWith('CONCLUSION')) return 'C';
             if (s.startsWith('OBJECTION')) return 'Obj';
             if (s.startsWith('TRANSITION')) return 'Tr';
-            if (s.startsWith('REFORMULATION')) return 'Refo.';
+            if (s.startsWith('REFORMULATION')) return 'Rf';
             return s.charAt(0);
         }
 
