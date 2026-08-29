@@ -339,22 +339,28 @@
             border-radius: 8px;
         }
 
-        /* Carte d'évaluation par section */
+        /* Carte d'évaluation par section (Indice Unique) */
         .section-eval-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-left: 4px solid #3498db;
             border-radius: 6px;
-            padding: 12px 16px;
+            padding: 10px 16px;
             margin: 12px 0 16px 0;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-        }
-
-        .section-eval-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .section-eval-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 200px;
         }
 
         .section-eval-title {
@@ -363,47 +369,21 @@
             color: #475569;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
-        .section-score-pill {
-            font-size: 13px;
-            font-weight: 800;
-            padding: 2px 10px;
-            border-radius: 12px;
-        }
-
-        .criteria-bars {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .criteria-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }
-
-        .criteria-label {
-            width: 215px;
-            flex-shrink: 0;
-            color: #475569;
-            font-weight: 500;
-        }
-
-        .criteria-bar-container {
+        .section-eval-bar-container {
             flex: 1;
-            height: 8px;
+            height: 10px;
             background: #e2e8f0;
-            border-radius: 4px;
+            border-radius: 5px;
             overflow: hidden;
             min-width: 80px;
         }
 
-        .criteria-bar-fill {
+        .section-eval-bar-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 5px;
             transition: width 0.4s ease;
         }
 
@@ -419,25 +399,22 @@
             background-color: #e74c3c;
         }
 
-        .criteria-val {
-            width: 52px;
-            text-align: right;
-            font-weight: 700;
-            color: #334155;
-            font-size: 12px;
-            flex-shrink: 0;
+        .section-score-pill {
+            font-size: 13px;
+            font-weight: 800;
+            padding: 3px 12px;
+            border-radius: 12px;
+            white-space: nowrap;
         }
 
         @media (max-width: 600px) {
-            .criteria-row {
-                flex-wrap: wrap;
-                gap: 4px;
+            .section-eval-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
             }
-            .criteria-label {
-                width: 100%;
-            }
-            .criteria-bar-container {
-                flex: 1;
+            .section-score-pill {
+                align-self: flex-end;
             }
         }
 
@@ -3296,7 +3273,7 @@
                         .normalize("NFD")
                         .replace(/[\u0300-\u036f]/g, "")
                         .replace(/[^a-z]/g, "");
-                    if (normalized.includes("aucunepistedameliorationnecessaire")) {
+                    if (normalized.includes("aucunepistedamelioration")) {
                         return;
                     }
                     pistes[sectionName] = text;
@@ -3307,6 +3284,7 @@
         }
 
         function getScoreColorClass(score) {
+            if (score >= 90) return { bg: 'score-excellent', bar: 'bar-excellent' };
             if (score >= 80) return { bg: 'score-excellent', bar: 'bar-excellent' };
             if (score >= 50) return { bg: 'score-good', bar: 'bar-good' };
             return { bg: 'score-low', bar: 'bar-low' };
@@ -3345,32 +3323,28 @@
                 const sectionName = header.textContent.replace(/[\[\]]/g, '').trim();
                 let current = header.nextElementSibling;
                 let scoreElement = null;
-                let methodeScore = null;
-                let rigueurScore = null;
-                let clarteScore = null;
+                let extractedScore = null;
                 const elementsToRemove = [];
 
                 // Parcourir les éléments jusqu'au prochain titre de section
                 while (current && current.tagName !== 'H3' && current.tagName !== 'H2') {
                     const text = current.textContent;
 
-                    // Repérer les 3 piliers
-                    const mMatch = text.match(/m[eé]thodologie\s*[:*]+\s*(\d+)\s*\/\s*100/i);
-                    const rMatch = text.match(/rigueur(?:\s+conceptuelle(?:\s*(?:&|et))?\s*logique)?\s*[:*]+\s*(\d+)\s*\/\s*100/i);
-                    const cMatch = text.match(/clart[eé](?:\s*(?:&|et))?\s*pr[eé]cision(?:\s*formelle)?\s*[:*]+\s*(\d+)\s*\/\s*100/i);
+                    // Repérer l'indice de conformité
+                    const scoreMatch = text.match(/(?:conformit[eé]|indice(?:\s+de\s+conformit[eé])?|m[eé]thodologie|note)[*\s]*[:*]+\s*(\d+)\s*\/\s*100/i);
 
-                    if (mMatch && methodeScore === null) methodeScore = parseInt(mMatch[1], 10);
-                    if (rMatch && rigueurScore === null) rigueurScore = parseInt(rMatch[1], 10);
-                    if (cMatch && clarteScore === null) clarteScore = parseInt(cMatch[1], 10);
+                    if (scoreMatch && extractedScore === null) {
+                        extractedScore = parseInt(scoreMatch[1], 10);
+                        scoreElement = current;
+                    }
 
-                    // Si on rencontre un paragraphe d'introduction "Évaluation :" avant la liste
-                    if (current.tagName === 'P' && /^[*\s]*[eé]valuation\b/i.test(text.trim())) {
+                    // Si on rencontre un paragraphe d'introduction "Indice de conformité :" ou "Évaluation :" avant la liste
+                    if (current.tagName === 'P' && /^[*\s]*(?:[eé]valuation|indice\s+de\s+conformit[eé])\b/i.test(text.trim())) {
                         elementsToRemove.push(current);
                     }
 
-                    if (mMatch || rMatch || cMatch) {
-                        scoreElement = current;
-                        if (current.tagName === 'UL' || current.tagName === 'OL') {
+                    if (scoreElement) {
+                        if (current.tagName === 'UL' || current.tagName === 'OL' || current.tagName === 'P') {
                             break;
                         }
                     }
@@ -3382,13 +3356,9 @@
                     current = current.nextElementSibling;
                 }
 
-                // Si au moins un score a été détecté pour cette section
-                if (methodeScore !== null || rigueurScore !== null || clarteScore !== null) {
-                    const validScores = [methodeScore, rigueurScore, clarteScore].filter(s => s !== null && !isNaN(s));
-                    let sectionAvg = validScores.length ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length) : 0;
-                    let mVal = methodeScore !== null ? methodeScore : sectionAvg;
-                    let rVal = rigueurScore !== null ? rigueurScore : sectionAvg;
-                    let cVal = clarteScore !== null ? clarteScore : sectionAvg;
+                // Si un score a été détecté pour cette section
+                if (extractedScore !== null && !isNaN(extractedScore)) {
+                    let finalScore = extractedScore;
 
                     // Robustesse : vérification d'invariance de saisie pour verrouiller la note
                     const normSection = sectionName.toUpperCase().replace(/\s+/g, ' ');
@@ -3402,60 +3372,35 @@
                         currentContent.trim() === prevContent.trim()
                     );
 
-                    const prevScore = (isUnchanged && previousCorrectionObj && Array.isArray(previousCorrectionObj.scores))
+                    const prevScoreObj = (isUnchanged && previousCorrectionObj && Array.isArray(previousCorrectionObj.scores))
                         ? previousCorrectionObj.scores.find(s => s && s.name && s.name.toUpperCase().replace(/\s+/g, ' ') === normSection)
                         : null;
 
-                    if (prevScore && typeof prevScore.avg === 'number') {
-                        mVal = typeof prevScore.methode === 'number' ? prevScore.methode : mVal;
-                        rVal = typeof prevScore.rigueur === 'number' ? prevScore.rigueur : rVal;
-                        cVal = typeof prevScore.clarte === 'number' ? prevScore.clarte : cVal;
-                        sectionAvg = prevScore.avg;
+                    if (prevScoreObj) {
+                        const lockedVal = typeof prevScoreObj.score === 'number' ? prevScoreObj.score : prevScoreObj.avg;
+                        if (typeof lockedVal === 'number') {
+                            finalScore = lockedVal;
+                        }
                     }
 
                     sections.push({
                         name: sectionName,
-                        avg: sectionAvg,
-                        methode: mVal,
-                        rigueur: rVal,
-                        clarte: cVal
+                        score: finalScore,
+                        avg: finalScore
                     });
 
-                    const avgColors = getScoreColorClass(sectionAvg);
-                    const mColors = getScoreColorClass(mVal);
-                    const rColors = getScoreColorClass(rVal);
-                    const cColors = getScoreColorClass(cVal);
+                    const scoreColors = getScoreColorClass(finalScore);
 
                     const cardDiv = doc.createElement('div');
                     cardDiv.className = 'section-eval-card';
                     cardDiv.innerHTML = `
-                        <div class="section-eval-header">
+                        <div class="section-eval-left">
                             <span class="section-eval-title">Indice de conformité</span>
-                            <span class="section-score-pill ${avgColors.bg}">${sectionAvg} / 100</span>
-                        </div>
-                        <div class="criteria-bars">
-                            <div class="criteria-row">
-                                <span class="criteria-label">Conformité méthodologique</span>
-                                <div class="criteria-bar-container">
-                                    <div class="criteria-bar-fill ${mColors.bar}" style="width: ${mVal}%;"></div>
-                                </div>
-                                <span class="criteria-val">${mVal}/100</span>
-                            </div>
-                            <div class="criteria-row">
-                                <span class="criteria-label">Rigueur conceptuelle &amp; logique</span>
-                                <div class="criteria-bar-container">
-                                    <div class="criteria-bar-fill ${rColors.bar}" style="width: ${rVal}%;"></div>
-                                </div>
-                                <span class="criteria-val">${rVal}/100</span>
-                            </div>
-                            <div class="criteria-row">
-                                <span class="criteria-label">Clarté &amp; précision formelle</span>
-                                <div class="criteria-bar-container">
-                                    <div class="criteria-bar-fill ${cColors.bar}" style="width: ${cVal}%;"></div>
-                                </div>
-                                <span class="criteria-val">${cVal}/100</span>
+                            <div class="section-eval-bar-container">
+                                <div class="section-eval-bar-fill ${scoreColors.bar}" style="width: ${finalScore}%;"></div>
                             </div>
                         </div>
+                        <span class="section-score-pill ${scoreColors.bg}">${finalScore} / 100</span>
                     `;
 
                     // Nettoyer les éléments parasites d'introduction
@@ -3463,7 +3408,7 @@
                         if (el && el.parentNode) el.parentNode.removeChild(el);
                     });
 
-                    // Remplacer l'élément de liste de score par la carte visuelle stylisée
+                    // Remplacer l'élément de liste de score par la carte visuelle épurée
                     if (scoreElement && scoreElement.parentNode) {
                         scoreElement.parentNode.replaceChild(cardDiv, scoreElement);
                     } else if (header.parentNode) {
@@ -3475,7 +3420,7 @@
             // Construction du tableau de bord global en tête si des sections sont évaluées
             let globalScore = null;
             if (sections.length > 0) {
-                globalScore = Math.round(sections.reduce((acc, s) => acc + s.avg, 0) / sections.length);
+                globalScore = Math.round(sections.reduce((acc, s) => acc + s.score, 0) / sections.length);
                 const globalColors = getScoreColorClass(globalScore);
 
                 let deltaHtml = '';
@@ -3491,8 +3436,8 @@
                 }
 
                 const chipsHtml = sections.map(s => {
-                    const c = getScoreColorClass(s.avg);
-                    return `<span class="section-chip">${s.name} <span class="section-chip-score ${c.bg}">${s.avg}/100</span></span>`;
+                    const c = getScoreColorClass(s.score);
+                    return `<span class="section-chip">${s.name} <span class="section-chip-score ${c.bg}">${s.score}/100</span></span>`;
                 }).join('');
 
                 const dashboardDiv = doc.createElement('div');
