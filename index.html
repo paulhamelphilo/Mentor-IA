@@ -266,22 +266,34 @@
             gap: 4px;
         }
 
-        .score-excellent {
+        .score-tier-1 {
             background-color: #e8f5e9;
-            color: #2e7d32;
+            color: #1b5e20;
             border: 1px solid #a5d6a7;
         }
 
-        .score-good {
-            background-color: #fff8e1;
-            color: #d97706;
+        .score-tier-2 {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .score-tier-3 {
+            background-color: #fef3c7;
+            color: #b45309;
             border: 1px solid #fde68a;
         }
 
-        .score-low {
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef9a9a;
+        .score-tier-4 {
+            background-color: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+
+        .score-tier-5 {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
         }
 
         .score-delta-badge {
@@ -387,16 +399,24 @@
             transition: width 0.4s ease;
         }
 
-        .bar-excellent {
-            background-color: #2ecc71;
+        .bar-tier-1 {
+            background-color: #22c55e;
         }
 
-        .bar-good {
-            background-color: #f39c12;
+        .bar-tier-2 {
+            background-color: #0ea5e9;
         }
 
-        .bar-low {
-            background-color: #e74c3c;
+        .bar-tier-3 {
+            background-color: #f59e0b;
+        }
+
+        .bar-tier-4 {
+            background-color: #f97316;
+        }
+
+        .bar-tier-5 {
+            background-color: #ef4444;
         }
 
         .section-score-pill {
@@ -3284,9 +3304,11 @@
         }
 
         function getScoreColorClass(score) {
-            if (score >= 90) return { bg: 'score-excellent', bar: 'bar-excellent' };
-            if (score >= 50) return { bg: 'score-good', bar: 'bar-good' };
-            return { bg: 'score-low', bar: 'bar-low' };
+            if (score >= 90) return { bg: 'score-tier-1', bar: 'bar-tier-1' }; // Vert (90-100)
+            if (score >= 75) return { bg: 'score-tier-2', bar: 'bar-tier-2' }; // Bleu (75-89)
+            if (score >= 60) return { bg: 'score-tier-3', bar: 'bar-tier-3' }; // Ambre / Jaune (60-74)
+            if (score >= 50) return { bg: 'score-tier-4', bar: 'bar-tier-4' }; // Orange (50-59)
+            return { bg: 'score-tier-5', bar: 'bar-tier-5' };                   // Rouge (< 50)
         }
 
         function extraireTexteParSection(rawText) {
