@@ -3677,6 +3677,14 @@
             const selectExplic = document.getElementById("select-explic-text");
             const selectExplicArg = document.getElementById("select-explic-text-arg");
 
+            const inputCustomAuthor = document.getElementById("input-custom-author");
+            const inputCustomWork = document.getElementById("input-custom-work");
+            const textareaCustomText = document.getElementById("textarea-custom-text");
+
+            const inputCustomArgAuthor = document.getElementById("input-custom-arg-author");
+            const inputCustomArgWork = document.getElementById("input-custom-arg-work");
+            const textareaCustomArgFragment = document.getElementById("textarea-custom-arg-fragment");
+
             storageData.lastActive = {
                 exerciseType: state.exerciseType,
                 mode: state.mode,
@@ -3691,6 +3699,12 @@
                 isCustomArgumentation: state.isCustomArgumentation,
                 isCustomExplication: state.isCustomExplication,
                 isCustomExplicationArg: state.isCustomExplicationArg,
+                customAuthor: inputCustomAuthor ? inputCustomAuthor.value : '',
+                customWork: inputCustomWork ? inputCustomWork.value : '',
+                customText: textareaCustomText ? textareaCustomText.value : '',
+                customArgAuthor: inputCustomArgAuthor ? inputCustomArgAuthor.value : '',
+                customArgWork: inputCustomArgWork ? inputCustomArgWork.value : '',
+                customArgFragment: textareaCustomArgFragment ? textareaCustomArgFragment.value : '',
                 explicIdx: selectExplic ? selectExplic.value : '',
                 explicArgIdx: selectExplicArg ? selectExplicArg.value : '',
                 activeThesis: state.activeThesis || '',
@@ -4140,89 +4154,129 @@
             if (selExp) selExp.style.display = (state.exerciseType === 'explication' && state.mode !== 'argumentation') ? 'block' : 'none';
             if (selExpArg) selExpArg.style.display = (state.exerciseType === 'explication' && state.mode === 'argumentation') ? 'block' : 'none';
 
-            // Restore Dissertation standard
-            if (la.isCustomDissertation) {
-                toggleDissertationMode(true);
-                const inputCustomSujet = document.getElementById("input-custom-sujet");
-                if (inputCustomSujet && la.customSujet) {
-                    inputCustomSujet.value = la.customSujet;
-                }
-            } else if (la.notion) {
-                const selectNotion = document.getElementById("select-notion");
-                if (selectNotion) {
-                    selectNotion.value = la.notion;
-                    const selectSujet = document.getElementById("select-sujet");
-                    if (selectSujet) {
-                        selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet --</option>';
-                        if (sujetsPhilo[la.notion]) {
-                            selectSujet.disabled = false;
-                            sujetsPhilo[la.notion].forEach(s => {
-                                const opt = document.createElement("option"); opt.value = s.question; opt.textContent = s.question;
-                                selectSujet.appendChild(opt);
-                            });
-                            if (la.sujet) {
-                                selectSujet.value = la.sujet;
+            if (state.exerciseType === 'dissertation') {
+                if (state.mode !== 'argumentation') {
+                    // Restore Dissertation standard
+                    if (la.isCustomDissertation) {
+                        state.isCustomDissertation = true;
+                        const preDis = document.getElementById('dissertation-predefined');
+                        const custDis = document.getElementById('dissertation-custom');
+                        if (preDis) preDis.style.display = 'none';
+                        if (custDis) custDis.style.display = 'block';
+
+                        const inputCustomSujet = document.getElementById("input-custom-sujet");
+                        if (inputCustomSujet && la.customSujet) {
+                            inputCustomSujet.value = la.customSujet;
+                        }
+                    } else if (la.notion) {
+                        const selectNotion = document.getElementById("select-notion");
+                        if (selectNotion) {
+                            selectNotion.value = la.notion;
+                            const selectSujet = document.getElementById("select-sujet");
+                            if (selectSujet) {
+                                selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet --</option>';
+                                if (sujetsPhilo[la.notion]) {
+                                    selectSujet.disabled = false;
+                                    sujetsPhilo[la.notion].forEach(s => {
+                                        const opt = document.createElement("option"); opt.value = s.question; opt.textContent = s.question;
+                                        selectSujet.appendChild(opt);
+                                    });
+                                    if (la.sujet) {
+                                        selectSujet.value = la.sujet;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Restore Dissertation Argumentation
+                    if (la.isCustomArgumentation) {
+                        state.isCustomArgumentation = true;
+                        const preArg = document.getElementById('argumentation-predefined');
+                        const custArg = document.getElementById('argumentation-custom');
+                        if (preArg) preArg.style.display = 'none';
+                        if (custArg) custArg.style.display = 'block';
+
+                        const inputCustomThesis = document.getElementById("input-custom-thesis");
+                        if (inputCustomThesis && la.customThesis) {
+                            inputCustomThesis.value = la.customThesis;
+                            updateCustomArgPosition();
+                        }
+                    } else if (la.notionArg) {
+                        const selectNotionArg = document.getElementById("select-notion-arg");
+                        if (selectNotionArg) {
+                            selectNotionArg.value = la.notionArg;
+                            const selectSujetArg = document.getElementById("select-sujet-arg");
+                            if (selectSujetArg && sujetsPhilo[la.notionArg]) {
+                                selectSujetArg.disabled = false;
+                                selectSujetArg.innerHTML = '<option value="">-- Sélectionnez un sujet d’étude --</option>';
+                                sujetsPhilo[la.notionArg].forEach((s, idx) => {
+                                    const opt = document.createElement("option");
+                                    opt.value = idx;
+                                    opt.textContent = s.question;
+                                    selectSujetArg.appendChild(opt);
+                                });
+                                if (la.sujetArgIdx !== '') {
+                                    selectSujetArg.value = la.sujetArgIdx;
+                                    updateArgThesisButtons();
+                                    if (la.thesisOrientation) {
+                                        selectArgPosition(la.thesisOrientation);
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
+            } else if (state.exerciseType === 'explication') {
+                if (state.mode !== 'argumentation') {
+                    // Restore Explication standard
+                    if (la.isCustomExplication) {
+                        state.isCustomExplication = true;
+                        const preExp = document.getElementById('explication-predefined');
+                        const custExp = document.getElementById('explication-custom');
+                        if (preExp) preExp.style.display = 'none';
+                        if (custExp) custExp.style.display = 'block';
 
-            // Restore Dissertation Argumentation
-            if (la.isCustomArgumentation) {
-                toggleArgumentationMode(true);
-                const inputCustomThesis = document.getElementById("input-custom-thesis");
-                if (inputCustomThesis && la.customThesis) {
-                    inputCustomThesis.value = la.customThesis;
-                    updateCustomArgPosition();
-                }
-            } else if (la.notionArg) {
-                const selectNotionArg = document.getElementById("select-notion-arg");
-                if (selectNotionArg) {
-                    selectNotionArg.value = la.notionArg;
-                    const selectSujetArg = document.getElementById("select-sujet-arg");
-                    if (selectSujetArg && sujetsPhilo[la.notionArg]) {
-                        selectSujetArg.disabled = false;
-                        selectSujetArg.innerHTML = '<option value="">-- Sélectionnez un sujet d’étude --</option>';
-                        sujetsPhilo[la.notionArg].forEach((s, idx) => {
-                            const opt = document.createElement("option");
-                            opt.value = idx;
-                            opt.textContent = s.question;
-                            selectSujetArg.appendChild(opt);
-                        });
-                        if (la.sujetArgIdx !== '') {
-                            selectSujetArg.value = la.sujetArgIdx;
-                            updateArgThesisButtons();
-                            if (la.thesisOrientation) {
-                                selectArgPosition(la.thesisOrientation);
-                            }
+                        const inputCustomAuthor = document.getElementById("input-custom-author");
+                        const inputCustomWork = document.getElementById("input-custom-work");
+                        const textareaCustomText = document.getElementById("textarea-custom-text");
+                        if (inputCustomAuthor && la.customAuthor) inputCustomAuthor.value = la.customAuthor;
+                        if (inputCustomWork && la.customWork) inputCustomWork.value = la.customWork;
+                        if (textareaCustomText && la.customText) textareaCustomText.value = la.customText;
+                        updateCustomExplication();
+                    } else if (la.explicIdx !== '' && la.explicIdx !== null && typeof la.explicIdx !== 'undefined') {
+                        const selectExplic = document.getElementById("select-explic-text");
+                        if (selectExplic) {
+                            selectExplic.value = la.explicIdx;
+                            selectExplicText(la.explicIdx);
                         }
                     }
-                }
-            }
+                } else {
+                    // Restore Explication Argumentation
+                    if (la.isCustomExplicationArg) {
+                        state.isCustomExplicationArg = true;
+                        const preArg = document.getElementById('explication-arg-predefined');
+                        const custArg = document.getElementById('explication-arg-custom');
+                        if (preArg) preArg.style.display = 'none';
+                        if (custArg) custArg.style.display = 'block';
 
-            // Restore Explication standard
-            if (la.isCustomExplication) {
-                toggleExplicationMode(true);
-            } else if (la.explicIdx !== '' && la.explicIdx !== null && typeof la.explicIdx !== 'undefined') {
-                const selectExplic = document.getElementById("select-explic-text");
-                if (selectExplic) {
-                    selectExplic.value = la.explicIdx;
-                    selectExplicText(la.explicIdx);
-                }
-            }
-
-            // Restore Explication Argumentation
-            if (la.isCustomExplicationArg) {
-                toggleExplicationArgMode(true);
-            } else if (la.explicArgIdx !== '' && la.explicArgIdx !== null && typeof la.explicArgIdx !== 'undefined') {
-                const selectExplicArg = document.getElementById("select-explic-text-arg");
-                if (selectExplicArg) {
-                    selectExplicArg.value = la.explicArgIdx;
-                    if (la.activeFragment) {
-                        state.activeFragment = la.activeFragment;
+                        const inputCustomArgAuthor = document.getElementById("input-custom-arg-author");
+                        const inputCustomArgWork = document.getElementById("input-custom-arg-work");
+                        const textareaCustomArgFragment = document.getElementById("textarea-custom-arg-fragment");
+                        if (inputCustomArgAuthor && la.customArgAuthor) inputCustomArgAuthor.value = la.customArgAuthor;
+                        if (inputCustomArgWork && la.customArgWork) inputCustomArgWork.value = la.customArgWork;
+                        if (textareaCustomArgFragment && la.customArgFragment) textareaCustomArgFragment.value = la.customArgFragment;
+                        updateCustomExplicationArg();
+                    } else if (la.explicArgIdx !== '' && la.explicArgIdx !== null && typeof la.explicArgIdx !== 'undefined') {
+                        const selectExplicArg = document.getElementById("select-explic-text-arg");
+                        if (selectExplicArg) {
+                            selectExplicArg.value = la.explicArgIdx;
+                            if (la.activeFragment) {
+                                state.activeFragment = la.activeFragment;
+                            }
+                            selectExplicTextArg(la.explicArgIdx);
+                        }
                     }
-                    selectExplicTextArg(la.explicArgIdx);
                 }
             }
         }
@@ -4544,6 +4598,7 @@
         }
 
         function updateCustomExplication() {
+            saveCurrentDraftToLastRenderedSubject();
             const author = document.getElementById("input-custom-author").value.trim();
             const work = document.getElementById("input-custom-work").value.trim();
             const text = document.getElementById("textarea-custom-text").value.trim();
@@ -4595,6 +4650,7 @@
         }
 
         function updateCustomExplicationArg() {
+            saveCurrentDraftToLastRenderedSubject();
             const author = document.getElementById("input-custom-arg-author") ? document.getElementById("input-custom-arg-author").value.trim() : "";
             const work = document.getElementById("input-custom-arg-work") ? document.getElementById("input-custom-arg-work").value.trim() : "";
             const fragment = document.getElementById("textarea-custom-arg-fragment") ? document.getElementById("textarea-custom-arg-fragment").value.trim() : "";
