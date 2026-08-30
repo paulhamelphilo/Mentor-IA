@@ -4433,19 +4433,13 @@
             render();
         };
 
-        // === CORRECTIF POUR MOBILE (ONGLETS & HISTORIQUE) ===
+        // === SYNCHRONISATION MULTI-ONGLETS / RETOUR DE NAVIGATION ===
         window.addEventListener('pageshow', (event) => {
-            setTimeout(() => {
-                const select = document.getElementById("select-notion");
-                const selectArg = document.getElementById("select-notion-arg");
-                if (select && select.value && !select.disabled) {
-                    updateSujets();
-                }
-                if (selectArg && selectArg.value && !selectArg.disabled) {
-                    updateSujetsArg();
-                }
+            if (event.persisted) {
+                loadStorageData();
+                restoreLastActiveState();
                 render();
-            }, 0);
+            }
         });
 
         function updateSujets() {
@@ -5113,6 +5107,9 @@
             const savedScores = (savedCorrectionObj && Array.isArray(savedCorrectionObj.scores)) ? savedCorrectionObj.scores : [];
             const savedGlobalScore = (savedCorrectionObj && typeof savedCorrectionObj.globalScore === 'number') ? savedCorrectionObj.globalScore : null;
             updateFloatingQuickNav(savedScores, savedGlobalScore);
+
+            updateLastActiveState();
+            persistStorageData();
         }
 
         async function envoyerCorrection() {
