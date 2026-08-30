@@ -3574,14 +3574,149 @@
             }
         };
 
-        state.training.dissertation.intro = content.intro.trainingTemplate;
-        state.training.dissertation.dev = content.dev.trainingTemplate;
-        state.training.explic.intro = content.explic.intro.trainingTemplate;
-        state.training.explic.dev = content.explic.dev.trainingTemplate;
-        state.training.argumentation.dissertation = content.argumentation.trainingTemplate;
-        state.training.argumentation.fragment = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
-        state.corrections.argumentation.dissertation = null;
-        state.corrections.argumentation.fragment = null;
+        // ============ GESTION DU STOCKAGE LOCAL PAR SUJET (PERSISTANCE) ============
+        const STORAGE_KEY = 'mentor_ia_saved_data_v1';
+        let lastRenderedSubjectKey = null;
+
+        let storageData = {
+            version: 1,
+            lastActive: {
+                exerciseType: 'dissertation',
+                mode: 'intro',
+                notion: '',
+                sujet: '',
+                customSujet: '',
+                isCustomDissertation: false,
+                notionArg: '',
+                sujetArgIdx: '',
+                customThesis: '',
+                isCustomArgumentation: false,
+                isCustomExplication: false,
+                isCustomExplicationArg: false,
+                explicIdx: '',
+                explicArgIdx: '',
+                activeThesis: '',
+                thesisOrientation: null,
+                activeFragment: null,
+                showHelp: false
+            },
+            subjectsData: {}
+        };
+
+        function getSubjectStorageKey(exerciseType, mode, sujet) {
+            const ex = (exerciseType || 'dissertation').trim().toLowerCase();
+            const md = (mode || 'intro').trim().toLowerCase();
+            const s = (sujet || '').trim().replace(/[’'`]/g, "'").replace(/\s+/g, ' ');
+            return `${ex}_${md}:${s}`;
+        }
+
+        function loadStorageData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === 'object') {
+                        if (parsed.lastActive && typeof parsed.lastActive === 'object') {
+                            storageData.lastActive = { ...storageData.lastActive, ...parsed.lastActive };
+                        }
+                        if (parsed.subjectsData && typeof parsed.subjectsData === 'object') {
+                            storageData.subjectsData = { ...parsed.subjectsData };
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn("Erreur chargement localStorage:", e);
+            }
+        }
+
+        function persistStorageData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+            } catch (e) {
+                console.warn("Erreur sauvegarde localStorage:", e);
+            }
+        }
+
+        function getDefaultTemplate(exerciseType, mode) {
+            if (exerciseType === 'dissertation') {
+                if (mode === 'argumentation') return `[ARGUMENT]\n[RÉF/EX]`;
+                if (mode === 'dev') return content.dev.trainingTemplate;
+                return content.intro.trainingTemplate;
+            } else if (exerciseType === 'explication') {
+                if (mode === 'argumentation') return `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
+                if (mode === 'dev') return content.explic.dev.trainingTemplate;
+                return content.explic.intro.trainingTemplate;
+            }
+            return `[AMORCE]\n[SUJET]\n[ÉVIDENCE DU SENS COMMUN]\n[OBJECTION À L'ÉVIDENCE DU SENS COMMUN]\n[CONTRADICTION LOGIQUE]\n[PROBLÉMATIQUE]\n[ANNONCE DU PLAN]`;
+        }
+
+        function getSubjectStoredDraftAndCorrection(exerciseType, mode, sujet) {
+            const key = getSubjectStorageKey(exerciseType, mode, sujet);
+            const entry = storageData.subjectsData[key];
+            if (entry) {
+                return {
+                    draft: (typeof entry.draft === 'string') ? entry.draft : getDefaultTemplate(exerciseType, mode),
+                    correction: (entry.correction && typeof entry.correction === 'object') ? entry.correction : null
+                };
+            }
+            return {
+                draft: getDefaultTemplate(exerciseType, mode),
+                correction: null
+            };
+        }
+
+        function updateLastActiveState() {
+            const selectNotion = document.getElementById("select-notion");
+            const selectSujet = document.getElementById("select-sujet");
+            const inputCustomSujet = document.getElementById("input-custom-sujet");
+
+            const selectNotionArg = document.getElementById("select-notion-arg");
+            const selectSujetArg = document.getElementById("select-sujet-arg");
+            const inputCustomThesis = document.getElementById("input-custom-thesis");
+
+            const selectExplic = document.getElementById("select-explic-text");
+            const selectExplicArg = document.getElementById("select-explic-text-arg");
+
+            storageData.lastActive = {
+                exerciseType: state.exerciseType,
+                mode: state.mode,
+                showHelp: state.showHelp,
+                notion: selectNotion ? selectNotion.value : '',
+                sujet: selectSujet ? selectSujet.value : '',
+                customSujet: inputCustomSujet ? inputCustomSujet.value : '',
+                isCustomDissertation: state.isCustomDissertation,
+                notionArg: selectNotionArg ? selectNotionArg.value : '',
+                sujetArgIdx: selectSujetArg ? selectSujetArg.value : '',
+                customThesis: inputCustomThesis ? inputCustomThesis.value : '',
+                isCustomArgumentation: state.isCustomArgumentation,
+                isCustomExplication: state.isCustomExplication,
+                isCustomExplicationArg: state.isCustomExplicationArg,
+                explicIdx: selectExplic ? selectExplic.value : '',
+                explicArgIdx: selectExplicArg ? selectExplicArg.value : '',
+                activeThesis: state.activeThesis || '',
+                thesisOrientation: state.thesisOrientation || null,
+                activeFragment: state.activeFragment || null
+            };
+        }
+
+        function saveCurrentDraftToLastRenderedSubject() {
+            const textarea = document.getElementById("training-textarea");
+            if (textarea && lastRenderedSubjectKey) {
+                const val = textarea.value;
+                if (!storageData.subjectsData[lastRenderedSubjectKey]) {
+                    storageData.subjectsData[lastRenderedSubjectKey] = {
+                        draft: val,
+                        correction: null,
+                        updatedAt: Date.now()
+                    };
+                } else {
+                    storageData.subjectsData[lastRenderedSubjectKey].draft = val;
+                    storageData.subjectsData[lastRenderedSubjectKey].updatedAt = Date.now();
+                }
+                updateLastActiveState();
+                persistStorageData();
+            }
+        }
 
         function obtenirSujetActif() {
             if (state.exerciseType === 'dissertation') {
@@ -3977,10 +4112,128 @@
             }
         });
 
+        function restoreLastActiveState() {
+            const la = storageData.lastActive;
+            if (!la) return;
+
+            if (la.exerciseType) {
+                state.exerciseType = la.exerciseType;
+                const btnDis = document.getElementById('btn-ex-type-dis');
+                const btnExp = document.getElementById('btn-ex-type-exp');
+                if (btnDis) btnDis.classList.toggle('active', la.exerciseType === 'dissertation');
+                if (btnExp) btnExp.classList.toggle('active', la.exerciseType === 'explication');
+            }
+            if (la.mode) {
+                state.mode = la.mode;
+            }
+            if (typeof la.showHelp === 'boolean') {
+                state.showHelp = la.showHelp;
+            }
+
+            // Sync selectors visibility based on exerciseType & mode
+            const selDis = document.getElementById('selector-dissertation');
+            const selDisArg = document.getElementById('selector-dissertation-argumentation');
+            const selExp = document.getElementById('selector-explication');
+            const selExpArg = document.getElementById('selector-explication-argumentation');
+            if (selDis) selDis.style.display = (state.exerciseType === 'dissertation' && state.mode !== 'argumentation') ? 'block' : 'none';
+            if (selDisArg) selDisArg.style.display = (state.exerciseType === 'dissertation' && state.mode === 'argumentation') ? 'block' : 'none';
+            if (selExp) selExp.style.display = (state.exerciseType === 'explication' && state.mode !== 'argumentation') ? 'block' : 'none';
+            if (selExpArg) selExpArg.style.display = (state.exerciseType === 'explication' && state.mode === 'argumentation') ? 'block' : 'none';
+
+            // Restore Dissertation standard
+            if (la.isCustomDissertation) {
+                toggleDissertationMode(true);
+                const inputCustomSujet = document.getElementById("input-custom-sujet");
+                if (inputCustomSujet && la.customSujet) {
+                    inputCustomSujet.value = la.customSujet;
+                }
+            } else if (la.notion) {
+                const selectNotion = document.getElementById("select-notion");
+                if (selectNotion) {
+                    selectNotion.value = la.notion;
+                    const selectSujet = document.getElementById("select-sujet");
+                    if (selectSujet) {
+                        selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet --</option>';
+                        if (sujetsPhilo[la.notion]) {
+                            selectSujet.disabled = false;
+                            sujetsPhilo[la.notion].forEach(s => {
+                                const opt = document.createElement("option"); opt.value = s.question; opt.textContent = s.question;
+                                selectSujet.appendChild(opt);
+                            });
+                            if (la.sujet) {
+                                selectSujet.value = la.sujet;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Restore Dissertation Argumentation
+            if (la.isCustomArgumentation) {
+                toggleArgumentationMode(true);
+                const inputCustomThesis = document.getElementById("input-custom-thesis");
+                if (inputCustomThesis && la.customThesis) {
+                    inputCustomThesis.value = la.customThesis;
+                    updateCustomArgPosition();
+                }
+            } else if (la.notionArg) {
+                const selectNotionArg = document.getElementById("select-notion-arg");
+                if (selectNotionArg) {
+                    selectNotionArg.value = la.notionArg;
+                    const selectSujetArg = document.getElementById("select-sujet-arg");
+                    if (selectSujetArg && sujetsPhilo[la.notionArg]) {
+                        selectSujetArg.disabled = false;
+                        selectSujetArg.innerHTML = '<option value="">-- Sélectionnez un sujet d’étude --</option>';
+                        sujetsPhilo[la.notionArg].forEach((s, idx) => {
+                            const opt = document.createElement("option");
+                            opt.value = idx;
+                            opt.textContent = s.question;
+                            selectSujetArg.appendChild(opt);
+                        });
+                        if (la.sujetArgIdx !== '') {
+                            selectSujetArg.value = la.sujetArgIdx;
+                            updateArgThesisButtons();
+                            if (la.thesisOrientation) {
+                                selectArgPosition(la.thesisOrientation);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Restore Explication standard
+            if (la.isCustomExplication) {
+                toggleExplicationMode(true);
+            } else if (la.explicIdx !== '' && la.explicIdx !== null && typeof la.explicIdx !== 'undefined') {
+                const selectExplic = document.getElementById("select-explic-text");
+                if (selectExplic) {
+                    selectExplic.value = la.explicIdx;
+                    selectExplicText(la.explicIdx);
+                }
+            }
+
+            // Restore Explication Argumentation
+            if (la.isCustomExplicationArg) {
+                toggleExplicationArgMode(true);
+            } else if (la.explicArgIdx !== '' && la.explicArgIdx !== null && typeof la.explicArgIdx !== 'undefined') {
+                const selectExplicArg = document.getElementById("select-explic-text-arg");
+                if (selectExplicArg) {
+                    selectExplicArg.value = la.explicArgIdx;
+                    if (la.activeFragment) {
+                        state.activeFragment = la.activeFragment;
+                    }
+                    selectExplicTextArg(la.explicArgIdx);
+                }
+            }
+        }
+
         window.onload = () => {
+            loadStorageData();
+
             // Initialize explication texts
             state.explicTexts = explicTextsData;
             populateExplicTextSelector();
+            populateExplicTextArgSelector();
 
             // Initialize dissertation subjects
             const select = document.getElementById("select-notion");
@@ -3996,28 +4249,27 @@
                 selectArg.appendChild(opt);
             });
 
+            restoreLastActiveState();
             render();
         };
 
-        // === CORRECTIF ULTIME POUR MOBILE (ONGLETS & HISTORIQUE) ===
+        // === CORRECTIF POUR MOBILE (ONGLETS & HISTORIQUE) ===
         window.addEventListener('pageshow', (event) => {
-            const select = document.getElementById("select-notion");
-            const selectArg = document.getElementById("select-notion-arg");
-
-            // On laisse un micro-délai (0ms) pour s'assurer que le navigateur a fini d'injecter les valeurs
             setTimeout(() => {
-                if (select && select.value) {
+                const select = document.getElementById("select-notion");
+                const selectArg = document.getElementById("select-notion-arg");
+                if (select && select.value && !select.disabled) {
                     updateSujets();
                 }
-                if (selectArg && selectArg.value) {
+                if (selectArg && selectArg.value && !selectArg.disabled) {
                     updateSujetsArg();
                 }
                 render();
             }, 0);
         });
-        // ===========================================================
 
         function updateSujets() {
+            saveCurrentDraftToLastRenderedSubject();
             const notion = document.getElementById("select-notion").value;
             const selectSujet = document.getElementById("select-sujet");
             selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet --</option>';
@@ -4034,22 +4286,7 @@
         }
 
         function preserveTrainingText() {
-            const textarea = document.getElementById("training-textarea");
-            if (textarea) {
-                if (state.exerciseType === 'dissertation') {
-                    if (state.mode === 'argumentation') {
-                        state.training.argumentation.dissertation = textarea.value;
-                    } else {
-                        state.training.dissertation[state.mode] = textarea.value;
-                    }
-                } else if (state.exerciseType === 'explication') {
-                    if (state.mode === 'argumentation') {
-                        state.training.argumentation.fragment = textarea.value;
-                    } else {
-                        state.training.explic[state.mode] = textarea.value;
-                    }
-                }
-            }
+            saveCurrentDraftToLastRenderedSubject();
         }
 
         function syncSelections(oldMode, newMode) {
@@ -4267,6 +4504,7 @@
         }
 
         function selectExplicText(val) {
+            saveCurrentDraftToLastRenderedSubject();
             const idx = parseInt(val, 10);
             if (isNaN(idx) || idx < 0 || idx >= state.explicTexts.length) {
                 state.currentExplicTextIndex = null;
@@ -4279,6 +4517,7 @@
         }
 
         function toggleDissertationMode(isCustom) {
+            saveCurrentDraftToLastRenderedSubject();
             state.isCustomDissertation = isCustom;
             document.getElementById('dissertation-predefined').style.display = isCustom ? 'none' : 'block';
             document.getElementById('dissertation-custom').style.display = isCustom ? 'block' : 'none';
@@ -4289,6 +4528,7 @@
         }
 
         function toggleExplicationMode(isCustom) {
+            saveCurrentDraftToLastRenderedSubject();
             state.isCustomExplication = isCustom;
             document.getElementById('explication-predefined').style.display = isCustom ? 'none' : 'block';
             document.getElementById('explication-custom').style.display = isCustom ? 'block' : 'none';
@@ -4327,15 +4567,17 @@
         }
 
         function toggleExplicationArgMode(isCustom) {
+            saveCurrentDraftToLastRenderedSubject();
             state.isCustomExplicationArg = isCustom;
             const pre = document.getElementById('explication-arg-predefined');
             const cust = document.getElementById('explication-arg-custom');
             if (pre) pre.style.display = isCustom ? 'none' : 'block';
             if (cust) cust.style.display = isCustom ? 'block' : 'none';
+
             if (!isCustom) {
-                const authorInput = document.getElementById('input-custom-arg-author');
-                const workInput = document.getElementById('input-custom-arg-work');
-                const fragmentTextarea = document.getElementById('textarea-custom-arg-fragment');
+                const authorInput = document.getElementById("input-custom-arg-author");
+                const workInput = document.getElementById("input-custom-arg-work");
+                const fragmentTextarea = document.getElementById("textarea-custom-arg-fragment");
                 if (authorInput) authorInput.value = '';
                 if (workInput) workInput.value = '';
                 if (fragmentTextarea) fragmentTextarea.value = '';
@@ -4374,23 +4616,17 @@
         }
 
         function resetTraining() {
-            if (state.exerciseType === 'dissertation') {
-                if (state.mode === 'argumentation') {
-                    state.training.argumentation.dissertation = `[ARGUMENT]\n[RÉF/EX]`;
-                    state.corrections.argumentation.dissertation = null;
-                } else {
-                    state.training.dissertation[state.mode] = content[state.mode].trainingTemplate;
-                    state.corrections.dissertation[state.mode] = null;
-                }
-            } else if (state.exerciseType === 'explication') {
-                if (state.mode === 'argumentation') {
-                    state.training.argumentation.fragment = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
-                    state.corrections.argumentation.fragment = null;
-                } else {
-                    state.training.explic[state.mode] = content.explic[state.mode].trainingTemplate;
-                    state.corrections.explic[state.mode] = null;
-                }
-            }
+            const sujetActif = obtenirSujetActif();
+            const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+            const defaultTpl = getDefaultTemplate(state.exerciseType, state.mode);
+
+            storageData.subjectsData[currentSubjectKey] = {
+                draft: defaultTpl,
+                correction: null,
+                updatedAt: Date.now()
+            };
+            updateLastActiveState();
+            persistStorageData();
             render();
         }
 
@@ -4423,23 +4659,13 @@
         }
 
         function preserveAndCount(textarea) {
-            if (state.exerciseType === 'dissertation') {
-                if (state.mode === 'argumentation') {
-                    state.training.argumentation.dissertation = textarea.value;
-                } else {
-                    state.training.dissertation[state.mode] = textarea.value;
-                }
-            } else if (state.exerciseType === 'explication') {
-                if (state.mode === 'argumentation') {
-                    state.training.argumentation.fragment = textarea.value;
-                } else {
-                    state.training.explic[state.mode] = textarea.value;
-                }
-            }
+            saveCurrentDraftToLastRenderedSubject();
             updateCharCount(textarea);
         }
 
         function render() {
+            saveCurrentDraftToLastRenderedSubject();
+
             // Check active navigation buttons
             document.getElementById('btn-mode-intro').classList.toggle('active', state.mode === 'intro');
             document.getElementById('btn-mode-dev').classList.toggle('active', state.mode === 'dev');
@@ -4490,32 +4716,15 @@
             const area = document.getElementById('content-area');
 
             const maxLength = state.mode === 'argumentation' ? 3000 : (state.mode === 'intro' ? 3000 : 12000);
-            let currentText = '';
-            let savedCorrectionObj = null;
-
-            if (state.exerciseType === 'dissertation') {
-                if (state.mode === 'argumentation') {
-                    currentText = state.training.argumentation.dissertation || '';
-                    savedCorrectionObj = state.corrections.argumentation.dissertation;
-                } else {
-                    currentText = state.training.dissertation[state.mode] || '';
-                    savedCorrectionObj = state.corrections.dissertation[state.mode];
-                }
-            } else if (state.exerciseType === 'explication') {
-                if (state.mode === 'argumentation') {
-                    currentText = state.training.argumentation.fragment || '';
-                    savedCorrectionObj = state.corrections.argumentation.fragment;
-                } else {
-                    currentText = state.training.explic[state.mode] || '';
-                    savedCorrectionObj = state.corrections.explic[state.mode];
-                }
-            }
-
+            
             const sujetActif = obtenirSujetActif();
-            let savedCorrection = null;
-            if (savedCorrectionObj && savedCorrectionObj.sujet === sujetActif && sujetActif !== '') {
-                savedCorrection = savedCorrectionObj.html;
-            }
+            const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+            lastRenderedSubjectKey = currentSubjectKey;
+
+            const stored = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
+            let currentText = stored.draft;
+            let savedCorrectionObj = stored.correction;
+            let savedCorrection = (savedCorrectionObj && savedCorrectionObj.sujet === sujetActif && sujetActif !== '') ? savedCorrectionObj.html : null;
             const currentLength = currentText.length;
             const charInfo = getCharCountInfo(currentLength, maxLength);
 
@@ -4836,23 +5045,11 @@
             }
 
             const sujetActif = obtenirSujetActif();
-            let savedCorrectionObj = null;
-            if (state.exerciseType === 'dissertation') {
-                if (state.mode === 'argumentation') {
-                    savedCorrectionObj = state.corrections.argumentation.dissertation;
-                } else {
-                    savedCorrectionObj = state.corrections.dissertation[state.mode];
-                }
-            } else if (state.exerciseType === 'explication') {
-                if (state.mode === 'argumentation') {
-                    savedCorrectionObj = state.corrections.argumentation.fragment;
-                } else {
-                    savedCorrectionObj = state.corrections.explic[state.mode];
-                }
-            }
+            const storedCorrection = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
+            const savedCorrectionObj = (storedCorrection.correction && storedCorrection.correction.sujet === sujetActif && sujetActif !== '') ? storedCorrection.correction : null;
 
             let pistesPrecedentes = {};
-            if (savedCorrectionObj && savedCorrectionObj.sujet === sujetActif && sujetActif !== '') {
+            if (savedCorrectionObj) {
                 pistesPrecedentes = extrairePistesParBalise(savedCorrectionObj.html, savedCorrectionObj.scores);
             }
 
@@ -4944,19 +5141,21 @@
                     globalScore: transformedFinal.globalScore,
                     draftBySection: currentDraftBySection
                 };
-                if (state.exerciseType === 'dissertation') {
-                    if (state.mode === 'argumentation') {
-                        state.corrections.argumentation.dissertation = newCorrectionObj;
-                    } else {
-                        state.corrections.dissertation[state.mode] = newCorrectionObj;
-                    }
-                } else if (state.exerciseType === 'explication') {
-                    if (state.mode === 'argumentation') {
-                        state.corrections.argumentation.fragment = newCorrectionObj;
-                    } else {
-                        state.corrections.explic[state.mode] = newCorrectionObj;
-                    }
+                
+                const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+                if (!storageData.subjectsData[currentSubjectKey]) {
+                    storageData.subjectsData[currentSubjectKey] = {
+                        draft: trainingText,
+                        correction: newCorrectionObj,
+                        updatedAt: Date.now()
+                    };
+                } else {
+                    storageData.subjectsData[currentSubjectKey].draft = trainingText;
+                    storageData.subjectsData[currentSubjectKey].correction = newCorrectionObj;
+                    storageData.subjectsData[currentSubjectKey].updatedAt = Date.now();
                 }
+                updateLastActiveState();
+                persistStorageData();
             } catch (error) {
                 alert("Erreur lors de la communication avec le correcteur : " + error.message);
             } finally {
@@ -4971,6 +5170,7 @@
         }
 
         function updateSujetsArg() {
+            saveCurrentDraftToLastRenderedSubject();
             const notion = document.getElementById("select-notion-arg").value;
             const selectSujet = document.getElementById("select-sujet-arg");
             selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet --</option>';
@@ -5000,6 +5200,7 @@
         }
 
         function updateArgThesisButtons() {
+            saveCurrentDraftToLastRenderedSubject();
             const notion = document.getElementById("select-notion-arg").value;
             const idx = parseInt(document.getElementById("select-sujet-arg").value, 10);
 
@@ -5033,6 +5234,7 @@
         }
 
         function selectArgPosition(orientation) {
+            saveCurrentDraftToLastRenderedSubject();
             const notion = document.getElementById("select-notion-arg").value;
             const idx = parseInt(document.getElementById("select-sujet-arg").value, 10);
             if (!notion || isNaN(idx)) return;
@@ -5050,6 +5252,7 @@
         }
 
         function updateCustomArgPosition() {
+            saveCurrentDraftToLastRenderedSubject();
             const text = document.getElementById("input-custom-thesis").value.trim();
             if (text) {
                 state.activeThesis = text;
@@ -5063,6 +5266,7 @@
         }
 
         function toggleArgumentationMode(isCustom) {
+            saveCurrentDraftToLastRenderedSubject();
             state.isCustomArgumentation = isCustom;
             document.getElementById('argumentation-predefined').style.display = isCustom ? 'none' : 'block';
             document.getElementById('argumentation-custom').style.display = isCustom ? 'block' : 'none';
@@ -5108,17 +5312,7 @@
         }
 
         function initArgumentationSubMode() {
-            const textarea = document.getElementById("training-textarea");
-            const defaultDissertationTemplate = `[ARGUMENT]\n[RÉF/EX]`;
-            const defaultFragmentTemplate = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
-
             if (state.exerciseType === 'explication') {
-                if (!state.training.argumentation.fragment) {
-                    state.training.argumentation.fragment = defaultFragmentTemplate;
-                }
-                if (textarea) {
-                    textarea.value = state.training.argumentation.fragment;
-                }
                 populateExplicTextArgSelector();
                 const select = document.getElementById('select-explic-text-arg');
                 if (select) {
@@ -5138,12 +5332,6 @@
                 }
                 toggleExplicationArgMode(state.isCustomExplicationArg);
             } else if (state.exerciseType === 'dissertation') {
-                if (!state.training.argumentation.dissertation) {
-                    state.training.argumentation.dissertation = defaultDissertationTemplate;
-                }
-                if (textarea) {
-                    textarea.value = state.training.argumentation.dissertation;
-                }
                 toggleArgumentationMode(state.isCustomArgumentation);
             }
 
@@ -5161,6 +5349,7 @@
         }
 
         function selectExplicTextArg(val) {
+            saveCurrentDraftToLastRenderedSubject();
             const idx = parseInt(val, 10);
             if (isNaN(idx) || idx < 0 || idx >= state.explicTexts.length) {
                 state.activeFragment = null;
@@ -5191,16 +5380,8 @@
         }
 
         function clickFragment(textIdx, mIdx, sIdx) {
+            saveCurrentDraftToLastRenderedSubject();
             state.activeFragment = { textIndex: textIdx, momentIndex: mIdx, subMomentIndex: sIdx };
-
-            const defaultFragmentTemplate = `[REFORMULATION]\n[ARGUMENT]\n[RÉF/EX]\n[TRANSITION]`;
-            state.training.argumentation.fragment = defaultFragmentTemplate;
-            const textarea = document.getElementById("training-textarea");
-            if (textarea) {
-                textarea.value = defaultFragmentTemplate;
-                updateCharCount(textarea);
-            }
-
             selectExplicTextArg(textIdx);
         }
 
