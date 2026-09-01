@@ -302,6 +302,18 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            user-select: none;
+        }
+
+        .global-score-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .global-score-badge:active {
+            transform: translateY(0);
         }
 
         .score-tier-1 {
@@ -497,6 +509,24 @@
             background-color: #ef4444;
         }
 
+        .section-card-score-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .section-score-delta {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+        }
+
         .section-score-pill {
             font-size: 13px;
             font-weight: 800;
@@ -563,6 +593,7 @@
                 align-items: stretch;
                 gap: 10px;
             }
+            .section-card-score-wrap,
             .section-score-pill {
                 align-self: flex-end;
             }
@@ -4000,7 +4031,8 @@
 
             headers.forEach((header, idx) => {
                 const sectionName = header.textContent.replace(/[\[\]]/g, '').trim();
-                const sectionAnchorId = 'sec-eval-' + idx;
+                const sectionSlug = sectionName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || ('sec-' + idx);
+                const sectionAnchorId = 'sec-eval-' + sectionSlug;
 
                 // Collecter tous les nœuds frères appartenant à cette section jusqu'au prochain h3 ou h2
                 const sectionNodes = [];
@@ -4046,14 +4078,30 @@
                         currentContent.trim() === prevContent.trim()
                     );
 
-                    const prevScoreObj = (isUnchanged && previousCorrectionObj && Array.isArray(previousCorrectionObj.scores))
+                    const prevScoreObj = (previousCorrectionObj && Array.isArray(previousCorrectionObj.scores))
                         ? previousCorrectionObj.scores.find(s => s && s.name && s.name.toUpperCase().replace(/[’'`]/g, "'").replace(/\s+/g, ' ') === normSection)
                         : null;
 
-                    if (prevScoreObj) {
+                    if (isUnchanged && prevScoreObj) {
                         const lockedVal = typeof prevScoreObj.score === 'number' ? prevScoreObj.score : prevScoreObj.avg;
                         if (typeof lockedVal === 'number') {
                             finalScore = lockedVal;
+                        }
+                    }
+
+                    // Calcul de l'indicateur d'évolution pour cette section
+                    let sectionDeltaHtml = '';
+                    if (prevScoreObj) {
+                        const prevScoreVal = typeof prevScoreObj.score === 'number' ? prevScoreObj.score : prevScoreObj.avg;
+                        if (typeof prevScoreVal === 'number' && !isNaN(prevScoreVal)) {
+                            const diff = finalScore - prevScoreVal;
+                            if (diff > 0) {
+                                sectionDeltaHtml = `<span class="section-score-delta delta-positive" title="Précédent : ${prevScoreVal}/100">▲ +${diff} pt${diff > 1 ? 's' : ''}</span>`;
+                            } else if (diff < 0) {
+                                sectionDeltaHtml = `<span class="section-score-delta delta-negative" title="Précédent : ${prevScoreVal}/100">▼ ${diff} pt${Math.abs(diff) > 1 ? 's' : ''}</span>`;
+                            } else {
+                                sectionDeltaHtml = `<span class="section-score-delta delta-neutral" title="Identique : ${prevScoreVal}/100">■ 0 pt</span>`;
+                            }
                         }
                     }
 
@@ -4071,7 +4119,7 @@
                     cardDiv.className = `section-feedback-card ${scoreColors.card}`;
                     cardDiv.id = sectionAnchorId;
 
-                    // En-tête intégré moderne de la carte
+                    // En-tête intégré moderne de la carte avec indicateur d'évolution à gauche de la note
                     const cardHeader = doc.createElement('div');
                     cardHeader.className = 'section-card-header';
                     cardHeader.innerHTML = `
@@ -4081,7 +4129,10 @@
                                 <div class="section-eval-bar-fill ${scoreColors.bar}" style="width: ${finalScore}%;"></div>
                             </div>
                         </div>
-                        <span class="section-score-pill ${scoreColors.bg}">${finalScore} / 100</span>
+                        <div class="section-card-score-wrap">
+                            ${sectionDeltaHtml}
+                            <span class="section-score-pill ${scoreColors.bg}">${finalScore} / 100</span>
+                        </div>
                     `;
                     cardDiv.appendChild(cardHeader);
 
@@ -4134,7 +4185,7 @@
                         </div>
                         <div class="dashboard-score-wrap">
                             ${deltaHtml}
-                            <span class="global-score-badge ${globalColors.bg}">${globalScore} / 100</span>
+                            <span class="global-score-badge ${globalColors.bg}" title="Cliquez pour afficher le haut de la correction" data-target="correction-box">${globalScore} / 100</span>
                         </div>
                     </div>
                     <div class="dashboard-sections-summary">
@@ -4186,9 +4237,16 @@
         }
 
         function scrollToElement(id) {
+            if (!id) return;
             const el = document.getElementById(id);
             if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const yOffset = -20;
+                const elementPosition = el.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset + yOffset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
             }
         }
 
@@ -4234,23 +4292,22 @@
                 });
             }
 
-            nav.innerHTML = html;
+            if (nav.innerHTML !== html) {
+                nav.innerHTML = html;
+            }
         }
 
         // Navigation fluide instantanée via les badges et pastilles de section (actif en continu, même pendant le streaming)
         document.addEventListener('click', function (e) {
-            const chip = e.target.closest('.section-chip, .quicknav-section-pill, .quicknav-global-pill');
+            const chip = e.target.closest('.section-chip, .quicknav-section-pill, .quicknav-global-pill, .global-score-badge');
             if (chip) {
                 e.preventDefault();
-                const targetId = chip.getAttribute('data-target') || chip.getAttribute('href')?.replace('#', '');
+                const targetId = chip.getAttribute('data-target') || chip.getAttribute('href')?.replace('#', '') || (chip.classList.contains('global-score-badge') ? 'correction-box' : null);
                 if (targetId) {
-                    const targetEl = document.getElementById(targetId);
-                    if (targetEl) {
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
+                    scrollToElement(targetId);
                 }
             }
-        });
+        }, true);
 
         function restoreLastActiveState() {
             const la = storageData.lastActive;
@@ -4794,13 +4851,33 @@
         function resetTraining() {
             const sujetActif = obtenirSujetActif();
             const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+            const stored = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
             const defaultTpl = getDefaultTemplate(state.exerciseType, state.mode);
 
-            storageData.subjectsData[currentSubjectKey] = {
-                draft: defaultTpl,
-                correction: null,
-                updatedAt: Date.now()
-            };
+            // Si une correction IA est actuellement présente pour ce sujet, le 1er clic l'efface en conservant le texte rédigé
+            if (stored.correction && stored.correction.sujet === sujetActif && stored.correction.html) {
+                if (!storageData.subjectsData[currentSubjectKey]) {
+                    storageData.subjectsData[currentSubjectKey] = {
+                        draft: stored.draft || defaultTpl,
+                        correction: null,
+                        updatedAt: Date.now()
+                    };
+                } else {
+                    storageData.subjectsData[currentSubjectKey].correction = null;
+                    storageData.subjectsData[currentSubjectKey].updatedAt = Date.now();
+                }
+            } else {
+                // Sans correction : le clic réinitialise le champ de saisie aux balises initiales
+                const textarea = document.getElementById("training-textarea");
+                if (textarea) {
+                    textarea.value = defaultTpl;
+                }
+                storageData.subjectsData[currentSubjectKey] = {
+                    draft: defaultTpl,
+                    correction: null,
+                    updatedAt: Date.now()
+                };
+            }
             updateLastActiveState();
             persistStorageData();
             render();
@@ -5072,7 +5149,7 @@
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
                             <button class="btn btn-submit" onclick="envoyerCorrection()">Correction IA</button>
-                            <button class="btn btn-secondary" onclick="resetTraining()">Remise à zéro</button>
+                            <button class="btn btn-secondary" onclick="resetTraining()">${savedCorrection ? 'Effacer la correction' : 'Remise à zéro'}</button>
                         </div>
                         <div id="loading-msg" class="loading">Le correcteur IA analyse votre travail conformément à la méthodologie, veuillez patienter (environ 5 à 10 secondes)...</div>
                         <div id="correction-box" style="${savedCorrection ? 'display: block;' : 'display: none;'}">
