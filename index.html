@@ -568,6 +568,25 @@
             font-size: 15px;
         }
 
+        .section-feedback-card blockquote:empty {
+            display: none !important;
+        }
+
+        .section-feedback-card blockquote ul,
+        .section-feedback-card blockquote ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .section-feedback-card blockquote li {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        .section-feedback-card blockquote li:last-child {
+            margin-bottom: 0;
+        }
+
         .section-feedback-card.card-tier-1 blockquote {
             border-left-color: #22c55e;
         }
@@ -794,7 +813,11 @@
         /* Mode Mobile (<= 768px) : Dock horizontal fixé en bas et adaptation anti-débordement */
         @media (max-width: 768px) {
             body {
-                padding: 10px 8px;
+                padding: 10px 8px 85px 8px !important;
+            }
+
+            #correction-box {
+                margin-bottom: 75px !important;
             }
 
             .container {
@@ -4021,6 +4044,31 @@
             return sections;
         }
 
+        function normaliserMarkdownCorrection(md) {
+            if (!md || typeof md !== 'string') return '';
+            // Détecter et restructurer proprement chaque bloc Pistes d'amélioration
+            return md.replace(/(####\s*Pistes\s+d['’]am[ée]lioration[^\n]*\n)([\s\S]*?)(?=\n\s*(?:---|###|$)|$)/gi, (match, header, content) => {
+                const rawLines = content.split('\n');
+                const validLines = [];
+                for (let line of rawLines) {
+                    const trimmed = line.trim();
+                    // Supprimer les chevrons isolés qui ouvrent/ferment des blockquotes vides
+                    if (trimmed === '>' || trimmed === '') continue;
+                    // Nettoyer les chevrons existants et ajouter un chevron standard par ligne
+                    if (trimmed.startsWith('>')) {
+                        const inner = trimmed.replace(/^>\s*/, '').trim();
+                        if (inner) validLines.push('> ' + inner);
+                    } else {
+                        validLines.push('> ' + trimmed);
+                    }
+                }
+                if (validLines.length === 0) {
+                    return header + '> Aucune piste d\'amélioration significative.\n\n';
+                }
+                return header + validLines.join('\n') + '\n\n';
+            });
+        }
+
         function transformerRenduCorrection(rawHtml, previousCorrectionObj, currentDraftBySection) {
             if (!rawHtml) return { html: '', sections: [], globalScore: null };
 
@@ -4140,6 +4188,36 @@
                     sectionNodes.forEach(node => {
                         cardDiv.appendChild(node);
                     });
+
+                    // Nettoyage des blockquotes vides et regroupement robuste des pistes orphelines
+                    cardDiv.querySelectorAll('blockquote').forEach(bq => {
+                        if (!bq.textContent.trim()) {
+                            if (bq.parentNode) bq.parentNode.removeChild(bq);
+                        }
+                    });
+
+                    const h4Pistes = Array.from(cardDiv.querySelectorAll('h4')).find(h => /Pistes\s+d['’]am[ée]lioration/i.test(h.textContent));
+                    if (h4Pistes) {
+                        let el = h4Pistes.nextElementSibling;
+                        let targetBq = cardDiv.querySelector('blockquote');
+                        while (el) {
+                            const next = el.nextElementSibling;
+                            if (el.tagName === 'BLOCKQUOTE') {
+                                if (!el.textContent.trim()) {
+                                    if (el.parentNode) el.parentNode.removeChild(el);
+                                } else {
+                                    targetBq = el;
+                                }
+                            } else if (['UL', 'OL', 'P'].includes(el.tagName)) {
+                                if (!targetBq) {
+                                    targetBq = doc.createElement('blockquote');
+                                    h4Pistes.parentNode.insertBefore(targetBq, el);
+                                }
+                                targetBq.appendChild(el);
+                            }
+                            el = next;
+                        }
+                    }
 
                     // Supprimer l'élément brut de score s'il existe
                     if (scoreElement && scoreElement.parentNode) {
@@ -5371,20 +5449,20 @@
 
                         const chunk = decoder.decode(value, { stream: true });
                         texteCumule += chunk;
-                        const intermediateHtml = marked.parse(texteCumule);
+                        const intermediateHtml = marked.parse(normaliserMarkdownCorrection(texteCumule));
                         const intermediateTransformed = transformerRenduCorrection(intermediateHtml, savedCorrectionObj, currentDraftBySection);
                         document.getElementById("correction-text").innerHTML = intermediateTransformed.html;
                         updateFloatingQuickNav(intermediateTransformed.sections, intermediateTransformed.globalScore);
                     }
                 } catch (streamError) {
                     texteCumule += "\n\n[Erreur de connexion : le flux a été interrompu par le réseau. Veuillez réessayer si la correction est incomplète.]";
-                    const errHtml = marked.parse(texteCumule);
+                    const errHtml = marked.parse(normaliserMarkdownCorrection(texteCumule));
                     const errTransformed = transformerRenduCorrection(errHtml, savedCorrectionObj, currentDraftBySection);
                     document.getElementById("correction-text").innerHTML = errTransformed.html;
                     updateFloatingQuickNav(errTransformed.sections, errTransformed.globalScore);
                 }
 
-                const correctionHtmlFinale = marked.parse(texteCumule);
+                const correctionHtmlFinale = marked.parse(normaliserMarkdownCorrection(texteCumule));
                 const transformedFinal = transformerRenduCorrection(correctionHtmlFinale, savedCorrectionObj, currentDraftBySection);
                 document.getElementById("correction-text").innerHTML = transformedFinal.html;
                 updateFloatingQuickNav(transformedFinal.sections, transformedFinal.globalScore);
