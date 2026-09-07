@@ -1634,7 +1634,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.07.dock_v3";
+        const APP_BUILD_VERSION = "2026.09.07.dock_v4";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
@@ -6178,6 +6178,7 @@
 
             const sujetActif = obtenirSujetActif();
             const currentSubKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+            const storedCorrection = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
             const normStoredSub = storedCorrection.correction && storedCorrection.correction.sujet ? getSubjectStorageKey(state.exerciseType, state.mode, storedCorrection.correction.sujet) : currentSubKey;
             const savedCorrectionObj = (storedCorrection.correction && storedCorrection.correction.html && sujetActif !== '' && normStoredSub === currentSubKey) ? storedCorrection.correction : null;
 
