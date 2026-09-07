@@ -836,6 +836,255 @@
             transform: translateY(-50%) translateX(-4px);
         }
 
+        /* ==========================================================================
+           Dock latéral gauche : Multi-profils et historique cranté par filiation
+           ========================================================================== */
+        .floating-profile-dock {
+            position: fixed;
+            left: clamp(8px, 1.2vw, 16px);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 48px;
+            min-width: 48px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid #cbd5e1;
+            border-radius: 28px;
+            padding: 10px 2px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            max-height: 94vh;
+            overflow: visible;
+            opacity: 0.18;
+            transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        .floating-profile-dock:hover {
+            opacity: 1 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Section des profils */
+        .profiles-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            width: 100%;
+        }
+
+        .profile-pill-slot {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .profile-pill {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            position: relative;
+            user-select: none;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .profile-pill.active {
+            background: #2c3e50;
+            color: #ffffff;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #38bdf8;
+            opacity: 1;
+        }
+
+        .profile-pill.active:hover {
+            transform: none !important;
+        }
+
+        .profile-pill.translucent {
+            background: #ffffff;
+            color: #64748b;
+            border: 1.5px solid #cbd5e1;
+            opacity: 0.45;
+        }
+
+        .profile-pill.translucent:hover {
+            opacity: 1;
+            background: #f1f5f9;
+            transform: scale(1.05);
+        }
+
+        /* Bouton "+" intégré verticalement sous le dernier profil */
+        .profile-add-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            user-select: none;
+            position: relative;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            padding: 0;
+            margin: 0;
+            line-height: 0;
+        }
+
+        .profile-add-btn svg {
+            display: block;
+            pointer-events: none;
+        }
+
+        .profile-add-btn:hover {
+            background: #2c3e50;
+            border-color: #2c3e50;
+            color: #ffffff;
+            transform: scale(1.06);
+            box-shadow: 0 3px 10px rgba(44, 62, 80, 0.25);
+        }
+
+        .profile-add-btn:active {
+            transform: scale(0.95);
+        }
+
+        .dock-divider {
+            width: 22px;
+            height: 1px;
+            background: #cbd5e1;
+            margin: 2px 0;
+            flex-shrink: 0;
+        }
+
+        /* Zone de défilement de l'historique cranté (Strictement anti-scroll horizontal) */
+        .timeline-scroll-area {
+            position: relative;
+            width: 100%;
+            max-height: clamp(140px, 35vh, 240px);
+            overflow-y: auto;
+            overflow-x: hidden !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            scrollbar-width: none;
+            box-sizing: border-box;
+        }
+
+        .timeline-scroll-area::-webkit-scrollbar {
+            width: 0px;
+            display: none;
+        }
+
+        /* Tige verticale continue */
+        .vertical-stem-line {
+            position: absolute;
+            top: 10px;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            background: #cbd5e1;
+            z-index: 1;
+        }
+
+        /* Pastilles-crans */
+        .cran-pill {
+            position: relative;
+            z-index: 2;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            user-select: none;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .cran-pill:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
+            z-index: 20;
+        }
+
+        .cran-pill.active {
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0284c7;
+            z-index: 20;
+            transform: none !important;
+        }
+
+        .cran-pill.active:hover {
+            transform: none !important;
+            filter: brightness(1.06);
+        }
+
+        /* Petit point indicateur sur la saisie la plus récente */
+        .cran-pill.is-latest::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 7px;
+            height: 7px;
+            background: #2563eb;
+            border: 1.5px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(37, 99, 235, 0.6);
+            pointer-events: none;
+        }
+
+        .cran-pill.tier-draft {
+            background: #ffffff;
+            color: #0284c7;
+            border: 1.5px solid #0284c7;
+            font-size: 12px;
+        }
+        .cran-pill.tier-draft.active {
+            background: #0284c7;
+            color: #ffffff;
+            border: 1.5px solid #0284c7;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0284c7;
+            transform: none !important;
+        }
+        .cran-pill.tier-draft.active:hover {
+            transform: none !important;
+            filter: brightness(1.06);
+        }
+
+
+
         /* Mode Mobile (<= 768px) : Dock horizontal fixé en bas et adaptation anti-débordement */
         @media (max-width: 768px) {
             body {
@@ -1004,6 +1253,47 @@
                 opacity: 1;
                 transform: translateX(-50%) translateY(-4px);
             }
+
+            /* Dock profil & crans sur mobile */
+            .floating-profile-dock {
+                left: 4px;
+                top: 60px;
+                transform: none;
+                padding: 6px 2px;
+                max-height: 55vh;
+                z-index: 1050;
+                width: 36px;
+                min-width: 36px;
+            }
+            .profile-pill, .cran-pill {
+                width: 26px;
+                height: 26px;
+                font-size: 9.5px;
+            }
+            .profile-add-btn {
+                width: 22px;
+                height: 22px;
+                font-size: 12px;
+            }
+            .timeline-scroll-area {
+                max-height: 160px;
+                overflow-x: hidden !important;
+            }
+            .profile-pill[data-tooltip]::before,
+            .profile-add-btn[data-tooltip]::before,
+            .cran-pill[data-tooltip]::before {
+                left: calc(100% + 4px);
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+        }
+
+        /* Sécurité anti-chevauchement pour ordinateurs de classe / écrans portables (1024px-1380px) */
+        @media (min-width: 769px) and (max-width: 1380px) {
+            body {
+                padding-left: 68px !important;
+                padding-right: 68px !important;
+            }
         }
 
         .footer-credit {
@@ -1151,6 +1441,9 @@
 </head>
 
 <body>
+
+    <!-- Barre latérale gauche : multi-profils et historique cranté -->
+    <div id="floating-profile-dock" class="floating-profile-dock" title="Survolez pour afficher les profils et l'historique"></div>
 
     <div class="container">
         <h1>🤔 Mentor IA philo</h1>
@@ -3781,34 +4074,79 @@
             }
         };
 
-        // ============ GESTION DU STOCKAGE LOCAL PAR SUJET (PERSISTANCE) ============
-        const STORAGE_KEY = 'mentor_ia_saved_data_v1';
+        // ============ GESTION DU STOCKAGE LOCAL PAR SUJET (PERSISTANCE & MULTI-PROFILS) ============
+        const STORAGE_KEY_V1 = 'mentor_ia_saved_data_v1';
+        const STORAGE_KEY_V2 = 'mentor_ia_saved_data_v2';
         let lastRenderedSubjectKey = null;
 
         let storageData = {
-            version: 1,
-            lastActive: {
-                exerciseType: 'dissertation',
-                mode: 'intro',
-                notion: '',
-                sujet: '',
-                customSujet: '',
-                isCustomDissertation: false,
-                notionArg: '',
-                sujetArgIdx: '',
-                customThesis: '',
-                isCustomArgumentation: false,
-                isCustomExplication: false,
-                isCustomExplicationArg: false,
-                explicIdx: '',
-                explicArgIdx: '',
-                activeThesis: '',
-                thesisOrientation: null,
-                activeFragment: null,
-                showHelp: false
+            version: 2,
+            activeProfileId: 1,
+            profiles: {
+                1: {
+                    id: 1,
+                    createdAt: Date.now(),
+                    lastActive: {
+                        exerciseType: 'dissertation',
+                        mode: 'intro',
+                        notion: '',
+                        sujet: '',
+                        customSujet: '',
+                        isCustomDissertation: false,
+                        notionArg: '',
+                        sujetArgIdx: '',
+                        customThesis: '',
+                        isCustomArgumentation: false,
+                        isCustomExplication: false,
+                        isCustomExplicationArg: false,
+                        explicIdx: '',
+                        explicArgIdx: '',
+                        activeThesis: '',
+                        thesisOrientation: null,
+                        activeFragment: null,
+                        showHelp: false
+                    },
+                    subjectsData: {}
+                }
             },
+            lastActive: {},
             subjectsData: {}
         };
+
+        function getActiveProfile() {
+            if (!storageData.profiles || typeof storageData.profiles !== 'object') {
+                storageData.profiles = {};
+            }
+            const pid = storageData.activeProfileId || 1;
+            if (!storageData.profiles[pid]) {
+                storageData.profiles[pid] = {
+                    id: pid,
+                    createdAt: Date.now(),
+                    lastActive: {
+                        exerciseType: 'dissertation',
+                        mode: 'intro',
+                        notion: '',
+                        sujet: '',
+                        customSujet: '',
+                        isCustomDissertation: false,
+                        notionArg: '',
+                        sujetArgIdx: '',
+                        customThesis: '',
+                        isCustomArgumentation: false,
+                        isCustomExplication: false,
+                        isCustomExplicationArg: false,
+                        explicIdx: '',
+                        explicArgIdx: '',
+                        activeThesis: '',
+                        thesisOrientation: null,
+                        activeFragment: null,
+                        showHelp: false
+                    },
+                    subjectsData: {}
+                };
+            }
+            return storageData.profiles[pid];
+        }
 
         function getSubjectStorageKey(exerciseType, mode, sujet) {
             const ex = (exerciseType || 'dissertation').trim().toLowerCase();
@@ -3819,26 +4157,88 @@
 
         function loadStorageData() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (parsed && typeof parsed === 'object') {
-                        if (parsed.lastActive && typeof parsed.lastActive === 'object') {
-                            storageData.lastActive = { ...storageData.lastActive, ...parsed.lastActive };
+                // 1. Priorité aux données V2
+                const rawV2 = localStorage.getItem(STORAGE_KEY_V2);
+                if (rawV2) {
+                    const parsedV2 = JSON.parse(rawV2);
+                    if (parsedV2 && parsedV2.version === 2 && parsedV2.profiles) {
+                        storageData.version = 2;
+                        storageData.activeProfileId = parsedV2.activeProfileId || 1;
+                        storageData.profiles = parsedV2.profiles;
+                        const activeProf = getActiveProfile();
+                        storageData.lastActive = activeProf.lastActive || {};
+                        storageData.subjectsData = activeProf.subjectsData || {};
+                        return;
+                    }
+                }
+
+                // 2. Migration transparente depuis V1 (aucune perte de données)
+                const rawV1 = localStorage.getItem(STORAGE_KEY_V1);
+                if (rawV1) {
+                    const parsedV1 = JSON.parse(rawV1);
+                    if (parsedV1 && typeof parsedV1 === 'object') {
+                        storageData.version = 2;
+                        storageData.activeProfileId = 1;
+                        const prof1 = {
+                            id: 1,
+                            createdAt: Date.now(),
+                            lastActive: (parsedV1.lastActive && typeof parsedV1.lastActive === 'object')
+                                ? { ...storageData.profiles[1].lastActive, ...parsedV1.lastActive }
+                                : { ...storageData.profiles[1].lastActive },
+                            subjectsData: {}
+                        };
+
+                        if (parsedV1.subjectsData && typeof parsedV1.subjectsData === 'object') {
+                            Object.keys(parsedV1.subjectsData).forEach(key => {
+                                const oldItem = parsedV1.subjectsData[key];
+                                if (oldItem && typeof oldItem === 'object') {
+                                    const crans = [];
+                                    if (oldItem.correction && typeof oldItem.correction === 'object') {
+                                        const score = (typeof oldItem.correction.globalScore === 'number')
+                                            ? oldItem.correction.globalScore
+                                            : (Array.isArray(oldItem.correction.scores) && oldItem.correction.scores.length > 0
+                                                ? Math.round(oldItem.correction.scores.reduce((a, s) => a + (s.score || 0), 0) / oldItem.correction.scores.length)
+                                                : null);
+                                        const timeDate = new Date(oldItem.updatedAt || Date.now());
+                                        const timeLabel = `${String(timeDate.getHours()).padStart(2, '0')}:${String(timeDate.getMinutes()).padStart(2, '0')}`;
+                                        crans.push({
+                                            id: 1,
+                                            parentId: null,
+                                            timestamp: oldItem.updatedAt || Date.now(),
+                                            timeLabel: timeLabel,
+                                            score: score,
+                                            draft: (typeof oldItem.draft === 'string') ? oldItem.draft : '',
+                                            correction: oldItem.correction
+                                        });
+                                    }
+                                    prof1.subjectsData[key] = {
+                                        activeCranId: crans.length > 0 ? 1 : 'draft',
+                                        draftParentId: crans.length > 0 ? 1 : null,
+                                        workingDraft: (typeof oldItem.draft === 'string') ? oldItem.draft : '',
+                                        crans: crans,
+                                        updatedAt: oldItem.updatedAt || Date.now()
+                                    };
+                                }
+                            });
                         }
-                        if (parsed.subjectsData && typeof parsed.subjectsData === 'object') {
-                            storageData.subjectsData = { ...parsed.subjectsData };
-                        }
+                        storageData.profiles = { 1: prof1 };
+                        storageData.lastActive = prof1.lastActive;
+                        storageData.subjectsData = prof1.subjectsData;
+                        persistStorageData();
+                        return;
                     }
                 }
             } catch (e) {
-                console.warn("Erreur chargement localStorage:", e);
+                console.warn("Erreur chargement/migration localStorage:", e);
             }
         }
 
         function persistStorageData() {
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+                const prof = getActiveProfile();
+                storageData.lastActive = prof.lastActive || {};
+                storageData.subjectsData = prof.subjectsData || {};
+                localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(storageData));
             } catch (e) {
                 console.warn("Erreur sauvegarde localStorage:", e);
             }
@@ -3858,17 +4258,54 @@
         }
 
         function getSubjectStoredDraftAndCorrection(exerciseType, mode, sujet) {
+            const prof = getActiveProfile();
             const key = getSubjectStorageKey(exerciseType, mode, sujet);
-            const entry = storageData.subjectsData[key];
-            if (entry) {
+            const entry = prof.subjectsData[key];
+            const defaultTpl = getDefaultTemplate(exerciseType, mode);
+
+            if (!entry) {
                 return {
-                    draft: (typeof entry.draft === 'string') ? entry.draft : getDefaultTemplate(exerciseType, mode),
-                    correction: (entry.correction && typeof entry.correction === 'object') ? entry.correction : null
+                    draft: defaultTpl,
+                    correction: null,
+                    activeCranId: 'draft',
+                    crans: []
                 };
             }
+
+            const crans = Array.isArray(entry.crans) ? entry.crans : [];
+
+            // Si un cran spécifique est sélectionné (instantané historique)
+            if (typeof entry.activeCranId === 'number') {
+                const cran = crans.find(c => c.id === entry.activeCranId);
+                if (cran) {
+                    return {
+                        draft: (typeof cran.draft === 'string') ? cran.draft : defaultTpl,
+                        correction: cran.correction || null,
+                        activeCranId: cran.id,
+                        crans: crans
+                    };
+                }
+            }
+
+            // Sinon l'élève est sur le Brouillon [ ✏️ ]
+            let draftText = (typeof entry.workingDraft === 'string' && entry.workingDraft.trim() !== '')
+                ? entry.workingDraft
+                : defaultTpl;
+
+            // Référence de correction pour guider la rédaction du brouillon
+            let refCorrection = null;
+            if (entry.draftParentId) {
+                const parentCran = crans.find(c => c.id === entry.draftParentId);
+                if (parentCran) refCorrection = parentCran.correction || null;
+            } else if (crans.length > 0) {
+                refCorrection = crans[0].correction || null;
+            }
+
             return {
-                draft: getDefaultTemplate(exerciseType, mode),
-                correction: null
+                draft: draftText,
+                correction: refCorrection,
+                activeCranId: 'draft',
+                crans: crans
             };
         }
 
@@ -3892,7 +4329,8 @@
             const inputCustomArgWork = document.getElementById("input-custom-arg-work");
             const textareaCustomArgFragment = document.getElementById("textarea-custom-arg-fragment");
 
-            storageData.lastActive = {
+            const prof = getActiveProfile();
+            prof.lastActive = {
                 exerciseType: state.exerciseType,
                 mode: state.mode,
                 showHelp: state.showHelp,
@@ -3918,25 +4356,299 @@
                 thesisOrientation: state.thesisOrientation || null,
                 activeFragment: state.activeFragment || null
             };
+            storageData.lastActive = prof.lastActive;
         }
 
         function saveCurrentDraftToLastRenderedSubject() {
             const textarea = document.getElementById("training-textarea");
             if (textarea && lastRenderedSubjectKey) {
                 const val = textarea.value;
-                if (!storageData.subjectsData[lastRenderedSubjectKey]) {
-                    storageData.subjectsData[lastRenderedSubjectKey] = {
-                        draft: val,
-                        correction: null,
+                const prof = getActiveProfile();
+                if (!prof.subjectsData[lastRenderedSubjectKey]) {
+                    prof.subjectsData[lastRenderedSubjectKey] = {
+                        activeCranId: 'draft',
+                        draftParentId: null,
+                        workingDraft: val,
+                        crans: [],
                         updatedAt: Date.now()
                     };
                 } else {
-                    storageData.subjectsData[lastRenderedSubjectKey].draft = val;
-                    storageData.subjectsData[lastRenderedSubjectKey].updatedAt = Date.now();
+                    const entry = prof.subjectsData[lastRenderedSubjectKey];
+                    if (typeof entry.activeCranId === 'number') {
+                        const activeCran = (entry.crans || []).find(c => c.id === entry.activeCranId);
+                        // Si le texte est modifié par rapport à l'instantané du cran
+                        if (!activeCran || activeCran.draft !== val) {
+                            entry.draftParentId = entry.activeCranId; // Filiation mémorisée
+                            entry.activeCranId = 'draft';             // Bascule sur le brouillon
+                            entry.workingDraft = val;
+                            updateFloatingProfileDock();
+                        }
+                    } else {
+                        entry.workingDraft = val;
+                    }
+                    entry.updatedAt = Date.now();
                 }
                 updateLastActiveState();
                 persistStorageData();
             }
+        }
+
+        // ============ GESTION MULTI-PROFILS (1 À 5) ============
+        function activateProfile(targetId) {
+            targetId = Number(targetId);
+            if (storageData.activeProfileId === targetId) return;
+            if (!storageData.profiles[targetId]) return;
+
+            saveCurrentDraftToLastRenderedSubject();
+            updateLastActiveState();
+
+            storageData.activeProfileId = targetId;
+            const prof = storageData.profiles[targetId];
+            if (prof && prof.lastActive) {
+                restoreLastActiveState();
+            }
+
+            persistStorageData();
+            render();
+            updateFloatingProfileDock();
+        }
+
+        function addNewProfile() {
+            const existingIds = Object.keys(storageData.profiles).map(Number);
+            if (existingIds.length >= 5) {
+                alert("Limite de 5 profils maximum atteinte.");
+                return;
+            }
+
+            let newId = null;
+            for (let i = 1; i <= 5; i++) {
+                if (!storageData.profiles[i]) {
+                    newId = i;
+                    break;
+                }
+            }
+            if (!newId) return;
+
+            saveCurrentDraftToLastRenderedSubject();
+            updateLastActiveState();
+
+            storageData.profiles[newId] = {
+                id: newId,
+                createdAt: Date.now(),
+                lastActive: {
+                    exerciseType: 'dissertation',
+                    mode: 'intro',
+                    notion: '',
+                    sujet: '',
+                    customSujet: '',
+                    isCustomDissertation: false,
+                    notionArg: '',
+                    sujetArgIdx: '',
+                    customThesis: '',
+                    isCustomArgumentation: false,
+                    isCustomExplication: false,
+                    isCustomExplicationArg: false,
+                    explicIdx: '',
+                    explicArgIdx: '',
+                    activeThesis: '',
+                    thesisOrientation: null,
+                    activeFragment: null,
+                    showHelp: false
+                },
+                subjectsData: {}
+            };
+
+            activateProfile(newId);
+        }
+
+        function deleteProfile(profileId) {
+            profileId = Number(profileId);
+            if (profileId === 1) {
+                alert("Le Profil 1 est le profil principal et ne peut pas être supprimé.");
+                return;
+            }
+            if (!confirm(`Supprimer définitivement le Profil ${profileId} et toutes ses données enregistrées ?`)) {
+                return;
+            }
+
+            const wasActive = storageData.activeProfileId === profileId;
+            delete storageData.profiles[profileId];
+
+            if (wasActive) {
+                storageData.activeProfileId = 1;
+                const prof1 = storageData.profiles[1];
+                if (prof1 && prof1.lastActive) {
+                    restoreLastActiveState();
+                }
+                persistStorageData();
+                render();
+                updateFloatingProfileDock();
+            } else {
+                persistStorageData();
+                updateFloatingProfileDock();
+            }
+        }
+
+        // ============ GESTION DE L'HISTORIQUE CRANTÉ (OPTION 2 : INSERTION PAR FILIATION) ============
+        function insertCranAboveParent(cransArray, newCran, parentId) {
+            if (!Array.isArray(cransArray) || cransArray.length === 0) {
+                return [newCran];
+            }
+            if (!parentId) {
+                return [newCran, ...cransArray];
+            }
+            const parentIndex = cransArray.findIndex(c => c.id === parentId);
+            if (parentIndex === -1) {
+                return [newCran, ...cransArray];
+            }
+            // Insertion directement au-dessus du parent dans l'ordre visuel (de haut en bas)
+            const copy = [...cransArray];
+            copy.splice(parentIndex, 0, newCran);
+            return copy;
+        }
+
+        function selectCran(cranId) {
+            const prof = getActiveProfile();
+            const sujetActif = obtenirSujetActif();
+            const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+            let entry = prof.subjectsData[currentSubjectKey];
+            if (!entry) {
+                entry = {
+                    activeCranId: 'draft',
+                    draftParentId: null,
+                    workingDraft: '',
+                    crans: [],
+                    updatedAt: Date.now()
+                };
+                prof.subjectsData[currentSubjectKey] = entry;
+            }
+
+            const textarea = document.getElementById("training-textarea");
+            if (entry.activeCranId === 'draft' && textarea) {
+                entry.workingDraft = textarea.value;
+            }
+
+            entry.activeCranId = cranId;
+            if (typeof cranId === 'number') {
+                entry.draftParentId = cranId;
+            }
+            entry.updatedAt = Date.now();
+
+            persistStorageData();
+            render();
+        }
+
+        function deleteCran(cranId) {
+            cranId = Number(cranId);
+            if (!confirm(`Supprimer définitivement la Saisie ${cranId} ?`)) {
+                return;
+            }
+            const prof = getActiveProfile();
+            const sujetActif = obtenirSujetActif();
+            const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+            const entry = prof.subjectsData[currentSubjectKey];
+            if (!entry || !Array.isArray(entry.crans)) return;
+
+            entry.crans = entry.crans.filter(c => c.id !== cranId);
+
+            if (entry.activeCranId === cranId) {
+                if (entry.crans.length > 0) {
+                    entry.activeCranId = entry.crans[0].id;
+                    entry.draftParentId = entry.crans[0].id;
+                } else {
+                    entry.activeCranId = 'draft';
+                    entry.draftParentId = null;
+                }
+            }
+            entry.updatedAt = Date.now();
+            persistStorageData();
+            render();
+        }
+
+        // Mise à jour dynamique de la barre latérale gauche (profils et crans)
+        function updateFloatingProfileDock() {
+            let dock = document.getElementById('floating-profile-dock');
+            if (!dock) {
+                dock = document.createElement('div');
+                dock.id = 'floating-profile-dock';
+                dock.className = 'floating-profile-dock';
+                dock.title = "Survolez pour afficher les profils et l'historique";
+                document.body.appendChild(dock);
+            }
+
+            const activeProfileId = storageData.activeProfileId || 1;
+            const prof = getActiveProfile();
+            const profileIds = Object.keys(storageData.profiles).map(Number).sort((a, b) => a - b);
+            const canAddProfile = profileIds.length < 5;
+
+            // Section profils (1 à 5, +)
+            let profilesHtml = '<div class="profiles-section" id="profiles-box">';
+            profileIds.forEach((pid) => {
+                const isActive = pid === activeProfileId;
+                const pillClass = isActive ? 'profile-pill active' : 'profile-pill translucent';
+                const title = pid > 1 ? `Profil ${pid} (Clic droit pour supprimer)` : `Profil ${pid}`;
+
+                profilesHtml += `<div class="profile-pill-slot">`;
+                profilesHtml += `  <div class="${pillClass}" title="${title}" onclick="activateProfile(${pid})" oncontextmenu="event.preventDefault(); deleteProfile(${pid});">${pid}</div>`;
+                profilesHtml += `</div>`;
+            });
+
+            // Bouton "+" directement sous le dernier profil créé
+            if (canAddProfile) {
+                profilesHtml += `<div class="profile-pill-slot">`;
+                profilesHtml += `  <div class="profile-add-btn" title="Ajouter un profil (+)" onclick="addNewProfile()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="2" x2="6" y2="10"></line><line x1="2" y1="6" x2="10" y2="6"></line></svg></div>`;
+                profilesHtml += `</div>`;
+            }
+            profilesHtml += '</div>';
+
+            let dividerHtml = '<div class="dock-divider"></div>';
+
+            // Section historique cranté
+            const sujetActif = obtenirSujetActif();
+            const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+            const entry = prof.subjectsData[currentSubjectKey] || { activeCranId: 'draft', crans: [] };
+            const crans = Array.isArray(entry.crans) ? entry.crans : [];
+            const activeCranId = entry.activeCranId !== undefined ? entry.activeCranId : 'draft';
+
+            let latestCranId = null;
+            if (crans.length > 0) {
+                let maxTs = -1;
+                crans.forEach(c => {
+                    const ts = c.timestamp || 0;
+                    if (ts >= maxTs) {
+                        maxTs = ts;
+                        latestCranId = c.id;
+                    }
+                });
+            }
+
+            let timelineHtml = '<div class="timeline-scroll-area" id="timeline-area">';
+            timelineHtml += '<div class="vertical-stem-line"></div>';
+
+            // 1. Sommet : Brouillon en cours de rédaction
+            const isDraftActive = activeCranId === 'draft';
+            const draftClass = isDraftActive ? 'cran-pill tier-draft active' : 'cran-pill tier-draft';
+            timelineHtml += `<div class="${draftClass}" title="✏️ Brouillon en cours de rédaction" onclick="selectCran('draft')">✏️</div>`;
+
+            // 2. Crans (ordonnés du plus récent au plus ancien, avec intercalation sur parent)
+            crans.forEach(c => {
+                const isCranActive = activeCranId === c.id;
+                const isLatest = c.id === latestCranId;
+                const score = typeof c.score === 'number' ? c.score : 0;
+                const colorClass = getScoreColorClass(score).pill;
+                let cranClass = `cran-pill ${colorClass}`;
+                if (isCranActive) cranClass += ' active';
+                if (isLatest) cranClass += ' is-latest';
+
+                const label = typeof c.score === 'number' ? c.score : '?';
+                const title = `Saisie ${c.id}${isLatest ? ' (Dernière)' : ''} : ${score}/100 (${c.timeLabel || ''}) — Clic droit pour supprimer`;
+
+                timelineHtml += `<div class="${cranClass}" title="${title}" onclick="selectCran(${c.id})" oncontextmenu="event.preventDefault(); deleteCran(${c.id});">${label}</div>`;
+            });
+
+            timelineHtml += '</div>';
+
+            dock.innerHTML = profilesHtml + dividerHtml + timelineHtml;
         }
 
         function obtenirSujetActif() {
@@ -4415,7 +5127,8 @@
         }, true);
 
         function restoreLastActiveState() {
-            const la = storageData.lastActive;
+            const prof = getActiveProfile();
+            const la = prof.lastActive || storageData.lastActive;
             if (!la) return;
 
             if (la.exerciseType) {
@@ -4956,32 +5669,39 @@
         function resetTraining() {
             const sujetActif = obtenirSujetActif();
             const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
-            const stored = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
+            const prof = getActiveProfile();
+            let entry = prof.subjectsData[currentSubjectKey];
             const defaultTpl = getDefaultTemplate(state.exerciseType, state.mode);
 
-            // Si une correction IA est actuellement présente pour ce sujet, le 1er clic l'efface en conservant le texte rédigé
+            if (!entry) {
+                entry = {
+                    activeCranId: 'draft',
+                    draftParentId: null,
+                    workingDraft: defaultTpl,
+                    crans: [],
+                    updatedAt: Date.now()
+                };
+                prof.subjectsData[currentSubjectKey] = entry;
+            }
+
+            const stored = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
+
+            // Si une correction IA est actuellement affichée pour ce sujet, le 1er clic l'efface en conservant le texte rédigé
             if (stored.correction && stored.correction.sujet === sujetActif && stored.correction.html) {
-                if (!storageData.subjectsData[currentSubjectKey]) {
-                    storageData.subjectsData[currentSubjectKey] = {
-                        draft: stored.draft || defaultTpl,
-                        correction: null,
-                        updatedAt: Date.now()
-                    };
-                } else {
-                    storageData.subjectsData[currentSubjectKey].correction = null;
-                    storageData.subjectsData[currentSubjectKey].updatedAt = Date.now();
-                }
+                entry.activeCranId = 'draft';
+                entry.workingDraft = stored.draft || defaultTpl;
+                entry.draftParentId = null;
+                entry.updatedAt = Date.now();
             } else {
-                // Sans correction : le clic réinitialise le champ de saisie aux balises initiales
+                // Sans correction affichée : réinitialise le champ de saisie aux balises méthodologiques initiales
                 const textarea = document.getElementById("training-textarea");
                 if (textarea) {
                     textarea.value = defaultTpl;
                 }
-                storageData.subjectsData[currentSubjectKey] = {
-                    draft: defaultTpl,
-                    correction: null,
-                    updatedAt: Date.now()
-                };
+                entry.activeCranId = 'draft';
+                entry.workingDraft = defaultTpl;
+                entry.draftParentId = null;
+                entry.updatedAt = Date.now();
             }
             updateLastActiveState();
             persistStorageData();
@@ -5285,10 +6005,11 @@
 
             area.innerHTML = workspaceHtml;
 
-            // Synchroniser la barre flottante de navigation rapide
+            // Synchroniser la barre flottante de navigation rapide et le dock de profils/crans
             const savedScores = (savedCorrectionObj && Array.isArray(savedCorrectionObj.scores)) ? savedCorrectionObj.scores : [];
             const savedGlobalScore = (savedCorrectionObj && typeof savedCorrectionObj.globalScore === 'number') ? savedCorrectionObj.globalScore : null;
             updateFloatingQuickNav(savedScores, savedGlobalScore);
+            updateFloatingProfileDock();
 
             updateLastActiveState();
             persistStorageData();
@@ -5504,19 +6225,66 @@
                 };
                 
                 const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
-                if (!storageData.subjectsData[currentSubjectKey]) {
-                    storageData.subjectsData[currentSubjectKey] = {
-                        draft: trainingText,
-                        correction: newCorrectionObj,
+                const prof = getActiveProfile();
+                if (!prof.subjectsData[currentSubjectKey]) {
+                    prof.subjectsData[currentSubjectKey] = {
+                        activeCranId: 'draft',
+                        draftParentId: null,
+                        workingDraft: '',
+                        crans: [],
                         updatedAt: Date.now()
                     };
-                } else {
-                    storageData.subjectsData[currentSubjectKey].draft = trainingText;
-                    storageData.subjectsData[currentSubjectKey].correction = newCorrectionObj;
-                    storageData.subjectsData[currentSubjectKey].updatedAt = Date.now();
                 }
+                const entry = prof.subjectsData[currentSubjectKey];
+                if (!Array.isArray(entry.crans)) {
+                    entry.crans = [];
+                }
+
+                // Détermination du parent pour l'insertion par filiation (Option 2)
+                let parentId = null;
+                if (typeof entry.activeCranId === 'number') {
+                    parentId = entry.activeCranId;
+                } else if (entry.draftParentId) {
+                    parentId = entry.draftParentId;
+                } else if (entry.crans.length > 0) {
+                    parentId = entry.crans[0].id;
+                }
+
+                // Génération d'un nouvel identifiant séquentiel de cran
+                const maxId = entry.crans.length > 0 ? Math.max(...entry.crans.map(c => c.id || 0)) : 0;
+                const newCranId = maxId + 1;
+
+                const now = new Date();
+                const timeLabel = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                const score = (typeof transformedFinal.globalScore === 'number') ? transformedFinal.globalScore : null;
+
+                const newCran = {
+                    id: newCranId,
+                    parentId: parentId,
+                    timestamp: Date.now(),
+                    timeLabel: timeLabel,
+                    score: score,
+                    draft: trainingText,
+                    correction: newCorrectionObj
+                };
+
+                // Insertion selon l'Option 2 : directement au-dessus du parent
+                entry.crans = insertCranAboveParent(entry.crans, newCran, parentId);
+                entry.activeCranId = newCranId;
+                entry.draftParentId = newCranId;
+                entry.workingDraft = trainingText;
+                entry.updatedAt = Date.now();
+
+                // Rétrocompatibilité globale
+                storageData.subjectsData[currentSubjectKey] = {
+                    draft: trainingText,
+                    correction: newCorrectionObj,
+                    updatedAt: Date.now()
+                };
+
                 updateLastActiveState();
                 persistStorageData();
+                updateFloatingProfileDock();
             } catch (error) {
                 alert("Erreur lors de la communication avec le correcteur : " + error.message);
             } finally {
