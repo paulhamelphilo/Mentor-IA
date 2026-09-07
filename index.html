@@ -1634,7 +1634,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.07.dock_v4";
+        const APP_BUILD_VERSION = "2026.09.07.dock_v5";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
@@ -4321,13 +4321,15 @@
                 ? entry.workingDraft
                 : defaultTpl;
 
-            // Référence de correction pour guider la rédaction du brouillon
+            // Référence de correction pour guider la rédaction du brouillon (si non masquée)
             let refCorrection = null;
-            if (entry.draftParentId) {
-                const parentCran = crans.find(c => c.id === entry.draftParentId);
-                if (parentCran) refCorrection = parentCran.correction || null;
-            } else if (crans.length > 0) {
-                refCorrection = crans[0].correction || null;
+            if (!entry.hideDraftCorrection) {
+                if (entry.draftParentId) {
+                    const parentCran = crans.find(c => c.id === entry.draftParentId);
+                    if (parentCran) refCorrection = parentCran.correction || null;
+                } else if (crans.length > 0) {
+                    refCorrection = crans[0].correction || null;
+                }
             }
 
             return {
@@ -4410,6 +4412,7 @@
                             entry.draftParentId = entry.activeCranId; // Filiation mémorisée
                             entry.activeCranId = 'draft';             // Bascule sur le brouillon
                             entry.workingDraft = val;
+                            entry.hideDraftCorrection = false;
                             updateFloatingProfileDock();
                         }
                     } else {
@@ -4562,6 +4565,7 @@
             entry.activeCranId = cranId;
             if (typeof cranId === 'number') {
                 entry.draftParentId = cranId;
+                entry.hideDraftCorrection = false;
             }
             entry.updatedAt = Date.now();
 
@@ -5731,15 +5735,18 @@
             }
 
             const stored = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
-
             const normStoredSujet = stored.correction && stored.correction.sujet ? getSubjectStorageKey(state.exerciseType, state.mode, stored.correction.sujet) : currentSubjectKey;
-            if (stored.correction && stored.correction.html && normStoredSujet === currentSubjectKey) {
+            const hasDisplayedCorrection = stored.correction && stored.correction.html && (normStoredSujet === currentSubjectKey);
+
+            if (hasDisplayedCorrection) {
+                // 1er clic : Efface l'affichage de la correction tout en conservant le texte rédigé
                 entry.activeCranId = 'draft';
                 entry.workingDraft = stored.draft || defaultTpl;
                 entry.draftParentId = null;
+                entry.hideDraftCorrection = true;
                 entry.updatedAt = Date.now();
             } else {
-                // Sans correction affichée : réinitialise le champ de saisie aux balises méthodologiques initiales
+                // 2e clic (ou sans correction affichée) : Réinitialise le champ de saisie aux balises méthodologiques initiales
                 const textarea = document.getElementById("training-textarea");
                 if (textarea) {
                     textarea.value = defaultTpl;
@@ -5747,6 +5754,7 @@
                 entry.activeCranId = 'draft';
                 entry.workingDraft = defaultTpl;
                 entry.draftParentId = null;
+                entry.hideDraftCorrection = true;
                 entry.updatedAt = Date.now();
             }
             updateLastActiveState();
@@ -6056,8 +6064,8 @@
             area.innerHTML = workspaceHtml;
 
             // Synchroniser la barre flottante de navigation rapide et le dock de profils/crans
-            const savedScores = (savedCorrectionObj && Array.isArray(savedCorrectionObj.scores)) ? savedCorrectionObj.scores : [];
-            const savedGlobalScore = (savedCorrectionObj && typeof savedCorrectionObj.globalScore === 'number') ? savedCorrectionObj.globalScore : null;
+            const savedScores = (savedCorrection && savedCorrectionObj && Array.isArray(savedCorrectionObj.scores)) ? savedCorrectionObj.scores : [];
+            const savedGlobalScore = (savedCorrection && savedCorrectionObj && typeof savedCorrectionObj.globalScore === 'number') ? savedCorrectionObj.globalScore : null;
             updateFloatingQuickNav(savedScores, savedGlobalScore);
             updateFloatingProfileDock();
 
@@ -6324,6 +6332,7 @@
                 entry.activeCranId = newCranId;
                 entry.draftParentId = newCranId;
                 entry.workingDraft = trainingText;
+                entry.hideDraftCorrection = false;
                 entry.updatedAt = Date.now();
 
                 updateLastActiveState();
