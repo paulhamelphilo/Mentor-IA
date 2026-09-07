@@ -1634,7 +1634,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.07.dock_v2";
+        const APP_BUILD_VERSION = "2026.09.07.dock_v3";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
@@ -5732,8 +5732,8 @@
 
             const stored = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
 
-            // Si une correction IA est actuellement affichée pour ce sujet, le 1er clic l'efface en conservant le texte rédigé
-            if (stored.correction && stored.correction.sujet === sujetActif && stored.correction.html) {
+            const normStoredSujet = stored.correction && stored.correction.sujet ? getSubjectStorageKey(state.exerciseType, state.mode, stored.correction.sujet) : currentSubjectKey;
+            if (stored.correction && stored.correction.html && normStoredSujet === currentSubjectKey) {
                 entry.activeCranId = 'draft';
                 entry.workingDraft = stored.draft || defaultTpl;
                 entry.draftParentId = null;
@@ -5788,10 +5788,6 @@
         }
 
         function render() {
-            if (lastRenderedSubjectKey) {
-                saveCurrentDraftToLastRenderedSubject();
-            }
-
             // Check active navigation buttons
             document.getElementById('btn-mode-intro').classList.toggle('active', state.mode === 'intro');
             document.getElementById('btn-mode-dev').classList.toggle('active', state.mode === 'dev');
@@ -5850,7 +5846,13 @@
             const stored = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
             let currentText = stored.draft;
             let savedCorrectionObj = stored.correction;
-            let savedCorrection = (savedCorrectionObj && savedCorrectionObj.sujet === sujetActif && sujetActif !== '') ? savedCorrectionObj.html : null;
+            let savedCorrection = null;
+            if (savedCorrectionObj && savedCorrectionObj.html && sujetActif !== '') {
+                const normSavedSujet = savedCorrectionObj.sujet ? getSubjectStorageKey(state.exerciseType, state.mode, savedCorrectionObj.sujet) : currentSubjectKey;
+                if (normSavedSujet === currentSubjectKey) {
+                    savedCorrection = savedCorrectionObj.html;
+                }
+            }
             const currentLength = currentText.length;
             const charInfo = getCharCountInfo(currentLength, maxLength);
 
@@ -6175,8 +6177,9 @@
             }
 
             const sujetActif = obtenirSujetActif();
-            const storedCorrection = getSubjectStoredDraftAndCorrection(state.exerciseType, state.mode, sujetActif);
-            const savedCorrectionObj = (storedCorrection.correction && storedCorrection.correction.sujet === sujetActif && sujetActif !== '') ? storedCorrection.correction : null;
+            const currentSubKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
+            const normStoredSub = storedCorrection.correction && storedCorrection.correction.sujet ? getSubjectStorageKey(state.exerciseType, state.mode, storedCorrection.correction.sujet) : currentSubKey;
+            const savedCorrectionObj = (storedCorrection.correction && storedCorrection.correction.html && sujetActif !== '' && normStoredSub === currentSubKey) ? storedCorrection.correction : null;
 
             let pistesPrecedentes = {};
             if (savedCorrectionObj) {
@@ -6316,19 +6319,11 @@
                     correction: newCorrectionObj
                 };
 
-                // Insertion selon l'Option 2 : directement au-dessus du parent
                 entry.crans = insertCranAboveParent(entry.crans, newCran, parentId);
                 entry.activeCranId = newCranId;
                 entry.draftParentId = newCranId;
                 entry.workingDraft = trainingText;
                 entry.updatedAt = Date.now();
-
-                // Rétrocompatibilité globale
-                storageData.subjectsData[currentSubjectKey] = {
-                    draft: trainingText,
-                    correction: newCorrectionObj,
-                    updatedAt: Date.now()
-                };
 
                 updateLastActiveState();
                 persistStorageData();
