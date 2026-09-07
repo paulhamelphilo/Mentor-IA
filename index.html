@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Mentor IA philo</title>
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🤔</text></svg>">
@@ -1631,6 +1634,32 @@
     </div>
 
     <script>
+        const APP_BUILD_VERSION = "2026.09.07.dock_v2";
+
+        // Détection et actualisation automatique anti-cache
+        (function checkAppUpdate() {
+            try {
+                const lastCheck = sessionStorage.getItem('mentor_last_version_check');
+                const now = Date.now();
+                if (lastCheck && now - Number(lastCheck) < 60000) return;
+                sessionStorage.setItem('mentor_last_version_check', String(now));
+
+                fetch(window.location.href.split('#')[0].split('?')[0] + '?_nocache=' + now, {
+                    method: 'GET',
+                    cache: 'no-store'
+                })
+                .then(res => res.text())
+                .then(html => {
+                    const match = html.match(/const\s+APP_BUILD_VERSION\s*=\s*["']([^"']+)["']/);
+                    if (match && match[1] && match[1] !== APP_BUILD_VERSION) {
+                        console.log("Nouvelle version Mentor IA disponible (" + match[1] + "). Rechargement...");
+                        window.location.reload(true);
+                    }
+                })
+                .catch(() => {});
+            } catch (e) {}
+        })();
+
         const CLOUD_FUNCTION_URL = "https://correction-philo-658321418385.europe-west1.run.app";
 
         // Textes d'explication intégrés
