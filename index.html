@@ -1634,7 +1634,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.07.dock_v5";
+        const APP_BUILD_VERSION = "2026.09.07.dock_v6";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
@@ -4447,27 +4447,9 @@
             updateFloatingProfileDock();
         }
 
-        function addNewProfile() {
-            const existingIds = Object.keys(storageData.profiles).map(Number);
-            if (existingIds.length >= 5) {
-                alert("Limite de 5 profils maximum atteinte.");
-                return;
-            }
-
-            let newId = null;
-            for (let i = 1; i <= 5; i++) {
-                if (!storageData.profiles[i]) {
-                    newId = i;
-                    break;
-                }
-            }
-            if (!newId) return;
-
-            saveCurrentDraftToLastRenderedSubject();
-            updateLastActiveState();
-
-            storageData.profiles[newId] = {
-                id: newId,
+        function createEmptyProfile(id) {
+            return {
+                id: id,
                 createdAt: Date.now(),
                 lastActive: {
                     exerciseType: 'dissertation',
@@ -4491,6 +4473,28 @@
                 },
                 subjectsData: {}
             };
+        }
+
+        function addNewProfile() {
+            const existingIds = Object.keys(storageData.profiles).map(Number);
+            if (existingIds.length >= 5) {
+                alert("Limite de 5 profils maximum atteinte.");
+                return;
+            }
+
+            let newId = null;
+            for (let i = 1; i <= 5; i++) {
+                if (!storageData.profiles[i]) {
+                    newId = i;
+                    break;
+                }
+            }
+            if (!newId) return;
+
+            saveCurrentDraftToLastRenderedSubject();
+            updateLastActiveState();
+
+            storageData.profiles[newId] = createEmptyProfile(newId);
 
             activateProfile(newId);
         }
@@ -4498,7 +4502,24 @@
         function deleteProfile(profileId) {
             profileId = Number(profileId);
             if (profileId === 1) {
-                alert("Le Profil 1 est le profil principal et ne peut pas être supprimé.");
+                if (!confirm("Réinitialiser le Profil 1 ? Toutes ses données enregistrées (brouillons et historiques de corrections) seront effacées.")) {
+                    return;
+                }
+                storageData.profiles[1] = createEmptyProfile(1);
+
+                if (storageData.activeProfileId === 1) {
+                    lastRenderedSubjectKey = null;
+                    const prof1 = storageData.profiles[1];
+                    if (prof1 && prof1.lastActive) {
+                        restoreLastActiveState();
+                    }
+                    persistStorageData();
+                    render();
+                    updateFloatingProfileDock();
+                } else {
+                    persistStorageData();
+                    updateFloatingProfileDock();
+                }
                 return;
             }
             if (!confirm(`Supprimer définitivement le Profil ${profileId} et toutes ses données enregistrées ?`)) {
@@ -4510,6 +4531,7 @@
 
             if (wasActive) {
                 storageData.activeProfileId = 1;
+                lastRenderedSubjectKey = null;
                 const prof1 = storageData.profiles[1];
                 if (prof1 && prof1.lastActive) {
                     restoreLastActiveState();
@@ -4621,7 +4643,7 @@
             profileIds.forEach((pid) => {
                 const isActive = pid === activeProfileId;
                 const pillClass = isActive ? 'profile-pill active' : 'profile-pill translucent';
-                const title = pid > 1 ? `Profil ${pid} (Clic droit pour supprimer)` : `Profil ${pid}`;
+                const title = pid === 1 ? 'Profil 1 (Clic droit pour réinitialiser)' : `Profil ${pid} (Clic droit pour supprimer)`;
 
                 profilesHtml += `<div class="profile-pill-slot">`;
                 profilesHtml += `  <div class="${pillClass}" title="${title}" onclick="activateProfile(${pid})" oncontextmenu="event.preventDefault(); deleteProfile(${pid});">${pid}</div>`;
