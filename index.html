@@ -4432,6 +4432,8 @@
             updateLastActiveState();
 
             storageData.activeProfileId = targetId;
+            lastRenderedSubjectKey = null;
+
             const prof = storageData.profiles[targetId];
             if (prof && prof.lastActive) {
                 restoreLastActiveState();
@@ -5160,19 +5162,14 @@
             const la = prof.lastActive || storageData.lastActive;
             if (!la) return;
 
-            if (la.exerciseType) {
-                state.exerciseType = la.exerciseType;
-                const btnDis = document.getElementById('btn-ex-type-dis');
-                const btnExp = document.getElementById('btn-ex-type-exp');
-                if (btnDis) btnDis.classList.toggle('active', la.exerciseType === 'dissertation');
-                if (btnExp) btnExp.classList.toggle('active', la.exerciseType === 'explication');
-            }
-            if (la.mode) {
-                state.mode = la.mode;
-            }
-            if (typeof la.showHelp === 'boolean') {
-                state.showHelp = la.showHelp;
-            }
+            state.exerciseType = la.exerciseType || 'dissertation';
+            const btnDis = document.getElementById('btn-ex-type-dis');
+            const btnExp = document.getElementById('btn-ex-type-exp');
+            if (btnDis) btnDis.classList.toggle('active', state.exerciseType === 'dissertation');
+            if (btnExp) btnExp.classList.toggle('active', state.exerciseType === 'explication');
+
+            state.mode = la.mode || 'intro';
+            state.showHelp = !!la.showHelp;
 
             // Sync selectors visibility based on exerciseType & mode
             const selDis = document.getElementById('selector-dissertation');
@@ -5187,71 +5184,83 @@
             if (state.exerciseType === 'dissertation') {
                 if (state.mode !== 'argumentation') {
                     // Restore Dissertation standard
-                    if (la.isCustomDissertation) {
-                        state.isCustomDissertation = true;
-                        const preDis = document.getElementById('dissertation-predefined');
-                        const custDis = document.getElementById('dissertation-custom');
+                    state.isCustomDissertation = !!la.isCustomDissertation;
+                    const preDis = document.getElementById('dissertation-predefined');
+                    const custDis = document.getElementById('dissertation-custom');
+                    if (state.isCustomDissertation) {
                         if (preDis) preDis.style.display = 'none';
                         if (custDis) custDis.style.display = 'block';
 
                         const inputCustomSujet = document.getElementById("input-custom-sujet");
-                        if (inputCustomSujet && la.customSujet) {
-                            inputCustomSujet.value = la.customSujet;
+                        if (inputCustomSujet) {
+                            inputCustomSujet.value = la.customSujet || '';
                         }
-                    } else if (la.notion) {
+                    } else {
+                        if (preDis) preDis.style.display = 'block';
+                        if (custDis) custDis.style.display = 'none';
+
                         const selectNotion = document.getElementById("select-notion");
+                        const selectSujet = document.getElementById("select-sujet");
                         if (selectNotion) {
-                            selectNotion.value = la.notion;
-                            const selectSujet = document.getElementById("select-sujet");
+                            selectNotion.value = la.notion || '';
                             if (selectSujet) {
                                 selectSujet.innerHTML = '<option value="">-- Sélectionnez un sujet --</option>';
-                                if (sujetsPhilo[la.notion]) {
+                                if (la.notion && sujetsPhilo[la.notion]) {
                                     selectSujet.disabled = false;
                                     sujetsPhilo[la.notion].forEach(s => {
                                         const opt = document.createElement("option"); opt.value = s.question; opt.textContent = s.question;
                                         selectSujet.appendChild(opt);
                                     });
-                                    if (la.sujet) {
-                                        selectSujet.value = la.sujet;
-                                    }
+                                    selectSujet.value = la.sujet || '';
+                                } else {
+                                    selectSujet.disabled = true;
+                                    selectSujet.value = '';
                                 }
                             }
                         }
                     }
                 } else {
                     // Restore Dissertation Argumentation
-                    if (la.isCustomArgumentation) {
-                        state.isCustomArgumentation = true;
-                        const preArg = document.getElementById('argumentation-predefined');
-                        const custArg = document.getElementById('argumentation-custom');
+                    state.isCustomArgumentation = !!la.isCustomArgumentation;
+                    const preArg = document.getElementById('argumentation-predefined');
+                    const custArg = document.getElementById('argumentation-custom');
+                    if (state.isCustomArgumentation) {
                         if (preArg) preArg.style.display = 'none';
                         if (custArg) custArg.style.display = 'block';
 
                         const inputCustomThesis = document.getElementById("input-custom-thesis");
-                        if (inputCustomThesis && la.customThesis) {
-                            inputCustomThesis.value = la.customThesis;
+                        if (inputCustomThesis) {
+                            inputCustomThesis.value = la.customThesis || '';
                             updateCustomArgPosition();
                         }
-                    } else if (la.notionArg) {
+                    } else {
+                        if (preArg) preArg.style.display = 'block';
+                        if (custArg) custArg.style.display = 'none';
+
                         const selectNotionArg = document.getElementById("select-notion-arg");
+                        const selectSujetArg = document.getElementById("select-sujet-arg");
                         if (selectNotionArg) {
-                            selectNotionArg.value = la.notionArg;
-                            const selectSujetArg = document.getElementById("select-sujet-arg");
-                            if (selectSujetArg && sujetsPhilo[la.notionArg]) {
-                                selectSujetArg.disabled = false;
-                                selectSujetArg.innerHTML = '<option value="">-- Sélectionnez un sujet d’étude --</option>';
-                                sujetsPhilo[la.notionArg].forEach((s, idx) => {
-                                    const opt = document.createElement("option");
-                                    opt.value = idx;
-                                    opt.textContent = s.question;
-                                    selectSujetArg.appendChild(opt);
-                                });
-                                if (la.sujetArgIdx !== '') {
-                                    selectSujetArg.value = la.sujetArgIdx;
+                            selectNotionArg.value = la.notionArg || '';
+                            if (selectSujetArg) {
+                                if (la.notionArg && sujetsPhilo[la.notionArg]) {
+                                    selectSujetArg.disabled = false;
+                                    selectSujetArg.innerHTML = '<option value="">-- Sélectionnez un sujet d’étude --</option>';
+                                    sujetsPhilo[la.notionArg].forEach((s, idx) => {
+                                        const opt = document.createElement("option");
+                                        opt.value = idx;
+                                        opt.textContent = s.question;
+                                        selectSujetArg.appendChild(opt);
+                                    });
+                                    selectSujetArg.value = (la.sujetArgIdx !== '' && la.sujetArgIdx !== undefined) ? la.sujetArgIdx : '';
                                     updateArgThesisButtons();
                                     if (la.thesisOrientation) {
                                         selectArgPosition(la.thesisOrientation);
                                     }
+                                } else {
+                                    selectSujetArg.disabled = true;
+                                    selectSujetArg.innerHTML = '<option value="">-- Sélectionnez d’abord une notion --</option>';
+                                    selectSujetArg.value = '';
+                                    updateArgThesisButtons();
                                 }
                             }
                         }
@@ -5260,51 +5269,59 @@
             } else if (state.exerciseType === 'explication') {
                 if (state.mode !== 'argumentation') {
                     // Restore Explication standard
-                    if (la.isCustomExplication) {
-                        state.isCustomExplication = true;
-                        const preExp = document.getElementById('explication-predefined');
-                        const custExp = document.getElementById('explication-custom');
+                    state.isCustomExplication = !!la.isCustomExplication;
+                    const preExp = document.getElementById('explication-predefined');
+                    const custExp = document.getElementById('explication-custom');
+                    if (state.isCustomExplication) {
                         if (preExp) preExp.style.display = 'none';
                         if (custExp) custExp.style.display = 'block';
 
                         const inputCustomAuthor = document.getElementById("input-custom-author");
                         const inputCustomWork = document.getElementById("input-custom-work");
                         const textareaCustomText = document.getElementById("textarea-custom-text");
-                        if (inputCustomAuthor && la.customAuthor) inputCustomAuthor.value = la.customAuthor;
-                        if (inputCustomWork && la.customWork) inputCustomWork.value = la.customWork;
-                        if (textareaCustomText && la.customText) textareaCustomText.value = la.customText;
+                        if (inputCustomAuthor) inputCustomAuthor.value = la.customAuthor || '';
+                        if (inputCustomWork) inputCustomWork.value = la.customWork || '';
+                        if (textareaCustomText) textareaCustomText.value = la.customText || '';
                         updateCustomExplication();
-                    } else if (la.explicIdx !== '' && la.explicIdx !== null && typeof la.explicIdx !== 'undefined') {
+                    } else {
+                        if (preExp) preExp.style.display = 'block';
+                        if (custExp) custExp.style.display = 'none';
+
                         const selectExplic = document.getElementById("select-explic-text");
                         if (selectExplic) {
-                            selectExplic.value = la.explicIdx;
-                            selectExplicText(la.explicIdx);
+                            selectExplic.value = (la.explicIdx !== '' && la.explicIdx !== null && la.explicIdx !== undefined) ? la.explicIdx : '';
+                            selectExplicText(selectExplic.value);
                         }
                     }
                 } else {
                     // Restore Explication Argumentation
-                    if (la.isCustomExplicationArg) {
-                        state.isCustomExplicationArg = true;
-                        const preArg = document.getElementById('explication-arg-predefined');
-                        const custArg = document.getElementById('explication-arg-custom');
+                    state.isCustomExplicationArg = !!la.isCustomExplicationArg;
+                    const preArg = document.getElementById('explication-arg-predefined');
+                    const custArg = document.getElementById('explication-arg-custom');
+                    if (state.isCustomExplicationArg) {
                         if (preArg) preArg.style.display = 'none';
                         if (custArg) custArg.style.display = 'block';
 
                         const inputCustomArgAuthor = document.getElementById("input-custom-arg-author");
                         const inputCustomArgWork = document.getElementById("input-custom-arg-work");
                         const textareaCustomArgFragment = document.getElementById("textarea-custom-arg-fragment");
-                        if (inputCustomArgAuthor && la.customArgAuthor) inputCustomArgAuthor.value = la.customArgAuthor;
-                        if (inputCustomArgWork && la.customArgWork) inputCustomArgWork.value = la.customArgWork;
-                        if (textareaCustomArgFragment && la.customArgFragment) textareaCustomArgFragment.value = la.customArgFragment;
+                        if (inputCustomArgAuthor) inputCustomArgAuthor.value = la.customArgAuthor || '';
+                        if (inputCustomArgWork) inputCustomArgWork.value = la.customArgWork || '';
+                        if (textareaCustomArgFragment) textareaCustomArgFragment.value = la.customArgFragment || '';
                         updateCustomExplicationArg();
-                    } else if (la.explicArgIdx !== '' && la.explicArgIdx !== null && typeof la.explicArgIdx !== 'undefined') {
+                    } else {
+                        if (preArg) preArg.style.display = 'block';
+                        if (custArg) custArg.style.display = 'none';
+
                         const selectExplicArg = document.getElementById("select-explic-text-arg");
                         if (selectExplicArg) {
-                            selectExplicArg.value = la.explicArgIdx;
+                            selectExplicArg.value = (la.explicArgIdx !== '' && la.explicArgIdx !== null && la.explicArgIdx !== undefined) ? la.explicArgIdx : '';
                             if (la.activeFragment) {
                                 state.activeFragment = la.activeFragment;
+                            } else {
+                                state.activeFragment = null;
                             }
-                            selectExplicTextArg(la.explicArgIdx);
+                            selectExplicTextArg(selectExplicArg.value);
                         }
                     }
                 }
@@ -5771,7 +5788,9 @@
         }
 
         function render() {
-            saveCurrentDraftToLastRenderedSubject();
+            if (lastRenderedSubjectKey) {
+                saveCurrentDraftToLastRenderedSubject();
+            }
 
             // Check active navigation buttons
             document.getElementById('btn-mode-intro').classList.toggle('active', state.mode === 'intro');
