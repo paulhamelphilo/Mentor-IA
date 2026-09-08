@@ -675,11 +675,8 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid #cbd5e1;
-            border-radius: 31px;
-            width: 62px;
-            min-width: 62px;
-            box-sizing: border-box;
-            padding: clamp(8px, 1.5vh, 14px) 0;
+            border-radius: clamp(18px, 4.8vh, 30px);
+            padding: clamp(6px, 1.5vh, 12px) clamp(5px, 1.2vh, 10px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             max-height: 94vh;
             overflow: visible;
@@ -695,9 +692,8 @@
         }
 
         .quicknav-btn {
-            width: 34px;
-            height: 34px;
-            min-width: 34px;
+            width: clamp(20px, 6.8vh, 38px);
+            height: clamp(20px, 6.8vh, 38px);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -706,14 +702,13 @@
             color: #334155;
             border: 1px solid #cbd5e1;
             cursor: pointer;
-            font-size: 15px;
+            font-size: clamp(10px, 3vh, 17px);
             transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
             position: relative;
             user-select: none;
             text-decoration: none;
             box-sizing: border-box;
             flex-shrink: 0;
-            padding: 0;
         }
 
         .quicknav-btn:hover {
@@ -729,23 +724,22 @@
         }
 
         .quicknav-divider {
-            width: 26px;
+            width: clamp(14px, 4.2vh, 24px);
             height: 1px;
             background: #cbd5e1;
-            margin: clamp(2px, 0.5vh, 4px) auto;
+            margin: clamp(1px, 0.4vh, 2px) 0;
             flex-shrink: 0;
         }
 
         .quicknav-global-pill {
-            width: 36px;
-            min-width: 36px;
-            height: 31px;
-            padding: 0 4px;
-            border-radius: 16px;
+            min-width: clamp(22px, 6.8vh, 38px);
+            height: clamp(18px, 6.2vh, 34px);
+            padding: 0 clamp(2px, 1vh, 6px);
+            border-radius: clamp(10px, 3.1vh, 17px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: clamp(9px, 2.5vh, 14px);
             font-weight: 900;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -768,15 +762,14 @@
         }
 
         .quicknav-section-pill {
-            width: 36px;
-            min-width: 36px;
-            height: 31px;
-            padding: 0 4px;
-            border-radius: 16px;
+            min-width: clamp(22px, 6.8vh, 38px);
+            height: clamp(18px, 6.2vh, 34px);
+            padding: 0 clamp(2px, 1vh, 6px);
+            border-radius: clamp(10px, 3.1vh, 17px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11.5px;
+            font-size: clamp(8.5px, 2.35vh, 13px);
             font-weight: 800;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -871,11 +864,8 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid #cbd5e1;
-            border-radius: 31px;
-            width: 62px;
-            min-width: 62px;
-            box-sizing: border-box;
-            padding: clamp(8px, 1.5vh, 14px) 0;
+            border-radius: clamp(18px, 4.8vh, 30px);
+            padding: clamp(6px, 1.5vh, 12px) clamp(5px, 1.2vh, 10px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             max-height: 94vh;
             overflow: visible;
@@ -884,6 +874,7 @@
             opacity: 0.18;
             transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
+            box-sizing: border-box;
         }
 
         .floating-profile-dock::-webkit-scrollbar {
@@ -916,14 +907,13 @@
         }
 
         .profile-pill {
-            width: 34px;
-            height: 34px;
-            min-width: 34px;
+            width: clamp(20px, 6.8vh, 36px);
+            height: clamp(20px, 6.8vh, 36px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: clamp(10px, 3vh, 15px);
             font-weight: 800;
             cursor: pointer;
             transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
@@ -962,9 +952,8 @@
 
         /* Bouton "+" intégré verticalement sous le dernier profil */
         .profile-add-btn {
-            width: 30px;
-            height: 30px;
-            min-width: 30px;
+            width: clamp(18px, 6.2vh, 32px);
+            height: clamp(18px, 6.2vh, 32px);
             border-radius: 50%;
             background: #f8fafc;
             border: 1.5px solid #cbd5e1;
@@ -1002,29 +991,27 @@
         }
 
         .dock-divider {
-            width: 26px;
+            width: clamp(14px, 4.2vh, 24px);
             height: 1px;
             background: #cbd5e1;
-            margin: clamp(2px, 0.5vh, 4px) auto;
+            margin: clamp(1px, 0.4vh, 2px) 0;
             flex-shrink: 0;
         }
 
-        /* Zone de défilement de l'historique cranté (Strictement anti-scroll horizontal avec fondu) */
+        /* Zone de défilement de l'historique cranté (Strictement anti-scroll horizontal) */
         .timeline-scroll-area {
             position: relative;
             width: 100%;
-            max-height: clamp(180px, 50vh, 380px);
+            max-height: clamp(140px, 35vh, 240px);
             overflow-y: auto;
             overflow-x: hidden !important;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: clamp(3px, 1.1vh, 6px);
-            padding: 6px 10px 24px 10px;
+            padding: 4px 2px 8px 2px;
             scrollbar-width: none;
             box-sizing: border-box;
-            -webkit-mask-image: linear-gradient(to bottom, transparent, black 14px, black calc(100% - 16px), transparent 100%);
-            mask-image: linear-gradient(to bottom, transparent, black 14px, black calc(100% - 16px), transparent 100%);
         }
 
         .timeline-scroll-area::-webkit-scrollbar {
@@ -1035,8 +1022,8 @@
         /* Tige verticale continue */
         .vertical-stem-line {
             position: absolute;
-            top: 18px;
-            bottom: 38px;
+            top: 10px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             width: 2px;
@@ -1048,15 +1035,14 @@
         .cran-pill {
             position: relative;
             z-index: 2;
-            width: 36px;
-            min-width: 36px;
-            height: 31px;
-            padding: 0 4px;
-            border-radius: 16px;
+            min-width: clamp(22px, 6.8vh, 38px);
+            height: clamp(18px, 6.2vh, 34px);
+            padding: 0 clamp(2px, 1vh, 6px);
+            border-radius: clamp(10px, 3.1vh, 17px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: clamp(8.5px, 2.35vh, 13px);
             font-weight: 800;
             cursor: pointer;
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
@@ -1090,8 +1076,8 @@
             position: absolute;
             top: -2px;
             right: -1px;
-            width: 7px;
-            height: 7px;
+            width: clamp(5px, 1.2vh, 7px);
+            height: clamp(5px, 1.2vh, 7px);
             background: #2563eb;
             border: 1.5px solid #ffffff;
             border-radius: 50%;
@@ -1103,7 +1089,7 @@
             background: #ffffff;
             color: #0284c7;
             border: 1.5px solid #0284c7;
-            font-size: 12px;
+            font-size: clamp(8.5px, 2.35vh, 13px);
         }
         .cran-pill.tier-draft.active {
             background: #0284c7;
@@ -1384,15 +1370,13 @@
                 max-width: calc(100vw - 120px) !important;
                 max-height: none !important;
                 height: 100% !important;
-                padding: 0 4px !important;
+                padding: 0 2px !important;
                 gap: 4px !important;
                 align-items: center !important;
                 overflow-x: auto !important;
                 overflow-y: hidden !important;
                 scrollbar-width: none !important;
                 -ms-overflow-style: none !important;
-                -webkit-mask-image: none !important;
-                mask-image: none !important;
             }
 
             .floating-profile-dock .timeline-scroll-area::-webkit-scrollbar {
@@ -1779,7 +1763,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.08.dock_v12";
+        const APP_BUILD_VERSION = "2026.09.08.dock_v13";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
