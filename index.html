@@ -909,14 +909,13 @@
         }
 
         .profile-pill {
-            min-width: 32px;
-            height: 22px;
-            padding: 0 4px;
-            border-radius: 11px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 800;
             cursor: pointer;
             transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
@@ -954,9 +953,9 @@
 
         /* Bouton "+" intégré verticalement sous le dernier profil */
         .profile-add-btn {
-            min-width: 26px;
-            height: 22px;
-            border-radius: 11px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
             background: #f8fafc;
             border: 1.5px solid #cbd5e1;
             color: #475569;
@@ -1037,10 +1036,9 @@
         .cran-pill {
             position: relative;
             z-index: 2;
-            min-width: 32px;
-            height: 22px;
-            padding: 0 4px;
-            border-radius: 11px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1077,9 +1075,9 @@
             content: '';
             position: absolute;
             top: -2px;
-            right: -1px;
-            width: 6px;
-            height: 6px;
+            right: -2px;
+            width: 7px;
+            height: 7px;
             background: #2563eb;
             border: 1.5px solid #ffffff;
             border-radius: 50%;
@@ -1765,7 +1763,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.08.dock_v8";
+        const APP_BUILD_VERSION = "2026.09.08.dock_v9";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
