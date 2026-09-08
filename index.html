@@ -680,7 +680,15 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             max-height: 94vh;
             overflow: visible;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .floating-quicknav::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
         }
 
         .quicknav-btn {
@@ -852,21 +860,29 @@
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            width: 48px;
-            min-width: 48px;
+            width: 50px;
+            min-width: 50px;
             background: rgba(255, 255, 255, 0.94);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid #cbd5e1;
             border-radius: 28px;
-            padding: 10px 2px;
+            padding: 10px 4px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             max-height: 94vh;
             overflow: visible;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
             opacity: 0.18;
             transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
             box-sizing: border-box;
+        }
+
+        .floating-profile-dock::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
         }
 
         .floating-profile-dock:hover {
@@ -893,13 +909,14 @@
         }
 
         .profile-pill {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+            min-width: 32px;
+            height: 22px;
+            padding: 0 4px;
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 800;
             cursor: pointer;
             transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
@@ -913,8 +930,8 @@
         .profile-pill.active {
             background: #2c3e50;
             color: #ffffff;
-            border: 2px solid #38bdf8;
-            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #38bdf8;
+            border: 1.5px solid #38bdf8;
+            box-shadow: 0 0 0 1.5px #ffffff, 0 0 0 2.5px #38bdf8;
             opacity: 1;
         }
 
@@ -937,9 +954,9 @@
 
         /* Bouton "+" intégré verticalement sous le dernier profil */
         .profile-add-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+            min-width: 26px;
+            height: 22px;
+            border-radius: 11px;
             background: #f8fafc;
             border: 1.5px solid #cbd5e1;
             color: #475569;
@@ -1020,9 +1037,10 @@
         .cran-pill {
             position: relative;
             z-index: 2;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+            min-width: 32px;
+            height: 22px;
+            padding: 0 4px;
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1043,7 +1061,8 @@
         }
 
         .cran-pill.active {
-            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0284c7;
+            border: 1.5px solid #0284c7;
+            box-shadow: 0 0 0 1.5px #ffffff, 0 0 0 2.5px #0284c7;
             z-index: 20;
             transform: none !important;
         }
@@ -1058,9 +1077,9 @@
             content: '';
             position: absolute;
             top: -2px;
-            right: -2px;
-            width: 7px;
-            height: 7px;
+            right: -1px;
+            width: 6px;
+            height: 6px;
             background: #2563eb;
             border: 1.5px solid #ffffff;
             border-radius: 50%;
@@ -1078,7 +1097,7 @@
             background: #0284c7;
             color: #ffffff;
             border: 1.5px solid #0284c7;
-            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0284c7;
+            box-shadow: 0 0 0 1.5px #ffffff, 0 0 0 2.5px #0284c7;
             transform: none !important;
         }
         .cran-pill.tier-draft.active:hover {
@@ -1202,43 +1221,57 @@
                 bottom: 54px !important;
                 transform: translateX(-50%) !important;
                 flex-direction: row !important;
-                max-width: calc(100vw - 16px) !important;
-                overflow-x: auto !important;
-                overflow-y: hidden !important;
-                padding: 4px 8px !important;
-                border-radius: 24px !important;
-                gap: 5px !important;
+                flex-wrap: nowrap !important;
+                white-space: nowrap !important;
+                width: max-content !important;
+                max-width: calc(100vw - 12px) !important;
+                overflow: visible !important;
+                overflow-x: visible !important;
+                overflow-y: visible !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+                padding: 3px 6px !important;
+                border-radius: 20px !important;
+                gap: 3px !important;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
                 z-index: 1101 !important;
                 opacity: 0.95 !important;
             }
 
+            .floating-quicknav::-webkit-scrollbar {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
+            }
+
             .quicknav-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 13px;
+                width: 26px !important;
+                height: 24px !important;
+                min-width: 26px !important;
+                font-size: 12px !important;
+                border-radius: 12px !important;
             }
 
             .quicknav-global-pill {
-                min-width: 32px;
-                height: 26px;
-                font-size: 11.5px;
-                border-radius: 13px;
-                padding: 0 4px;
+                min-width: 28px !important;
+                height: 22px !important;
+                font-size: 11px !important;
+                border-radius: 11px !important;
+                padding: 0 4px !important;
             }
 
             .quicknav-section-pill {
-                min-width: 30px;
-                height: 26px;
-                font-size: 10.5px;
-                border-radius: 13px;
-                padding: 0 4px;
+                min-width: 26px !important;
+                height: 22px !important;
+                font-size: 10.5px !important;
+                border-radius: 11px !important;
+                padding: 0 3px !important;
             }
 
             .quicknav-divider {
-                width: 1px;
-                height: 18px;
-                margin: 0 1px;
+                width: 1px !important;
+                height: 16px !important;
+                margin: 0 1px !important;
             }
 
             /* Info-bulles au-dessus sur Mobile */
@@ -1271,23 +1304,33 @@
                 justify-content: center !important;
                 width: auto !important;
                 min-width: 0 !important;
-                max-width: calc(100vw - 16px) !important;
-                height: 38px !important;
-                max-height: 38px !important;
+                max-width: calc(100vw - 12px) !important;
+                height: 40px !important;
+                min-height: 40px !important;
+                max-height: 40px !important;
                 padding: 4px 10px !important;
-                border-radius: 22px !important;
+                border-radius: 20px !important;
                 gap: 5px !important;
                 z-index: 1100 !important;
                 opacity: 0.95 !important;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18) !important;
-                overflow-x: auto !important;
-                overflow-y: hidden !important;
+                overflow: visible !important;
+                overflow-x: visible !important;
+                overflow-y: visible !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+            }
+
+            .floating-profile-dock::-webkit-scrollbar {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
             }
 
             .floating-profile-dock .profiles-section {
                 flex-direction: row !important;
                 width: auto !important;
-                gap: 5px !important;
+                gap: 4px !important;
             }
 
             .floating-profile-dock .profile-pill-slot {
@@ -1296,32 +1339,52 @@
             }
 
             .floating-profile-dock .profile-pill {
-                width: 28px !important;
-                height: 28px !important;
+                min-width: 28px !important;
+                width: auto !important;
+                height: 22px !important;
+                border-radius: 11px !important;
+                padding: 0 4px !important;
                 font-size: 11px !important;
             }
 
+            .floating-profile-dock .profile-pill.active {
+                border: 1.5px solid #38bdf8 !important;
+                box-shadow: 0 0 0 1.5px #ffffff, 0 0 0 2.5px #38bdf8 !important;
+            }
+
             .floating-profile-dock .profile-add-btn {
-                width: 26px !important;
-                height: 26px !important;
+                min-width: 24px !important;
+                width: auto !important;
+                height: 22px !important;
+                border-radius: 11px !important;
+                padding: 0 !important;
             }
 
             .floating-profile-dock .dock-divider {
                 width: 1px !important;
-                height: 18px !important;
-                margin: 0 4px !important;
+                height: 16px !important;
+                margin: 0 3px !important;
             }
 
             .floating-profile-dock .timeline-scroll-area {
                 flex-direction: row !important;
                 width: auto !important;
-                max-width: calc(100vw - 140px) !important;
+                max-width: calc(100vw - 120px) !important;
                 max-height: none !important;
                 height: 100% !important;
                 padding: 0 2px !important;
-                gap: 6px !important;
+                gap: 4px !important;
+                align-items: center !important;
                 overflow-x: auto !important;
                 overflow-y: hidden !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+            }
+
+            .floating-profile-dock .timeline-scroll-area::-webkit-scrollbar {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
             }
 
             .floating-profile-dock .vertical-stem-line {
@@ -1329,9 +1392,22 @@
             }
 
             .floating-profile-dock .cran-pill {
-                width: 28px !important;
-                height: 28px !important;
+                min-width: 28px !important;
+                width: auto !important;
+                height: 22px !important;
+                border-radius: 11px !important;
+                padding: 0 4px !important;
                 font-size: 11px !important;
+            }
+
+            .floating-profile-dock .cran-pill.active {
+                border: 1.5px solid #0284c7 !important;
+                box-shadow: 0 0 0 1.5px #ffffff, 0 0 0 2.5px #0284c7 !important;
+            }
+
+            .floating-profile-dock .cran-pill.tier-draft.active {
+                border: 1.5px solid #0284c7 !important;
+                box-shadow: 0 0 0 1.5px #ffffff, 0 0 0 2.5px #0284c7 !important;
             }
 
             .floating-profile-dock .profile-pill[data-tooltip]::before,
@@ -1689,7 +1765,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.08.dock_v7";
+        const APP_BUILD_VERSION = "2026.09.08.dock_v8";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
