@@ -670,13 +670,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: clamp(2px, 1.1vh, 6px);
+            gap: clamp(3px, 1.1vh, 6px);
             background: rgba(255, 255, 255, 0.94);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid #cbd5e1;
-            border-radius: clamp(16px, 4.5vh, 28px);
-            padding: clamp(3px, 1.3vh, 8px) clamp(3px, 0.9vh, 6px);
+            border-radius: clamp(18px, 4.8vh, 30px);
+            padding: clamp(6px, 1.5vh, 12px) clamp(5px, 1.2vh, 10px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             max-height: 94vh;
             overflow: visible;
@@ -859,13 +859,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: clamp(2px, 1.1vh, 6px);
+            gap: clamp(3px, 1.1vh, 6px);
             background: rgba(255, 255, 255, 0.94);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid #cbd5e1;
-            border-radius: clamp(16px, 4.5vh, 28px);
-            padding: clamp(3px, 1.3vh, 8px) clamp(3px, 0.9vh, 6px);
+            border-radius: clamp(18px, 4.8vh, 30px);
+            padding: clamp(6px, 1.5vh, 12px) clamp(5px, 1.2vh, 10px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             max-height: 94vh;
             overflow: visible;
@@ -893,7 +893,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: clamp(2px, 1.1vh, 6px);
+            gap: clamp(3px, 1.1vh, 6px);
             position: relative;
             width: 100%;
         }
@@ -907,14 +907,13 @@
         }
 
         .profile-pill {
-            min-width: clamp(22px, 6.8vh, 38px);
-            height: clamp(18px, 6.2vh, 34px);
-            padding: 0 clamp(2px, 1vh, 6px);
-            border-radius: clamp(10px, 3.1vh, 17px);
+            width: clamp(20px, 6.8vh, 36px);
+            height: clamp(20px, 6.8vh, 36px);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(9px, 2.5vh, 14px);
+            font-size: clamp(10px, 3vh, 15px);
             font-weight: 800;
             cursor: pointer;
             transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
@@ -923,6 +922,7 @@
             user-select: none;
             box-sizing: border-box;
             flex-shrink: 0;
+            padding: 0;
         }
 
         .profile-pill.active {
@@ -952,10 +952,9 @@
 
         /* Bouton "+" intégré verticalement sous le dernier profil */
         .profile-add-btn {
-            min-width: clamp(20px, 6.2vh, 34px);
-            height: clamp(18px, 6.2vh, 34px);
-            padding: 0 clamp(2px, 1vh, 6px);
-            border-radius: clamp(10px, 3.1vh, 17px);
+            width: clamp(18px, 6.2vh, 32px);
+            height: clamp(18px, 6.2vh, 32px);
+            border-radius: 50%;
             background: #f8fafc;
             border: 1.5px solid #cbd5e1;
             color: #475569;
@@ -971,6 +970,7 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
             margin: 0;
             line-height: 0;
+            padding: 0;
         }
 
         .profile-add-btn svg {
@@ -1008,8 +1008,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: clamp(2px, 1.1vh, 6px);
-            padding: 2px 0;
+            gap: clamp(3px, 1.1vh, 6px);
+            padding: 4px 2px 8px 2px;
             scrollbar-width: none;
             box-sizing: border-box;
         }
@@ -1337,12 +1337,12 @@
             }
 
             .floating-profile-dock .profile-pill {
-                min-width: 28px !important;
-                width: auto !important;
-                height: 22px !important;
-                border-radius: 11px !important;
-                padding: 0 4px !important;
-                font-size: 11px !important;
+                width: 24px !important;
+                min-width: 24px !important;
+                height: 24px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                font-size: 11.5px !important;
             }
 
             .floating-profile-dock .profile-pill.active {
@@ -1351,10 +1351,10 @@
             }
 
             .floating-profile-dock .profile-add-btn {
-                min-width: 24px !important;
-                width: auto !important;
+                width: 22px !important;
+                min-width: 22px !important;
                 height: 22px !important;
-                border-radius: 11px !important;
+                border-radius: 50% !important;
                 padding: 0 !important;
             }
 
@@ -1763,7 +1763,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.08.dock_v10";
+        const APP_BUILD_VERSION = "2026.09.08.dock_v11";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
