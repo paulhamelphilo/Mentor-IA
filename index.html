@@ -1763,7 +1763,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.08.dock_v13";
+        const APP_BUILD_VERSION = "2026.09.08.dock_v14";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
@@ -4555,8 +4555,8 @@
                         const activeCran = (entry.crans || []).find(c => c.id === entry.activeCranId);
                         if (!activeCran || activeCran.draft !== val) {
                             entry.draftParentId = entry.activeCranId; // Filiation mémorisée
+                            entry.activeCranId = 'draft';             // Bascule sur le brouillon
                             entry.workingDraft = val;
-                            entry.hideDraftCorrection = false;
                         } else {
                             entry.workingDraft = val;
                         }
@@ -5900,6 +5900,8 @@
 
             if (hasDisplayedCorrection) {
                 // 1er clic : Efface l'affichage de la correction tout en conservant le texte rédigé
+                entry.activeCranId = 'draft';
+                entry.draftParentId = null;
                 entry.workingDraft = stored.draft || defaultTpl;
                 entry.hideDraftCorrection = true;
                 entry.updatedAt = Date.now();
@@ -5909,6 +5911,8 @@
                 if (textarea) {
                     textarea.value = defaultTpl;
                 }
+                entry.activeCranId = 'draft';
+                entry.draftParentId = null;
                 entry.workingDraft = defaultTpl;
                 entry.hideDraftCorrection = true;
                 entry.updatedAt = Date.now();
@@ -6346,10 +6350,8 @@
             const normStoredSub = storedCorrection.correction && storedCorrection.correction.sujet ? getSubjectStorageKey(state.exerciseType, state.mode, storedCorrection.correction.sujet) : currentSubKey;
             const savedCorrectionObj = (storedCorrection.correction && storedCorrection.correction.html && sujetActif !== '' && normStoredSub === currentSubKey) ? storedCorrection.correction : null;
 
-            let pistesPrecedentes = {};
-            if (savedCorrectionObj) {
-                pistesPrecedentes = extrairePistesParBalise(savedCorrectionObj.html, savedCorrectionObj.scores);
-            }
+            // Évaluation souveraine et équitable : chaque copie est évaluée en soi, de manière anonyme et absolue.
+            // On ne transmet aucun historique de notation au serveur pour garantir qu'à saisie identique, la note soit identique.
 
             // Visuel de chargement
             const btnSubmit = document.querySelector(".btn-submit");
@@ -6369,8 +6371,7 @@
                     sujet,
                     type: state.mode === 'argumentation' ? 'argumentation' : state.exerciseType,
                     mode: state.mode,
-                    texte: trainingText,
-                    pistesPrecedentes
+                    texte: trainingText
                 };
                 if (state.exerciseType === 'explication' && state.mode !== 'argumentation') {
                     body.selectedTextTitle = selectedTextTitle;
