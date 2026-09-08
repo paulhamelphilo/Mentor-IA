@@ -1088,14 +1088,14 @@
 
 
 
-        /* Mode Mobile (<= 768px) : Dock horizontal fixé en bas et adaptation anti-débordement */
+        /* Mode Mobile (<= 768px) : Docks horizontaux fixés en bas et adaptation anti-débordement */
         @media (max-width: 768px) {
             body {
-                padding: 10px 8px 85px 8px !important;
+                padding: 10px 8px 115px 8px !important;
             }
 
             #correction-box {
-                margin-bottom: 75px !important;
+                margin-bottom: 105px !important;
             }
 
             .container {
@@ -1194,48 +1194,50 @@
                 min-width: 0 !important;
             }
 
-            /* Dock inférieur flottant */
+            /* Dock supérieur flottant (Pastilles d'évaluation) : au-dessus du dock profils */
             .floating-quicknav {
-                right: auto;
-                left: 50%;
-                top: auto;
-                bottom: 10px;
-                transform: translateX(-50%);
-                flex-direction: row;
-                max-width: calc(100vw - 16px);
-                overflow-x: auto;
-                overflow-y: hidden;
-                padding: 5px 8px;
-                border-radius: 24px;
-                gap: 5px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                right: auto !important;
+                left: 50% !important;
+                top: auto !important;
+                bottom: 54px !important;
+                transform: translateX(-50%) !important;
+                flex-direction: row !important;
+                max-width: calc(100vw - 16px) !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                padding: 4px 8px !important;
+                border-radius: 24px !important;
+                gap: 5px !important;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+                z-index: 1101 !important;
+                opacity: 0.95 !important;
             }
 
             .quicknav-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
+                width: 30px;
+                height: 30px;
+                font-size: 13px;
             }
 
             .quicknav-global-pill {
-                min-width: 34px;
-                height: 28px;
-                font-size: 12px;
-                border-radius: 14px;
+                min-width: 32px;
+                height: 26px;
+                font-size: 11.5px;
+                border-radius: 13px;
                 padding: 0 4px;
             }
 
             .quicknav-section-pill {
-                min-width: 32px;
-                height: 28px;
-                font-size: 11px;
-                border-radius: 14px;
+                min-width: 30px;
+                height: 26px;
+                font-size: 10.5px;
+                border-radius: 13px;
                 padding: 0 4px;
             }
 
             .quicknav-divider {
                 width: 1px;
-                height: 20px;
+                height: 18px;
                 margin: 0 1px;
             }
 
@@ -1257,37 +1259,90 @@
                 transform: translateX(-50%) translateY(-4px);
             }
 
-            /* Dock profil & crans sur mobile */
+            /* Dock profil & historique cranté sur mobile : Horizontal, centré, SOUS la barre d'évaluation */
             .floating-profile-dock {
-                left: 4px;
-                top: 60px;
-                transform: none;
-                padding: 6px 2px;
-                max-height: 55vh;
-                z-index: 1050;
-                width: 36px;
-                min-width: 36px;
+                left: 50% !important;
+                right: auto !important;
+                bottom: 10px !important;
+                top: auto !important;
+                transform: translateX(-50%) !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: auto !important;
+                min-width: 0 !important;
+                max-width: calc(100vw - 16px) !important;
+                height: 38px !important;
+                max-height: 38px !important;
+                padding: 4px 10px !important;
+                border-radius: 22px !important;
+                gap: 5px !important;
+                z-index: 1100 !important;
+                opacity: 0.95 !important;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18) !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
             }
-            .profile-pill, .cran-pill {
-                width: 26px;
-                height: 26px;
-                font-size: 9.5px;
+
+            .floating-profile-dock .profiles-section {
+                flex-direction: row !important;
+                width: auto !important;
+                gap: 5px !important;
             }
-            .profile-add-btn {
-                width: 22px;
-                height: 22px;
-                font-size: 12px;
+
+            .floating-profile-dock .profile-pill-slot {
+                width: auto !important;
+                height: auto !important;
             }
-            .timeline-scroll-area {
-                max-height: 160px;
-                overflow-x: hidden !important;
+
+            .floating-profile-dock .profile-pill {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 11px !important;
             }
-            .profile-pill[data-tooltip]::before,
-            .profile-add-btn[data-tooltip]::before,
-            .cran-pill[data-tooltip]::before {
-                left: calc(100% + 4px);
-                font-size: 10px;
-                padding: 3px 6px;
+
+            .floating-profile-dock .profile-add-btn {
+                width: 26px !important;
+                height: 26px !important;
+            }
+
+            .floating-profile-dock .dock-divider {
+                width: 1px !important;
+                height: 18px !important;
+                margin: 0 4px !important;
+            }
+
+            .floating-profile-dock .timeline-scroll-area {
+                flex-direction: row !important;
+                width: auto !important;
+                max-width: calc(100vw - 140px) !important;
+                max-height: none !important;
+                height: 100% !important;
+                padding: 0 2px !important;
+                gap: 6px !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+            }
+
+            .floating-profile-dock .vertical-stem-line {
+                display: none !important;
+            }
+
+            .floating-profile-dock .cran-pill {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 11px !important;
+            }
+
+            .floating-profile-dock .profile-pill[data-tooltip]::before,
+            .floating-profile-dock .profile-add-btn[data-tooltip]::before,
+            .floating-profile-dock .cran-pill[data-tooltip]::before {
+                left: 50% !important;
+                top: auto !important;
+                bottom: 125% !important;
+                transform: translateX(-50%) !important;
+                font-size: 10px !important;
+                padding: 3px 6px !important;
             }
         }
 
@@ -1634,7 +1689,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.07.dock_v6";
+        const APP_BUILD_VERSION = "2026.09.08.dock_v7";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
@@ -4303,25 +4358,42 @@
 
             const crans = Array.isArray(entry.crans) ? entry.crans : [];
 
-            // Si un cran spécifique est sélectionné (instantané historique)
+            let latestCranId = null;
+            if (crans.length > 0) {
+                let maxTs = -1;
+                crans.forEach(c => {
+                    const ts = c.timestamp || 0;
+                    if (ts >= maxTs) {
+                        maxTs = ts;
+                        latestCranId = c.id;
+                    }
+                });
+            }
+
+            // Si un cran spécifique est sélectionné
             if (typeof entry.activeCranId === 'number') {
                 const cran = crans.find(c => c.id === entry.activeCranId);
                 if (cran) {
+                    let draftText = (typeof cran.draft === 'string') ? cran.draft : defaultTpl;
+                    // Si on consulte la dernière saisie, son texte reflète les modifications en cours
+                    if (cran.id === latestCranId && typeof entry.workingDraft === 'string' && entry.workingDraft.trim() !== '') {
+                        draftText = entry.workingDraft;
+                    }
+
                     return {
-                        draft: (typeof cran.draft === 'string') ? cran.draft : defaultTpl,
-                        correction: cran.correction || null,
+                        draft: draftText,
+                        correction: entry.hideDraftCorrection ? null : (cran.correction || null),
                         activeCranId: cran.id,
                         crans: crans
                     };
                 }
             }
 
-            // Sinon l'élève est sur le Brouillon [ ✏️ ]
+            // Sinon (saisie la plus récente ou travail initial avant 1re évaluation)
             let draftText = (typeof entry.workingDraft === 'string' && entry.workingDraft.trim() !== '')
                 ? entry.workingDraft
                 : defaultTpl;
 
-            // Référence de correction pour guider la rédaction du brouillon (si non masquée)
             let refCorrection = null;
             if (!entry.hideDraftCorrection) {
                 if (entry.draftParentId) {
@@ -4335,7 +4407,7 @@
             return {
                 draft: draftText,
                 correction: refCorrection,
-                activeCranId: 'draft',
+                activeCranId: latestCranId || 'draft',
                 crans: crans
             };
         }
@@ -4407,13 +4479,12 @@
                     const entry = prof.subjectsData[lastRenderedSubjectKey];
                     if (typeof entry.activeCranId === 'number') {
                         const activeCran = (entry.crans || []).find(c => c.id === entry.activeCranId);
-                        // Si le texte est modifié par rapport à l'instantané du cran
                         if (!activeCran || activeCran.draft !== val) {
                             entry.draftParentId = entry.activeCranId; // Filiation mémorisée
-                            entry.activeCranId = 'draft';             // Bascule sur le brouillon
                             entry.workingDraft = val;
                             entry.hideDraftCorrection = false;
-                            updateFloatingProfileDock();
+                        } else {
+                            entry.workingDraft = val;
                         }
                     } else {
                         entry.workingDraft = val;
@@ -4579,10 +4650,6 @@
                 prof.subjectsData[currentSubjectKey] = entry;
             }
 
-            const textarea = document.getElementById("training-textarea");
-            if (entry.activeCranId === 'draft' && textarea) {
-                entry.workingDraft = textarea.value;
-            }
 
             entry.activeCranId = cranId;
             if (typeof cranId === 'number') {
@@ -4658,9 +4725,10 @@
             }
             profilesHtml += '</div>';
 
-            let dividerHtml = '<div class="dock-divider"></div>';
+            let dividerHtml = '';
+            let timelineHtml = '';
 
-            // Section historique cranté
+            // Section historique cranté (affichée uniquement s'il y a des saisies enregistrées)
             const sujetActif = obtenirSujetActif();
             const currentSubjectKey = getSubjectStorageKey(state.exerciseType, state.mode, sujetActif);
             const entry = prof.subjectsData[currentSubjectKey] || { activeCranId: 'draft', crans: [] };
@@ -4677,33 +4745,29 @@
                         latestCranId = c.id;
                     }
                 });
+
+                dividerHtml = '<div class="dock-divider"></div>';
+                timelineHtml = '<div class="timeline-scroll-area" id="timeline-area">';
+                timelineHtml += '<div class="vertical-stem-line"></div>';
+
+                // Crans (ordonnés du plus récent au plus ancien, avec intercalation sur parent)
+                crans.forEach(c => {
+                    const isCranActive = (activeCranId === c.id) || (activeCranId === 'draft' && (entry.draftParentId === c.id || (!entry.draftParentId && c.id === latestCranId)));
+                    const isLatest = c.id === latestCranId;
+                    const score = typeof c.score === 'number' ? c.score : 0;
+                    const colorClass = getScoreColorClass(score).pill;
+                    let cranClass = `cran-pill ${colorClass}`;
+                    if (isCranActive) cranClass += ' active';
+                    if (isLatest) cranClass += ' is-latest';
+
+                    const label = typeof c.score === 'number' ? c.score : '?';
+                    const title = `Saisie ${c.id}${isLatest ? ' (Dernière)' : ''} : ${score}/100 (${c.timeLabel || ''}) — Clic droit pour supprimer`;
+
+                    timelineHtml += `<div class="${cranClass}" title="${title}" onclick="selectCran(${c.id})" oncontextmenu="event.preventDefault(); deleteCran(${c.id});">${label}</div>`;
+                });
+
+                timelineHtml += '</div>';
             }
-
-            let timelineHtml = '<div class="timeline-scroll-area" id="timeline-area">';
-            timelineHtml += '<div class="vertical-stem-line"></div>';
-
-            // 1. Sommet : Brouillon en cours de rédaction
-            const isDraftActive = activeCranId === 'draft';
-            const draftClass = isDraftActive ? 'cran-pill tier-draft active' : 'cran-pill tier-draft';
-            timelineHtml += `<div class="${draftClass}" title="✏️ Brouillon en cours de rédaction" onclick="selectCran('draft')">✏️</div>`;
-
-            // 2. Crans (ordonnés du plus récent au plus ancien, avec intercalation sur parent)
-            crans.forEach(c => {
-                const isCranActive = activeCranId === c.id;
-                const isLatest = c.id === latestCranId;
-                const score = typeof c.score === 'number' ? c.score : 0;
-                const colorClass = getScoreColorClass(score).pill;
-                let cranClass = `cran-pill ${colorClass}`;
-                if (isCranActive) cranClass += ' active';
-                if (isLatest) cranClass += ' is-latest';
-
-                const label = typeof c.score === 'number' ? c.score : '?';
-                const title = `Saisie ${c.id}${isLatest ? ' (Dernière)' : ''} : ${score}/100 (${c.timeLabel || ''}) — Clic droit pour supprimer`;
-
-                timelineHtml += `<div class="${cranClass}" title="${title}" onclick="selectCran(${c.id})" oncontextmenu="event.preventDefault(); deleteCran(${c.id});">${label}</div>`;
-            });
-
-            timelineHtml += '</div>';
 
             dock.innerHTML = profilesHtml + dividerHtml + timelineHtml;
         }
@@ -5762,9 +5826,7 @@
 
             if (hasDisplayedCorrection) {
                 // 1er clic : Efface l'affichage de la correction tout en conservant le texte rédigé
-                entry.activeCranId = 'draft';
                 entry.workingDraft = stored.draft || defaultTpl;
-                entry.draftParentId = null;
                 entry.hideDraftCorrection = true;
                 entry.updatedAt = Date.now();
             } else {
@@ -5773,9 +5835,7 @@
                 if (textarea) {
                     textarea.value = defaultTpl;
                 }
-                entry.activeCranId = 'draft';
                 entry.workingDraft = defaultTpl;
-                entry.draftParentId = null;
                 entry.hideDraftCorrection = true;
                 entry.updatedAt = Date.now();
             }
