@@ -5958,6 +5958,14 @@
         }
 
         function preserveAndCount(textarea) {
+            if (textarea && typeof textarea.value === 'string' && !textarea.value.startsWith("    ")) {
+                const oldStart = textarea.selectionStart;
+                const oldEnd = textarea.selectionEnd;
+                const stripped = textarea.value.replace(/^\s*/, '');
+                textarea.value = "    " + stripped;
+                textarea.selectionStart = Math.max(4, oldStart + 4);
+                textarea.selectionEnd = Math.max(4, oldEnd + 4);
+            }
             saveCurrentDraftToLastRenderedSubject();
             updateCharCount(textarea);
         }
@@ -5988,6 +5996,15 @@
                 return;
             }
 
+            // Si une sélection incluant le tout début du texte est effacée (ex: Ctrl+A + Backspace/Delete),
+            // on conserve toujours le premier alinéa de 4 espaces quoi qu'il arrive
+            if ((e.key === 'Backspace' || e.key === 'Delete') && textarea.selectionStart === 0 && textarea.selectionEnd > 0) {
+                e.preventDefault();
+                textarea.setRangeText(INDENT, 0, textarea.selectionEnd, 'end');
+                preserveAndCount(textarea);
+                return;
+            }
+
             if (e.key === 'Backspace') {
                 const start = textarea.selectionStart;
                 const end = textarea.selectionEnd;
@@ -6006,16 +6023,16 @@
                 const leadingSpacesCount = leadingMatch ? leadingMatch[0].length : 0;
 
                 // Si le curseur se trouve dans la zone d'alinéa en début de ligne
-                if (leadingSpacesCount > 0 && start <= lineStart + leadingSpacesCount) {
+                if (start <= lineStart + leadingSpacesCount) {
                     e.preventDefault();
                     if (lineStart > 0) {
-                        // Supprime le saut de ligne précédent et l'alinéa pour revenir à la ligne du dessus
+                        // Lignes 2 et suivantes : supprime le saut de ligne précédent et l'alinéa pour revenir à la ligne du dessus
                         textarea.setRangeText('', lineStart - 1, lineStart + leadingSpacesCount, 'end');
+                        preserveAndCount(textarea);
                     } else {
-                        // Début de la première ligne : supprime l'alinéa initial
-                        textarea.setRangeText('', 0, leadingSpacesCount, 'end');
+                        // Première ligne : l'alinéa initial reste quoi qu'il arrive
+                        textarea.selectionStart = textarea.selectionEnd = leadingSpacesCount;
                     }
-                    preserveAndCount(textarea);
                     return;
                 }
             }
@@ -6023,6 +6040,18 @@
             if (e.key === 'Delete') {
                 const start = textarea.selectionStart;
                 const end = textarea.selectionEnd;
+
+                // Empêche la touche Suppr d'effacer les espaces du premier alinéa si le curseur est placé avant
+                if (start === end && start < 4 && !textarea.value.substring(0, start).includes('\n')) {
+                    const lineEnd = textarea.value.indexOf('\n');
+                    const firstLine = lineEnd === -1 ? textarea.value : textarea.value.substring(0, lineEnd);
+                    const lead = firstLine.match(/^\s+/);
+                    if (lead && start < lead[0].length) {
+                        e.preventDefault();
+                        textarea.selectionStart = textarea.selectionEnd = lead[0].length;
+                        return;
+                    }
+                }
 
                 if (start === end && start < textarea.value.length && textarea.value[start] === '\n') {
                     const nextLine = textarea.value.substring(start + 1);
