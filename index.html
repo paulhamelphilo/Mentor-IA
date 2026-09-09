@@ -4468,6 +4468,13 @@
                 ? entry.workingDraft
                 : defaultTpl;
 
+            // Si le brouillon en mémoire ne contient que des balises sans aucune rédaction d'élève et sans cran,
+            // on actualise automatiquement avec le nouveau gabarit indenté
+            if (crans.length === 0 && draftText.replace(/\[[^\]]+\]/g, '').trim() === '') {
+                draftText = defaultTpl;
+                entry.workingDraft = defaultTpl;
+            }
+
             let refCorrection = null;
             if (!entry.hideDraftCorrection) {
                 if (entry.draftParentId) {
