@@ -1763,14 +1763,15 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.10.sovereign_eval_v15";
+        const APP_BUILD_VERSION = "2026.09.10.auto_refresh_v16";
 
-        // Détection et actualisation automatique anti-cache
-        (function checkAppUpdate() {
+        // Détection et actualisation automatique transparente anti-cache
+        function checkAppUpdate(force = false) {
             try {
                 const lastCheck = sessionStorage.getItem('mentor_last_version_check');
                 const now = Date.now();
-                if (lastCheck && now - Number(lastCheck) < 60000) return;
+                // Garde-fou : vérification légère et asynchrone au maximum une fois par minute
+                if (!force && lastCheck && now - Number(lastCheck) < 60000) return;
                 sessionStorage.setItem('mentor_last_version_check', String(now));
 
                 fetch(window.location.href.split('#')[0].split('?')[0] + '?_nocache=' + now, {
@@ -1781,13 +1782,38 @@
                 .then(html => {
                     const match = html.match(/const\s+APP_BUILD_VERSION\s*=\s*["']([^"']+)["']/);
                     if (match && match[1] && match[1] !== APP_BUILD_VERSION) {
-                        console.log("Nouvelle version Mentor IA disponible (" + match[1] + "). Rechargement...");
+                        console.log("Nouvelle version Mentor IA disponible (" + match[1] + "). Actualisation transparente...");
+                        // Sauvegarde de sécurité absolue du brouillon avant tout rechargement
+                        if (typeof saveCurrentDraftToLastRenderedSubject === 'function') {
+                            saveCurrentDraftToLastRenderedSubject();
+                        }
+                        if (typeof persistStorageData === 'function') {
+                            persistStorageData();
+                        }
                         window.location.reload(true);
                     }
                 })
                 .catch(() => {});
             } catch (e) {}
-        })();
+        }
+
+        // 1. Contrôle immédiat au chargement
+        checkAppUpdate();
+
+        // 2. Contrôle automatique au réveil du PC ou au retour sur l'onglet
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                checkAppUpdate();
+            }
+        });
+        window.addEventListener('focus', () => {
+            checkAppUpdate();
+        });
+
+        // 3. Contrôle périodique silencieux toutes les 10 minutes en arrière-plan
+        setInterval(() => {
+            checkAppUpdate();
+        }, 600000);
 
         const CLOUD_FUNCTION_URL = "https://correction-philo-658321418385.europe-west1.run.app";
 
