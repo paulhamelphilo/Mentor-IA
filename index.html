@@ -1763,7 +1763,7 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.08.dock_v14";
+        const APP_BUILD_VERSION = "2026.09.10.sovereign_eval_v15";
 
         // Détection et actualisation automatique anti-cache
         (function checkAppUpdate() {
@@ -5056,28 +5056,11 @@
                 if (extractedScore !== null && !isNaN(extractedScore)) {
                     let finalScore = extractedScore;
 
-                    // Robustesse : vérification d'invariance de saisie pour verrouiller la note
+                    // Recherche de la note précédente pour calculer l'indicateur d'évolution (évaluation 100% souveraine sans verrouillage)
                     const normSection = sectionName.toUpperCase().replace(/[’'`]/g, "'").replace(/\s+/g, ' ');
-                    const currentContent = (currentDraftBySection && typeof currentDraftBySection === 'object') ? currentDraftBySection[normSection] : null;
-                    const prevContent = (previousCorrectionObj && previousCorrectionObj.draftBySection) ? previousCorrectionObj.draftBySection[normSection] : null;
-
-                    const isUnchanged = (
-                        typeof currentContent === 'string' &&
-                        typeof prevContent === 'string' &&
-                        currentContent.length >= 3 &&
-                        currentContent.trim() === prevContent.trim()
-                    );
-
                     const prevScoreObj = (previousCorrectionObj && Array.isArray(previousCorrectionObj.scores))
                         ? previousCorrectionObj.scores.find(s => s && s.name && s.name.toUpperCase().replace(/[’'`]/g, "'").replace(/\s+/g, ' ') === normSection)
                         : null;
-
-                    if (isUnchanged && prevScoreObj) {
-                        const lockedVal = typeof prevScoreObj.score === 'number' ? prevScoreObj.score : prevScoreObj.avg;
-                        if (typeof lockedVal === 'number') {
-                            finalScore = lockedVal;
-                        }
-                    }
 
                     // Calcul de l'indicateur d'évolution pour cette section
                     let sectionDeltaHtml = '';
