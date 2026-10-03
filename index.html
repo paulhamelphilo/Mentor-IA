@@ -1763,7 +1763,15 @@
     </div>
 
     <script>
-        const APP_BUILD_VERSION = "2026.09.10.auto_refresh_v16";
+        const APP_BUILD_VERSION = "2026.10.03.securisation_migration_firebase_v17";
+
+        // Nettoyage esthétique immédiat et transparent de l'URL dans la barre d'adresse
+        try {
+            if (window.location.search && (window.location.search.includes('v=') || window.location.search.includes('_nocache='))) {
+                const cleanUrl = window.location.pathname + (window.location.hash || '');
+                window.history.replaceState({}, document.title, cleanUrl);
+            }
+        } catch (_) {}
 
         // Détection et actualisation automatique transparente anti-cache
         function checkAppUpdate(force = false) {

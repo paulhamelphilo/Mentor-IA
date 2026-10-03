@@ -1,5 +1,26 @@
-﻿*.env
+# Dépendances et builds
+node_modules/
+.firebase/
+public/
+
+# Sauvegardes et versions locales
+Backups_Versions/
+Copies/
+*.bak
+
+# Fichiers de configuration et secrets
+*.env
+.env*
 env.yaml
 *keys*
-node_modules/
+api_keys.env
+
+# Données internes et bancs de test
+GCloud/
+scratch/
+Test Mentor/
+GEMINI.md
+copies_calibrees.json
+*.json
 .DS_Store
+Thumbs.db
